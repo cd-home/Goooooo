@@ -30,10 +30,10 @@ func NewEmptyFileLogger(cfg *FileLogConfig) *Logger {
 		return level >= zapcore.DebugLevel
 	})
 	logger := &Logger{
-		enabled:      true,
-		highPriority: highPriority,
-		lowPriority:  lowPriority,
-		cfg: cfg,
+		enabled: true,
+		high:    highPriority,
+		low:     lowPriority,
+		cfg:     cfg,
 	}
 	// Default Open
 	logger.WithOptions(WithEnable(true))
