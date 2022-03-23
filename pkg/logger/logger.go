@@ -1,111 +1,67 @@
 package logger
 
 import (
+	"os"
+	"time"
+
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-type Logger struct {
-	enabled bool
-	Log     *zap.Logger
-	cfg     *FileLogConfig
-	high    zap.LevelEnablerFunc
-	low     zap.LevelEnablerFunc
+type FileLogConfig struct {
+	Debug       bool   `json:"debug"`
+	FilePath    string `json:"filePath"`
+	FileMaxSize int    `json:"fileMaxSize"`
+	FileMaxAge  int    `json:"fileMaxAge"`
+	MaxBackups  int    `json:"maxBackups"`
+	Compress    bool   `json:"compress"`
 }
 
-func (s *Logger) WithOptions(opts ...option) *Logger {
-	c := s.clone()
-	for _, opt := range opts {
-		opt.apply(c)
+func FileLogHook(cfg *FileLogConfig) *lumberjack.Logger {
+	hook := &lumberjack.Logger{
+		Filename:   cfg.FilePath,
+		MaxSize:    cfg.FileMaxSize,
+		MaxAge:     cfg.FileMaxAge,
+		MaxBackups: cfg.MaxBackups,
+		Compress:   cfg.Compress,
 	}
-	return c
+	return hook
 }
 
-func WithEnable(enabled bool) option {
-	return optionFunc(func(s *Logger) {
-		s.enabled = enabled
+// Load Config
+func NewProductionEncoderConfig() zapcore.EncoderConfig {
+	EncoderConfig := zap.NewProductionEncoderConfig()
+	EncoderConfig.TimeKey = "time"
+	EncoderConfig.EncodeTime = func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
+		enc.AppendString(t.Local().Format("2006-01-02 15:04:05"))
+	}
+	return EncoderConfig
+}
+
+func New(cfg *FileLogConfig) *zap.Logger {
+
+	highPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
+		return lvl >= zapcore.InfoLevel
 	})
-}
 
-func (s *Logger) clone() *Logger {
-	copy := *s
-	return &copy
-}
+	lowPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
+		return lvl >= zapcore.DebugLevel
+	})
 
-// Build zap.Logger
-func (log *Logger) Build() *Logger {
-	consoleEncoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
-	fileWriter := zapcore.AddSync(FileLogHook(log.cfg))
-	var priority zap.LevelEnablerFunc
-	if log.cfg.Level == DebugLevel {
-		priority = log.low
+	var cores []zapcore.Core
+
+	if cfg.Debug {
+		// Development
+		consoleEncoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
+		consoleDebugging := zapcore.Lock(os.Stdout)
+		cores = append(cores, zapcore.NewCore(consoleEncoder, consoleDebugging, lowPriority))
 	} else {
-		priority = log.high
+		// Production
+		fileEncoder := zapcore.NewJSONEncoder(NewProductionEncoderConfig())
+		writerHook := zapcore.AddSync(FileLogHook(cfg))
+		cores = append(cores, zapcore.NewCore(fileEncoder, writerHook, highPriority))
 	}
-	core := zapcore.NewTee(zapcore.NewCore(consoleEncoder, fileWriter, priority))
-	log.Log = zap.New(core).WithOptions(zap.AddCaller())
-	return log
-}
 
-func (log *Logger) Info(msg string, fields ...zap.Field) {
-	if !log.enabled {
-		return
-	}
-	if ce := log.Log.Check(zap.InfoLevel, msg); ce != nil {
-		ce.Write(fields...)
-	}
-}
-
-func (log *Logger) Debug(msg string, fields ...zap.Field) {
-	if !log.enabled {
-		return
-	}
-	if ce := log.Log.Check(zap.DebugLevel, msg); ce != nil {
-		ce.Write(fields...)
-	}
-}
-
-func (log *Logger) Warn(msg string, fields ...zap.Field) {
-	if !log.enabled {
-		return
-	}
-	if ce := log.Log.Check(zap.WarnLevel, msg); ce != nil {
-		ce.Write(fields...)
-	}
-}
-
-func (log *Logger) Error(msg string, fields ...zap.Field) {
-	if !log.enabled {
-		return
-	}
-	if ce := log.Log.Check(zap.ErrorLevel, msg); ce != nil {
-		ce.Write(fields...)
-	}
-}
-
-func (log *Logger) DPanic(msg string, fields ...zap.Field) {
-	if !log.enabled {
-		return
-	}
-	if ce := log.Log.Check(zap.DPanicLevel, msg); ce != nil {
-		ce.Write(fields...)
-	}
-}
-
-func (log *Logger) Panic(msg string, fields ...zap.Field) {
-	if !log.enabled {
-		return
-	}
-	if ce := log.Log.Check(zap.PanicLevel, msg); ce != nil {
-		ce.Write(fields...)
-	}
-}
-
-func (log *Logger) Fatal(msg string, fields ...zap.Field) {
-	if !log.enabled {
-		return
-	}
-	if ce := log.Log.Check(zap.FatalLevel, msg); ce != nil {
-		ce.Write(fields...)
-	}
+	return zap.New(zapcore.NewTee(cores...)).WithOptions(zap.AddCaller())
 }
