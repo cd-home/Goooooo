@@ -34,7 +34,6 @@ func NewViper(mode string, configPaths ...string) *viper.Viper {
 		vp.SetConfigName(mode)
 		vp.SetConfigType(_DefaultConfigType)
 		_configPaths := defaultConfigPath(configPaths...)
-		fmt.Println(_configPaths)
 		for _, path := range _configPaths {
 			vp.AddConfigPath(path)
 		}
