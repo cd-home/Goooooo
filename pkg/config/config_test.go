@@ -14,6 +14,7 @@ func TestNewViper(t *testing.T) {
 	}{
 		{
 			Mode: "dev",
+			Path: []string{"./testdata"},
 		},
 		{
 			Mode: "prod",
@@ -21,7 +22,7 @@ func TestNewViper(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.Mode, func(t *testing.T) {
-			vp := NewViper(tt.Mode)
+			vp := NewViper(tt.Mode, tt.Path...)
 			if tt.Mode == "dev" {
 				t.Log(vp.GetString("APP.SECRET"))
 			} else {

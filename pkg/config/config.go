@@ -22,7 +22,7 @@ const (
 
 func defaultConfigPath(configPaths ...string) []string {
 	if len(configPaths) == 0 {
-		return []string{".", "./configs", "../configs", "./testdata"}
+		return []string{".", "./configs", "../configs"}
 	}
 	return configPaths
 }
