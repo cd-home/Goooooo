@@ -47,7 +47,8 @@ func New(cfg *FileLogConfig) *zap.Logger {
 	lowPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
 		return lvl >= zapcore.DebugLevel
 	})
-
+	
+	// cores: Maybe Add Kafka Log Hook, cores shuold be slice
 	var cores []zapcore.Core
 
 	if cfg.Debug {
@@ -62,6 +63,5 @@ func New(cfg *FileLogConfig) *zap.Logger {
 		cores = append(cores, zapcore.NewCore(fileEncoder, writerHook, highPriority))
 	}
 
-	// cores: Maybe Add Kafka Log Hook
 	return zap.New(zapcore.NewTee(cores...)).WithOptions(zap.AddCaller())
 }
