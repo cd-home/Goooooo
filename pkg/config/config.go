@@ -9,7 +9,7 @@ import (
 const (
 	_Development      = "development"
 	_Testing          = "testing"
-	_PRODUCTION       = "production"
+	_Production       = "production"
 	_ShortDevelopment = "dev"
 	_ShortTesting     = "test"
 	_ShortProduction  = "prod"
