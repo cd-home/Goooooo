@@ -28,7 +28,7 @@ func FileLogHook(cfg *FileLogConfig) *lumberjack.Logger {
 	}
 }
 
-// Load Config
+// Load Encoder Config
 func NewProductionEncoderConfig() zapcore.EncoderConfig {
 	EncoderConfig := zap.NewProductionEncoderConfig()
 	EncoderConfig.TimeKey = "time"
