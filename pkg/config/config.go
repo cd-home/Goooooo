@@ -1,8 +1,6 @@
 package config
 
 import (
-	"log"
-
 	"github.com/spf13/viper"
 )
 
@@ -39,7 +37,7 @@ func NewViper(mode string, configPaths ...string) *viper.Viper {
 		if err := vp.ReadInConfig(); err != nil {
 			panic(err)
 		}
-	// Production mode is always Read Env
+		// Production mode is always Read Env
 	} else {
 		vp.AutomaticEnv()
 	}
