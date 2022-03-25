@@ -37,10 +37,9 @@ func NewViper(mode string, configPaths ...string) *viper.Viper {
 			vp.AddConfigPath(path)
 		}
 		if err := vp.ReadInConfig(); err != nil {
-			log.Println(err.Error())
 			panic(err)
 		}
-		// Production mode is always Read Env
+	// Production mode is always Read Env
 	} else {
 		vp.AutomaticEnv()
 	}
