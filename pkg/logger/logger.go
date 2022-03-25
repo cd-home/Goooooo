@@ -19,14 +19,13 @@ type FileLogConfig struct {
 }
 
 func FileLogHook(cfg *FileLogConfig) *lumberjack.Logger {
-	hook := &lumberjack.Logger{
+	return &lumberjack.Logger{
 		Filename:   cfg.FilePath,
 		MaxSize:    cfg.FileMaxSize,
 		MaxAge:     cfg.FileMaxAge,
 		MaxBackups: cfg.MaxBackups,
 		Compress:   cfg.Compress,
 	}
-	return hook
 }
 
 // Load Config
@@ -63,5 +62,6 @@ func New(cfg *FileLogConfig) *zap.Logger {
 		cores = append(cores, zapcore.NewCore(fileEncoder, writerHook, highPriority))
 	}
 
+	// cores: Maybe Add Kafka Log Hook
 	return zap.New(zapcore.NewTee(cores...)).WithOptions(zap.AddCaller())
 }
