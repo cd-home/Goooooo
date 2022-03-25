@@ -9,7 +9,7 @@ import (
 func TestLogger(t *testing.T) {
 	tests := []struct {
 		Name string
-		Cfg *FileLogConfig
+		Cfg  *FileLogConfig
 	}{
 		{
 			Name: "console",
@@ -43,7 +43,16 @@ func TestLogger(t *testing.T) {
 }
 
 func BenchmarkLogger(b *testing.B) {
+	cfg := &FileLogConfig{
+		Debug:       false,
+		FilePath:    "./testdata/log.log",
+		FileMaxSize: 500,
+		FileMaxAge:  30,
+		MaxBackups:  10,
+		Compress:    true,
+	}
+	logger := New(cfg)
 	for i := 0; i < b.N; i++ {
-
+		logger.Info("Testing", zap.String("type", "Benchmark"))
 	}
 }
