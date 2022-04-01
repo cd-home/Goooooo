@@ -19,12 +19,18 @@ const (
 	_DefaultConfigDot  = "."
 	_DefaultConfigCur  = "./configs/"
 	_DefaultConfigPar  = "../configs/"
+	_DefaultConfigPPar = "../../configs/"
 	_DefaultConfigType = "toml"
 )
 
 func defaultConfigPath(mode string, configPaths ...string) []string {
 	if len(configPaths) == 0 {
-		return []string{_DefaultConfigDot, _DefaultConfigCur + mode, _DefaultConfigPar + mode}
+		return []string{
+			_DefaultConfigDot,
+			_DefaultConfigCur + mode,
+			_DefaultConfigPar + mode,
+			_DefaultConfigPPar + mode,
+		}
 	}
 	var paths []string
 	for _, path := range configPaths {
