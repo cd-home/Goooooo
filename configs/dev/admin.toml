@@ -1,0 +1,10 @@
+[admin]
+SECRET = "FILE SECRET"
+
+
+[api]
+SECRET = "FILE SECRET"
+
+
+[job]
+SECRET = "FILE SECRET"
