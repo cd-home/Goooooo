@@ -19,3 +19,7 @@ bin
 runtime
 .DS_Store
 logs
+
+configs
+
+*.env

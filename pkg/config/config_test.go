@@ -7,24 +7,38 @@ import (
 )
 
 func TestNewViper(t *testing.T) {
-	godotenv.Load("./testdata/.env")
+
+	_mockProd := true
+
+	if _mockProd {
+		godotenv.Load("./testdata/.env")
+	}
+
 	tests := []struct {
+		App  string
 		Mode string
 		Path []string
 	}{
 		{
+			App:  "admin",
 			Mode: "dev",
-			Path: []string{"./testdata"},
+			Path: []string{"./testdata/configs/"},
 		},
 		{
+			App:  "api",
+			Mode: "dev",
+			Path: []string{"./testdata/configs/"},
+		},
+		{
+			App:  "admin",
 			Mode: "prod",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.Mode, func(t *testing.T) {
-			vp := NewViper(tt.Mode, tt.Path...)
+			vp := NewViper(tt.App, tt.Mode, tt.Path...)
 			if tt.Mode == "dev" {
-				t.Log(vp.GetString("APP.SECRET"))
+				t.Log(vp.GetString(tt.App + ".SECRET"))
 			} else {
 				t.Log(vp.GetString("SECRET"))
 			}

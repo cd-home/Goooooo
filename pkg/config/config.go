@@ -1,6 +1,8 @@
 package config
 
 import (
+	"strings"
+
 	"github.com/spf13/viper"
 )
 
@@ -14,23 +16,33 @@ const (
 )
 
 const (
+	_DefaultConfigDot  = "."
+	_DefaultConfigCur  = "./configs/"
+	_DefaultConfigPar  = "../configs/"
 	_DefaultConfigType = "toml"
 )
 
-func defaultConfigPath(configPaths ...string) []string {
+func defaultConfigPath(mode string, configPaths ...string) []string {
 	if len(configPaths) == 0 {
-		return []string{".", "./configs", "../configs"}
+		return []string{_DefaultConfigDot, _DefaultConfigCur + mode, _DefaultConfigPar + mode}
 	}
-	return configPaths
+	var paths []string
+	for _, path := range configPaths {
+		if !strings.HasSuffix(path, "/") {
+			path = path + "/"
+		}
+		paths = append(paths, path+mode)
+	}
+	return paths
 }
 
-func NewViper(mode string, configPaths ...string) *viper.Viper {
+func NewViper(app string, mode string, configPaths ...string) *viper.Viper {
 	vp := viper.New()
-	// Development mode is always Read FileConfig
-	if mode == _Development || mode == _ShortDevelopment {
-		vp.SetConfigName(mode)
+	// Development, Testing mode is always Read FileConfig
+	if mode == _Development || mode == _ShortDevelopment || mode == _Testing || mode == _ShortTesting {
+		vp.SetConfigName(app)
 		vp.SetConfigType(_DefaultConfigType)
-		_configPaths := defaultConfigPath(configPaths...)
+		_configPaths := defaultConfigPath(mode, configPaths...)
 		for _, path := range _configPaths {
 			vp.AddConfigPath(path)
 		}
@@ -39,6 +51,7 @@ func NewViper(mode string, configPaths ...string) *viper.Viper {
 		}
 		// Production mode is always Read Env
 	} else {
+		vp.SetEnvPrefix(strings.ToUpper(app))
 		vp.AutomaticEnv()
 	}
 	return vp
