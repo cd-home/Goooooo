@@ -19,7 +19,7 @@ const (
 	Version  = "1.0.0"
 	AppName  = "admin"
 	Mode     = "dev"
-	MockProd = true
+	MockProd = false
 )
 
 func _env() (string, string) {
@@ -53,9 +53,9 @@ func NewConfig() *viper.Viper {
 	log.Println("config: ", configPaths.GetNames())
 	vp := config.NewViper(app, mode, configPaths.GetNames()...)
 
-	// common Get mode 
-	log.Println(vp.GetString("admin.DB_URL"))
-	log.Println(vp.GetString("admin.secret"))
+	// common Get mode
+	log.Println(vp.GetString(app + ".DB_URL"))
+	log.Println(vp.GetString(app + ".SECRET"))
 
 	return vp
 }

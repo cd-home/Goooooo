@@ -23,13 +23,13 @@ const (
 	_DefaultConfigType = "toml"
 )
 
-func defaultConfigPath(mode string, configPaths ...string) []string {
+func defaultConfigPath(app string, configPaths ...string) []string {
 	if len(configPaths) == 0 {
 		return []string{
 			_DefaultConfigDot,
-			_DefaultConfigCur + mode,
-			_DefaultConfigPar + mode,
-			_DefaultConfigPPar + mode,
+			_DefaultConfigCur + app,
+			_DefaultConfigPar + app,
+			_DefaultConfigPPar + app,
 		}
 	}
 	var paths []string
@@ -37,7 +37,7 @@ func defaultConfigPath(mode string, configPaths ...string) []string {
 		if !strings.HasSuffix(path, "/") {
 			path = path + "/"
 		}
-		paths = append(paths, path+mode)
+		paths = append(paths, path+app)
 	}
 	return paths
 }
@@ -46,9 +46,9 @@ func NewViper(app string, mode string, configPaths ...string) *viper.Viper {
 	vp := viper.New()
 	// Development, Testing mode is always Read FileConfig
 	if mode == _Development || mode == _ShortDevelopment || mode == _Testing || mode == _ShortTesting {
-		vp.SetConfigName(app)
+		vp.SetConfigName(mode)
 		vp.SetConfigType(_DefaultConfigType)
-		_configPaths := defaultConfigPath(mode, configPaths...)
+		_configPaths := defaultConfigPath(app, configPaths...)
 		for _, path := range _configPaths {
 			vp.AddConfigPath(path)
 		}

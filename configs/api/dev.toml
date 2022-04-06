@@ -1,0 +1,3 @@
+[API]
+SECRET = "Api Dev SECRET"
+DB_URL = "localhost:3306"

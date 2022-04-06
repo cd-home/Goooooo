@@ -1,0 +1,3 @@
+[admin]
+SECRET = "Admin Test SECRET"
+DB_URL = "localhost:3306"
