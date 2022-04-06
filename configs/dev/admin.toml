@@ -1,2 +1,3 @@
 [admin]
 SECRET = "Admin Dev SECRET"
+DB_URL = "localhost:3306"

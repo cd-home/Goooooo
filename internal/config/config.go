@@ -4,9 +4,11 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 	"strings"
 
 	"github.com/GodYao1995/Goooooo/pkg/config"
+	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 	"go.uber.org/fx"
 )
@@ -14,10 +16,20 @@ import (
 var Module = fx.Invoke(NewConfig)
 
 const (
-	Version = "1.0.0"
-	AppName = "admin"
-	Mode    = "dev"
+	Version  = "1.0.0"
+	AppName  = "admin"
+	Mode     = "dev"
+	MockProd = true
 )
+
+func _env() (string, string) {
+	app, mode := "", ""
+	if MockProd {
+		godotenv.Load()
+		app, mode = os.Getenv("APP"), os.Getenv("MODE")
+	}
+	return app, mode
+}
 
 func NewConfig() *viper.Viper {
 	var app string
@@ -30,11 +42,22 @@ func NewConfig() *viper.Viper {
 
 	flag.Parse()
 
+	// Production Mode
+	if _app, _mode := _env(); _app != "" && _mode != "" {
+		app = _app
+		mode = _mode
+	}
+
 	log.Println("app: ", app)
 	log.Println("mode: ", mode)
 	log.Println("config: ", configPaths.GetNames())
+	vp := config.NewViper(app, mode, configPaths.GetNames()...)
 
-	return config.NewViper(app, mode, configPaths.GetNames()...)
+	// common Get mode 
+	log.Println(vp.GetString("admin.DB_URL"))
+	log.Println(vp.GetString("admin.secret"))
+
+	return vp
 }
 
 type ConfigPaths struct {
