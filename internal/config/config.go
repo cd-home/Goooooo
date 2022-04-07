@@ -8,24 +8,18 @@ import (
 	"strings"
 
 	"github.com/GodYao1995/Goooooo/pkg/config"
-	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 	"go.uber.org/fx"
 )
 
-var Module = fx.Invoke(NewConfig)
+var Module = fx.Provide(NewConfig)
 
 const (
 	MockProd = false
 )
 
 func _env() (string, string) {
-	app, mode := "", ""
-	if MockProd {
-		godotenv.Load()
-		app, mode = os.Getenv("APP"), os.Getenv("MODE")
-	}
-	return app, mode
+	return os.Getenv("APP"), os.Getenv("MODE")
 }
 
 func NewConfig() *viper.Viper {
@@ -59,6 +53,11 @@ func NewConfig() *viper.Viper {
 	// common Get mode
 	log.Println(vp.GetString(app + ".DB_URL"))
 	log.Println(vp.GetString(app + ".SECRET"))
+
+	vp.SetDefault("APP", app)
+	vp.SetDefault("MODE", mode)
+
+	log.Println(vp.GetString(app + ".SERVER_HOST"))
 
 	return vp
 }
