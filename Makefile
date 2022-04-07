@@ -1,6 +1,6 @@
 .PHONY: build run upx test
 
-# Default
+# Default Dev Env
 os = darwin
 mode = dev
 config= ../configs/
@@ -15,7 +15,7 @@ build:
 run:
 	@echo "Build $(app) and Run"
 	cd cmd/$(app) && go build -o=../../bin && \
-	cd ../../bin && ./$(app) -mode=$(mode) -config=$(config)
+	cd ../../bin && ./$(app) -mode=$(mode) -app=$(app) -config=$(config)
 
 
 upx:
@@ -24,8 +24,12 @@ upx:
 	CGO_ENABLED=0 GOOS=$(os) GOARCH=amd64 go build -gcflags="-m -l" -ldflags="-w -s" -o=../../bin  && \
     cd ../../bin && rm -f $(app_os) && \
 	upx -$(level) $(app) -o $(app_os) && ls -lh  && \
-	./$(app_os) -mode=dev -config=../configs/
+	./$(app_os) -mode=$(mode) -app=$(app) -config=$(config)
 
 
 shbuild:
 	pwd && cd ./scripts/ && chmod +x build.sh && ./build.sh $(app) $(os) $(app_os)
+
+
+docker:
+	pwd && chmod +x ./scripts/docker.sh && ./scripts/docker.sh $(app) $(mode)

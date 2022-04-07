@@ -16,9 +16,6 @@ import (
 var Module = fx.Invoke(NewConfig)
 
 const (
-	Version  = "1.0.0"
-	AppName  = "admin"
-	Mode     = "dev"
 	MockProd = false
 )
 
@@ -36,8 +33,8 @@ func NewConfig() *viper.Viper {
 	var mode string
 	var configPaths ConfigPaths
 
-	flag.StringVar(&app, "app", AppName, "应用")
-	flag.StringVar(&mode, "mode", Mode, "运行环境")
+	flag.StringVar(&app, "app", "", "应用")
+	flag.StringVar(&mode, "mode", "", "运行环境")
 	flag.Var(&configPaths, "config", "配置文件目录")
 
 	flag.Parse()
@@ -48,9 +45,15 @@ func NewConfig() *viper.Viper {
 		mode = _mode
 	}
 
+	if app == "" && mode == "" {
+		log.Println("未找到应用与环境信息")
+		os.Exit(1)
+	}
+
 	log.Println("app: ", app)
 	log.Println("mode: ", mode)
 	log.Println("config: ", configPaths.GetNames())
+
 	vp := config.NewViper(app, mode, configPaths.GetNames()...)
 
 	// common Get mode
