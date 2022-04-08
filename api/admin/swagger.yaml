@@ -7,7 +7,7 @@ info:
   description: this is Goooooo-Admin Sys.
   version: 1.0.0
 paths:
-  /api/v1/login:
+  /login:
     post:
       consumes:
       - application/json

@@ -19,7 +19,7 @@ func NewOrderController(engine *gin.Engine) {
 // @Tags Order
 // @Accept  json
 // @Produce json
-// @Router /api/v1/order [POST]
+// @Router /order [POST]
 func (u OrderController) Order(ctx *gin.Context) {
 	ctx.JSON(200, map[string]interface{}{
 		"message": "order",

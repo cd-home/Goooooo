@@ -21,7 +21,7 @@ func NewUserController(engine *gin.Engine) {
 // @Tags User
 // @Accept  json
 // @Produce json
-// @Router /api/v1/login [POST]
+// @Router /login [POST]
 func (u UserController) Login(ctx *gin.Context) {
 	ctx.JSON(200, map[string]interface{}{
 		"message": "ok",
