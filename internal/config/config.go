@@ -7,7 +7,6 @@ import (
 
 	"github.com/GodYao1995/Goooooo/pkg/config"
 	"github.com/GodYao1995/Goooooo/pkg/errno"
-	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 	"go.uber.org/fx"
 )
