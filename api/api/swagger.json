@@ -1,0 +1,31 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "this is Goooooo-Api Sys.",
+        "contact": {
+            "name": "God Yao",
+            "email": "liyaoo1995@163.com"
+        },
+        "version": "1.0.0"
+    },
+    "host": "127.0.0.1:8080",
+    "basePath": "/api/v1",
+    "paths": {
+        "/api/v1/order": {
+            "post": {
+                "description": "Goods Order",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Order"
+                ],
+                "summary": "Goods Order",
+                "responses": {}
+            }
+        }
+    }
+}

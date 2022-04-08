@@ -1,0 +1,21 @@
+basePath: /api/v1
+host: 127.0.0.1:8080
+info:
+  contact:
+    email: liyaoo1995@163.com
+    name: God Yao
+  description: this is Goooooo-Api Sys.
+  version: 1.0.0
+paths:
+  /api/v1/order:
+    post:
+      consumes:
+      - application/json
+      description: Goods Order
+      produces:
+      - application/json
+      responses: {}
+      summary: Goods Order
+      tags:
+      - Order
+swagger: "2.0"

@@ -1,0 +1,21 @@
+basePath: /api/v1
+host: 127.0.0.1:8080
+info:
+  contact:
+    email: liyaoo1995@163.com
+    name: God Yao
+  description: this is Goooooo-Admin Sys.
+  version: 1.0.0
+paths:
+  /api/v1/login:
+    post:
+      consumes:
+      - application/json
+      description: User Login
+      produces:
+      - application/json
+      responses: {}
+      summary: User Login
+      tags:
+      - User
+swagger: "2.0"

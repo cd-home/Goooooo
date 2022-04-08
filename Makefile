@@ -1,4 +1,4 @@
-.PHONY: build run upx test
+.PHONY: build run upx test shbuild docker swag
 
 # Default Dev Env
 os = darwin
@@ -17,7 +17,6 @@ run:
 	cd cmd/$(app) && go build -o=../../bin && \
 	cd ../../bin && ./$(app) -mode=$(mode) -app=$(app) -config=$(config)
 
-
 upx:
 	@echo 'Build $(app) command:'
 	cd cmd/$(app) && \
@@ -33,3 +32,8 @@ shbuild:
 
 docker:
 	pwd && chmod +x ./scripts/docker.sh && ./scripts/docker.sh $(app) $(mode)
+
+
+swag:
+	swag init -g cmd/admin/main.go --output ./api/admin --exclude ./internal/api && \
+	swag init -g cmd/api/main.go --output ./api/api --exclude ./internal/admin
