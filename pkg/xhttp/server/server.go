@@ -13,6 +13,11 @@ import (
 	"go.uber.org/fx"
 )
 
+const (
+	_Production      = "production"
+	_ShortProduction = "prod"
+)
+
 var Module = fx.Provide(New)
 
 func New(lifecycle fx.Lifecycle, vp *viper.Viper) *gin.Engine {
@@ -20,25 +25,29 @@ func New(lifecycle fx.Lifecycle, vp *viper.Viper) *gin.Engine {
 	engine.Use(gin.Logger())
 
 	engine.GET("/docs/*any", swagger.WrapHandler(swaggerFiles.Handler))
-	app := vp.GetString("APP")
 
 	srv := &http.Server{
-		Addr:         vp.GetString(app + ".SERVER_HOST"),
+		Addr:         vp.GetString("APP.SERVER_HOST"),
 		Handler:      engine,
 		ReadTimeout:  500 * time.Millisecond,
 		WriteTimeout: 500 * time.Millisecond,
 	}
+
+	if mode := vp.GetString("APP.MODE"); mode == _Production || mode == _ShortProduction {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
+			log.Printf("\033[1;32;32m=========== Server Running: %s ============\033[0m", srv.Addr)
 			go func() {
 				if err := srv.ListenAndServe(); err != nil {
-					log.Println(err)
+					log.Fatal(err)
 				}
 			}()
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
-			log.Println("Stopping HTTP server.")
 			return srv.Shutdown(ctx)
 		},
 	})

@@ -9,6 +9,11 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
+const (
+	LoggerTimeKey    = "time"
+	LoggerTimeFormat = "2006-01-02 15:04:05"
+)
+
 type FileLogConfig struct {
 	Debug       bool   `json:"debug"`
 	FilePath    string `json:"filePath"`
@@ -31,9 +36,9 @@ func FileLogHook(cfg *FileLogConfig) *lumberjack.Logger {
 // Load Encoder Config
 func NewProductionEncoderConfig() zapcore.EncoderConfig {
 	EncoderConfig := zap.NewProductionEncoderConfig()
-	EncoderConfig.TimeKey = "time"
+	EncoderConfig.TimeKey = LoggerTimeKey
 	EncoderConfig.EncodeTime = func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
-		enc.AppendString(t.Local().Format("2006-01-02 15:04:05"))
+		enc.AppendString(t.Local().Format(LoggerTimeFormat))
 	}
 	return EncoderConfig
 }
@@ -47,7 +52,7 @@ func New(cfg *FileLogConfig) *zap.Logger {
 	lowPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
 		return lvl >= zapcore.DebugLevel
 	})
-	
+
 	// cores: Maybe Add Kafka Log Hook, cores shuold be slice
 	var cores []zapcore.Core
 

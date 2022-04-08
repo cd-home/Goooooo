@@ -1,4 +1,9 @@
-[api]
-SECRET = "Api Dev SECRET"
-DB_URL = "localhost:3306"
+[APP]
+Name = "api"
+MODE = "dev"
+SECRET = "APi Dev SECRET"
 SERVER_HOST = ":8081"
+
+[DB]
+HOST = "localhost:3306"
+PORT =    

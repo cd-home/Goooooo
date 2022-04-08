@@ -1,6 +1,7 @@
 package config
 
 import (
+	"log"
 	"strings"
 
 	"github.com/spf13/viper"
@@ -49,6 +50,7 @@ func NewViper(app string, mode string, configPaths ...string) *viper.Viper {
 		vp.SetConfigName(mode)
 		vp.SetConfigType(_DefaultConfigType)
 		_configPaths := defaultConfigPath(app, configPaths...)
+		log.Println(_configPaths)
 		for _, path := range _configPaths {
 			vp.AddConfigPath(path)
 		}

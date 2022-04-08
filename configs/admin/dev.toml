@@ -1,4 +1,9 @@
-[admin]
-SECRET = "Admin Dev SECRET"
-DB_URL = "localhost:3306"
-SERVER_HOST = ":8080"
+[APP]
+    NAME        = "admin"
+    MODE        = "dev"
+    SECRET      = "Admin Dev SECRET"
+    SERVER_HOST = ":8080"
+
+[DB]
+    HOST = "localhost"
+    PORT =  ":3306"
