@@ -24,6 +24,10 @@ func New(lifecycle fx.Lifecycle, vp *viper.Viper) *gin.Engine {
 	engine := gin.New()
 	engine.Use(gin.Logger())
 
+	if mode := vp.GetString("APP.MODE"); mode == _Production || mode == _ShortProduction {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	engine.GET("/docs/*any", swagger.WrapHandler(swaggerFiles.Handler))
 
 	srv := &http.Server{
@@ -31,10 +35,6 @@ func New(lifecycle fx.Lifecycle, vp *viper.Viper) *gin.Engine {
 		Handler:      engine,
 		ReadTimeout:  500 * time.Millisecond,
 		WriteTimeout: 500 * time.Millisecond,
-	}
-
-	if mode := vp.GetString("APP.MODE"); mode == _Production || mode == _ShortProduction {
-		gin.SetMode(gin.ReleaseMode)
 	}
 
 	lifecycle.Append(fx.Hook{

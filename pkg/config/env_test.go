@@ -8,8 +8,6 @@ import (
 )
 
 func TestLoadDotEnv(t *testing.T) {
-	err := godotenv.Load("./testdata/.env")
-	t.Log(err)
-
-	t.Log(os.Getenv("SECRET"))
+	godotenv.Load("./testdata/.env")
+	t.Log(os.Getenv("APP_NAME"))
 }

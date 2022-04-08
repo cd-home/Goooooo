@@ -7,4 +7,5 @@ import (
 
 var Module = fx.Invoke(
 	v1.NewUserController,
+	v1.NewSysController,
 )

@@ -7,6 +7,17 @@ info:
   description: this is Goooooo-Admin Sys.
   version: 1.0.0
 paths:
+  /db:
+    get:
+      consumes:
+      - application/json
+      description: Sys DBStats
+      produces:
+      - application/json
+      responses: {}
+      summary: Sys DBStats
+      tags:
+      - Sys
   /login:
     post:
       consumes:

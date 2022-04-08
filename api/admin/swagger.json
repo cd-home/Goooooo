@@ -11,6 +11,22 @@
     "host": "127.0.0.1:8080",
     "basePath": "/api/v1",
     "paths": {
+        "/db": {
+            "get": {
+                "description": "Sys DBStats",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sys"
+                ],
+                "summary": "Sys DBStats",
+                "responses": {}
+            }
+        },
         "/login": {
             "post": {
                 "description": "User Login",

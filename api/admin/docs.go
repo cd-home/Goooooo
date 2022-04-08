@@ -19,6 +19,22 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/db": {
+            "get": {
+                "description": "Sys DBStats",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sys"
+                ],
+                "summary": "Sys DBStats",
+                "responses": {}
+            }
+        },
         "/login": {
             "post": {
                 "description": "User Login",
