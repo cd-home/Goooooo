@@ -22,7 +22,9 @@ var Module = fx.Provide(New)
 
 func New(lifecycle fx.Lifecycle, vp *viper.Viper) *gin.Engine {
 	engine := gin.New()
-	engine.Use(gin.Logger())
+
+	// Common Middlewares
+	engine.Use(gin.Logger(), NoCache(), Cors(), Secure(), RequestID())
 
 	if mode := vp.GetString("APP.MODE"); mode == _Production || mode == _ShortProduction {
 		gin.SetMode(gin.ReleaseMode)
