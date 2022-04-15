@@ -3,7 +3,10 @@ package casbin
 import "fmt"
 
 const (
-	_RuleConfPath    = "../../configs/rules/casbin_rabc_rule.conf"
+	// real path
+	_RuleConfPath = "../configs/rules/casbin_rabc_rule.conf"
+	// for testing
+	// _RuleConfPath    = "../../configs/rules/casbin_rabc_rule.conf"
 	_PolicyTableName = "casbin_rule"
 	_PolicyTable     = `
 	CREATE TABLE %s (
