@@ -2,7 +2,6 @@ package casbin
 
 import (
 	"bytes"
-	"fmt"
 	"strconv"
 
 	"github.com/casbin/casbin/v2/model"
@@ -33,7 +32,6 @@ func (adapter *Adapter) LoadPolicy(model model.Model) error {
 
 func (adapter *Adapter) AddPolicy(sec string, ptype string, rule []string) error {
 	args := _GetArgs(ptype, rule)
-	fmt.Println(args)
 	_, err := adapter.db.Exec(_InsertPolicyRecordSQL, args...)
 	return err
 }

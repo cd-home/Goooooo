@@ -14,6 +14,11 @@ type Adapter struct {
 	db *sqlx.DB
 }
 
+func NewCasbinEnforcer(db *sqlx.DB) *casbin.Enforcer {
+	e, _ := casbin.NewEnforcer(_RuleConfPath, NewSqlxAdapter(db))
+	return e
+}
+
 func NewSqlxAdapter(db *sqlx.DB) *Adapter {
 	if db == nil {
 		panic("db is nil")
@@ -27,9 +32,4 @@ func NewSqlxAdapter(db *sqlx.DB) *Adapter {
 		}
 	}
 	return &Adapter{db: db}
-}
-
-func NewCasbinEnforcer(db *sqlx.DB) *casbin.Enforcer {
-	e, _ := casbin.NewEnforcer(_RuleConfPath, NewSqlxAdapter(db))
-	return e
 }
