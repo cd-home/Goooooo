@@ -1,4 +1,4 @@
-package v1
+package v2
 
 import (
 	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/permission"
@@ -13,7 +13,7 @@ type SysController struct {
 
 func NewSysController(engine *gin.Engine, db *sqlx.DB, e *casbin.Enforcer) {
 	ctl := &SysController{db: db}
-	v1 := engine.Group("/api/v1/")
+	v1 := engine.Group("/api/v2/")
 	v1.Use(permission.PermissionMiddleware(e))
 	{
 		v1.GET("/db", ctl.DBStats)

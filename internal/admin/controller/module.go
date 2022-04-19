@@ -2,10 +2,15 @@ package controller
 
 import (
 	v1 "github.com/GodYao1995/Goooooo/internal/admin/controller/v1"
+	v2 "github.com/GodYao1995/Goooooo/internal/admin/controller/v2"
 	"go.uber.org/fx"
 )
 
-var Module = fx.Invoke(
+var ModuleV1 = fx.Invoke(
 	v1.NewUserController,
 	v1.NewSysController,
+)
+
+var ModuleV2 = fx.Invoke(
+	v2.NewSysController,
 )
