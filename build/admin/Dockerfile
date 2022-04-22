@@ -21,4 +21,4 @@ COPY --from=Builder /app/build/ /app/release/
 EXPOSE 8080
 
 
-ENTRYPOINT ["./bin/admin"]
+ENTRYPOINT ["./bin/admin", "server"]

@@ -28,7 +28,7 @@ func Exeute() {
 
 func NewViper() *viper.Viper {
 	_differentAppAndEnvironment(&app, &mode)
-	return config.NewViper(app, mode)
+	return config.NewViper(app, mode, configs...)
 }
 
 func _differentAppAndEnvironment(app, mode *string) {

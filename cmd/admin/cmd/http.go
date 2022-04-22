@@ -5,8 +5,9 @@ import (
 )
 
 var (
-	app  string
-	mode string
+	app     string
+	mode    string
+	configs []string
 )
 
 var httpCmd = &cobra.Command{
@@ -22,6 +23,7 @@ func init() {
 	rootCmd.AddCommand(httpCmd)
 	httpCmd.Flags().StringVar(&app, "app", "", "chioce app")
 	httpCmd.Flags().StringVar(&mode, "mode", "", "chioce mode")
+	httpCmd.Flags().StringArrayVar(&configs, "config", nil, "configs")
 	httpCmd.MarkFlagRequired("app")
 	httpCmd.MarkFlagRequired("mode")
 }

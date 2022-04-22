@@ -1,0 +1,12 @@
+[APP]
+    NAME        = "api"
+    MODE        = "test"
+    SECRET      = "api test SECRET"
+    SERVER_HOST = ":8081"
+
+[DB]
+    HOST        = "localhost"
+    PORT        = "3306"
+    USER        = "root"
+    PASSWD      = "root@123456"
+    DATABASE    = "api_test"
