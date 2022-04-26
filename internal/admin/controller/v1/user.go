@@ -27,3 +27,17 @@ func (u UserController) Login(ctx *gin.Context) {
 		"message": "ok",
 	})
 }
+
+
+// Register
+// @Summary User Register
+// @Description User Register
+// @Tags User
+// @Accept  json
+// @Produce json
+// @Router /register [POST]
+func (u UserController) Register(ctx *gin.Context) {
+	ctx.JSON(200, map[string]interface{}{
+		"message": "ok",
+	})
+}
