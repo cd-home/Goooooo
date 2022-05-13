@@ -49,15 +49,13 @@ func (u UserController) Login(ctx *gin.Context) {
 // @Router /register [POST]
 func (user UserController) Register(ctx *gin.Context) {
 	params := types.RegisterParam{}
-	common := types.CommonResponse{}
+	common := types.CommonResponse{Code: 0}
 	if err := ctx.ShouldBindJSON(&params); err != nil {
-		common.Code = 0
 		common.Message = err.Error()
 		ctx.JSON(200, common)
 		return
 	}
 	if err := user.logic.Register(ctx, params.Account, params.Password); err != nil {
-		common.Code = 0
 		common.Message = err.Error()
 		ctx.JSON(200, common)
 		return
