@@ -43,13 +43,17 @@ func (repo *UserRepository) CreateUserByUserName(ctx context.Context, account st
 	// check if user already exist
 	var user User
 	var err error
+	
 	err = repo.db.Get(&user, `SELECT id FROM user WHERE username = ?`, account)
-	if err != nil {
+
+	// database error
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		repo.log.WithOptions(zap.Fields(zap.String("Repo Get", "CreateUserByUserName"))).Info(err.Error())
 		return errors.New("操作失败, 请重试")
 	}
-	repo.log.WithOptions(zap.Fields(zap.String("Repo", "CreateUserByUserName"))).Debug(fmt.Sprint(user.UserName))
+	// user already exist
 	if err == nil {
+		repo.log.WithOptions(zap.Fields(zap.String("Repo", "CreateUserByUserName"))).Debug(fmt.Sprint(user.UserName))
 		return errors.New("该用户名已经被注册")
 	}
 	// create user by username
