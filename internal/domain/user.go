@@ -1,15 +1,14 @@
 package domain
 
-import (
-	"github.com/GodYao1995/Goooooo/internal/admin/types"
-)
+import "context"
 
 type UserLogicFace interface {
-	Register(*types.RegisterParam) error
-	Login(*types.LoginParam) error
+	Register(ctx context.Context, account string, password string) error
 }
 
 type UserRepositoryFace interface {
+	CreateUserByUserName(ctx context.Context, account string, password string) error
+	CreateUserByEmail(ctx context.Context, account string, password string) error
 }
 
 // Domain Model And Interface
@@ -25,7 +24,7 @@ type User struct {
 	State     string `json:"state"`
 	Ip        uint32 `json:"ip"`
 	LastLogin string `json:"last_login"`
-	UpdatedAt string `json:"update_at"`
-	CreatedAt string `json:"created_at"`
+	UpdateAt  string `json:"update_at"`
+	CreateAt  string `json:"create_at"`
 	DeleteAt  string `json:"delete_at"`
 }

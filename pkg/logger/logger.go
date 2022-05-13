@@ -4,32 +4,27 @@ import (
 	"os"
 	"time"
 
+	"github.com/spf13/viper"
+	"go.uber.org/fx"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
+
+var Module = fx.Provide(NewLogger)
 
 const (
 	LoggerTimeKey    = "time"
 	LoggerTimeFormat = "2006-01-02 15:04:05"
 )
 
-type FileLogConfig struct {
-	Debug       bool   `json:"debug"`
-	FilePath    string `json:"filePath"`
-	FileMaxSize int    `json:"fileMaxSize"`
-	FileMaxAge  int    `json:"fileMaxAge"`
-	MaxBackups  int    `json:"maxBackups"`
-	Compress    bool   `json:"compress"`
-}
-
-func FileLogHook(cfg *FileLogConfig) *lumberjack.Logger {
+func FileLogHook(vp *viper.Viper) *lumberjack.Logger {
 	return &lumberjack.Logger{
-		Filename:   cfg.FilePath,
-		MaxSize:    cfg.FileMaxSize,
-		MaxAge:     cfg.FileMaxAge,
-		MaxBackups: cfg.MaxBackups,
-		Compress:   cfg.Compress,
+		Filename:   vp.GetString("LOG.PATH"),
+		MaxSize:    vp.GetInt("LOG.MAXSIZE"),
+		MaxAge:     vp.GetInt("LOG.MAXAGE"),
+		MaxBackups: vp.GetInt("LOG.MAXBACKUPS"),
+		Compress:   vp.GetBool("LOG.COMPRESS"),
 	}
 }
 
@@ -43,7 +38,7 @@ func NewProductionEncoderConfig() zapcore.EncoderConfig {
 	return EncoderConfig
 }
 
-func New(cfg *FileLogConfig) *zap.Logger {
+func NewLogger(vp *viper.Viper) *zap.Logger {
 
 	highPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
 		return lvl >= zapcore.InfoLevel
@@ -56,7 +51,7 @@ func New(cfg *FileLogConfig) *zap.Logger {
 	// cores: Maybe Add Kafka Log Hook, cores shuold be slice
 	var cores []zapcore.Core
 
-	if cfg.Debug {
+	if vp.GetBool("LOG.DEBUG") {
 		// Development
 		consoleEncoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
 		consoleDebugging := zapcore.Lock(os.Stdout)
@@ -64,7 +59,7 @@ func New(cfg *FileLogConfig) *zap.Logger {
 	} else {
 		// Production
 		fileEncoder := zapcore.NewJSONEncoder(NewProductionEncoderConfig())
-		writerHook := zapcore.AddSync(FileLogHook(cfg))
+		writerHook := zapcore.AddSync(FileLogHook(vp))
 		cores = append(cores, zapcore.NewCore(fileEncoder, writerHook, highPriority))
 	}
 

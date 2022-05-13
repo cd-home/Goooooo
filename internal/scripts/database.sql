@@ -1,7 +1,7 @@
 -- DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `user` (
     `id` INT unsigned PRIMARY KEY AUTO_INCREMENT COMMENT '自增主键id',
-    `username` varchar(20) NOT NULL COMMENT '用户名',
+    `username` varchar(20) NOT NULL DEFAULT 'Mike' COMMENT '用户名',
     `nickname` varchar(20) DEFAULT NULL COMMENT '昵称',
     `password` varchar(255) NOT NULL COMMENT '密码',
     `age` TINYINT DEFAULT NULL COMMENT '年龄',
