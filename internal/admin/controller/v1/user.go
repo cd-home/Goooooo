@@ -41,8 +41,11 @@ func (u UserController) Login(ctx *gin.Context) {
 // @Summary User Register
 // @Description User Register
 // @Tags User
-// @Accept  json
-// @Produce json
+// @Accept  json 
+// @Produce json 
+// @Param register body types.RegisterParam true "register"
+// @Success 1 {object} types.CommonResponse {"code":1,"data":null,"msg":"Success"}
+// @Failure 0 {object} types.CommonResponse {"code":0,"data":null,"msg":"Error"}
 // @Router /register [POST]
 func (user UserController) Register(ctx *gin.Context) {
 	params := types.RegisterParam{}
@@ -50,20 +53,17 @@ func (user UserController) Register(ctx *gin.Context) {
 	if err := ctx.ShouldBindJSON(&params); err != nil {
 		common.Code = 0
 		common.Message = err.Error()
-		common.Data = nil
 		ctx.JSON(200, common)
 		return
 	}
 	if err := user.logic.Register(ctx, params.Account, params.Password); err != nil {
 		common.Code = 0
 		common.Message = err.Error()
-		common.Data = nil
 		ctx.JSON(200, common)
 		return
 	} else {
 		common.Code = 1
-		common.Message = "OK"
-		common.Data = nil
+		common.Message = "注册成功"
 		ctx.JSON(200, common)
 		return
 	}
