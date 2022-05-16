@@ -3,6 +3,7 @@ package v1
 import (
 	"github.com/GodYao1995/Goooooo/internal/admin/types"
 	"github.com/GodYao1995/Goooooo/internal/domain"
+	"github.com/GodYao1995/Goooooo/pkg/errno"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -17,10 +18,11 @@ func NewUserController(engine *gin.Engine, log *zap.Logger, logic domain.UserLog
 		logic: logic,
 		log:   log.WithOptions(zap.Fields(zap.String("module", "UserController"))),
 	}
-	user := engine.Group("/api/v1")
+	user := engine.Group("/api/v1/user")
 	{
 		user.POST("/register", ctl.Register)
 		user.POST("/login", ctl.Login)
+		user.GET("/profile", ctl.GetUserProfile).Use()
 	}
 }
 
@@ -41,8 +43,8 @@ func (u UserController) Login(ctx *gin.Context) {
 // @Summary User Register
 // @Description User Register
 // @Tags User
-// @Accept  json 
-// @Produce json 
+// @Accept  json
+// @Produce json
 // @Param register body types.RegisterParam true "register"
 // @Success 1 {object} types.CommonResponse {"code":1,"data":null,"msg":"Success"}
 // @Failure 0 {object} types.CommonResponse {"code":0,"data":null,"msg":"Error"}
@@ -51,7 +53,7 @@ func (user UserController) Register(ctx *gin.Context) {
 	params := types.RegisterParam{}
 	common := types.CommonResponse{Code: 0}
 	if err := ctx.ShouldBindJSON(&params); err != nil {
-		common.Message = err.Error()
+		common.Message = errno.ParamsParseError
 		ctx.JSON(200, common)
 		return
 	}
@@ -61,8 +63,21 @@ func (user UserController) Register(ctx *gin.Context) {
 		return
 	} else {
 		common.Code = 1
-		common.Message = "注册成功"
+		common.Message = errno.Success
 		ctx.JSON(200, common)
 		return
 	}
+}
+
+// GetUserProfile
+// @Summary Get UserProfile
+// @Description Get UserProfile
+// @Tags User
+// @Accept  json
+// @Produce json
+// @Router /profile [GET]
+func (u UserController) GetUserProfile(ctx *gin.Context) {
+	ctx.JSON(200, map[string]interface{}{
+		"message": "ok",
+	})
 }

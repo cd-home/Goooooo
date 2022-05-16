@@ -39,6 +39,6 @@ func _differentAppAndEnvironment(app, mode *string) {
 	}
 
 	if len(strings.TrimSpace(*app)) == 0 || len(strings.TrimSpace(*mode)) == 0 {
-		log.Fatalln(errno.NotFoundService)
+		log.Fatalln(errno.NotFoundServiceError)
 	}
 }
