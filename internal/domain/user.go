@@ -13,6 +13,7 @@ type UserRepositoryFace interface {
 
 // Domain Model And Interface
 type User struct {
+	Id        string `json:"id"`
 	UserName  string `json:"user"`
 	NickName  string `json:"nickname"`
 	Password  string `json:"password"`

@@ -7,6 +7,7 @@ import (
 
 	"github.com/GodYao1995/Goooooo/pkg/config"
 	"github.com/GodYao1995/Goooooo/pkg/errno"
+	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"go.uber.org/fx"
@@ -39,6 +40,10 @@ func _differentAppAndEnvironment(app, mode *string) {
 	}
 
 	if len(strings.TrimSpace(*app)) == 0 || len(strings.TrimSpace(*mode)) == 0 {
-		log.Fatalln(errno.NotFoundService)
+		log.Fatalln(errno.NotFoundServiceError)
+	}
+	// just for testing prod mode
+	if *mode == "prod" {
+		godotenv.Load()
 	}
 }
