@@ -5,4 +5,4 @@ import (
 	"go.uber.org/fx"
 )
 
-var Module = fx.Provide(v1.NewUserLogic)
+var Module = fx.Provide(v1.NewUserLogic, v1.NewDirectoryrLogic)

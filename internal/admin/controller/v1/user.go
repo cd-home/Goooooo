@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"net/http"
+
 	"github.com/GodYao1995/Goooooo/internal/admin/types"
 	"github.com/GodYao1995/Goooooo/internal/domain"
 	"github.com/GodYao1995/Goooooo/pkg/errno"
@@ -54,17 +56,17 @@ func (user UserController) Register(ctx *gin.Context) {
 	common := types.CommonResponse{Code: 0}
 	if err := ctx.ShouldBindJSON(&params); err != nil {
 		common.Message = errno.ParamsParseError
-		ctx.JSON(200, common)
+		ctx.JSON(http.StatusOK, common)
 		return
 	}
 	if err := user.logic.Register(ctx, params.Account, params.Password); err != nil {
 		common.Message = err.Error()
-		ctx.JSON(200, common)
+		ctx.JSON(http.StatusOK, common)
 		return
 	} else {
 		common.Code = 1
 		common.Message = errno.Success
-		ctx.JSON(200, common)
+		ctx.JSON(http.StatusOK, common)
 		return
 	}
 }
