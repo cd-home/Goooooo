@@ -1,4 +1,4 @@
-.PHONY: build run upx test shbuild docker swag
+.PHONY: build run upx test shbuild docker swag db
 
 # Default Dev Env
 os = darwin
@@ -37,3 +37,6 @@ docker:
 swag:
 	swag init -g cmd/admin/main.go --output ./api/admin --exclude ./internal/api && \
 	swag init -g cmd/api/main.go --output ./api/api --exclude ./internal/admin
+
+db:
+	pwd && chmod +x ./scripts/database.sh && ./scripts/database.sh $(h) $(P) $(u) $(p) $(db)

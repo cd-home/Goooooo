@@ -13,7 +13,7 @@ type UserRepositoryFace interface {
 
 // Domain Model And Interface
 type User struct {
-	Id        string `json:"id"`
+	Id        int64  `json:"id"`
 	UserName  string `json:"user"`
 	NickName  string `json:"nickname"`
 	Password  string `json:"password"`
@@ -22,7 +22,7 @@ type User struct {
 	Email     string `json:"email"`
 	Avatar    string `json:"avatar"`
 	Phone     string `json:"phone"`
-	State     string `json:"state"`
+	State     uint8  `json:"state"`
 	Ip        uint32 `json:"ip"`
 	LastLogin string `json:"last_login"`
 	UpdateAt  string `json:"update_at"`
