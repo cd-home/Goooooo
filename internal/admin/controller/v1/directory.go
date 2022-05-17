@@ -48,7 +48,7 @@ func (d DirectoryController) CreateDirectory(ctx *gin.Context) {
 		params.DirectoryLevel,
 		params.DirectoryIndex, params.Father)
 	if err != nil {
-		common.Message = err.Error()
+		common.Message = errno.Failure
 		ctx.JSON(200, common)
 		return
 	} else {
