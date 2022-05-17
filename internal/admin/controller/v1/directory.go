@@ -42,17 +42,16 @@ func (d DirectoryController) CreateDirectory(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, common)
 		return
 	}
-	err := d.logic.CreateDirectory(
+	if err := d.logic.CreateDirectory(
 		params.DirectoryName,
 		params.DirectoryType,
 		params.DirectoryLevel,
-		params.DirectoryIndex, params.Father)
-	if err != nil {
+		params.DirectoryIndex, params.Father); err != nil {
 		common.Message = errno.Failure
 		ctx.JSON(200, common)
 		return
 	} else {
-		common.Code = 0
+		common.Code = 1
 		common.Message = errno.Success
 		ctx.JSON(200, common)
 		return
@@ -74,9 +73,8 @@ func (d DirectoryController) ListDirectory(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, common)
 		return
 	}
-	data := d.logic.ListDirectory(params.DirectoryLevel, params.Father)
-	common.Code = 0
+	common.Data = d.logic.ListDirectory(params.DirectoryLevel, params.Father)
+	common.Code = 1
 	common.Message = errno.Success
-	common.Data = data
 	ctx.JSON(200, common)
 }
