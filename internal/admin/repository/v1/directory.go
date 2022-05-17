@@ -16,8 +16,7 @@ func NewDirectoryRepository(db *sqlx.DB, log *zap.Logger) domain.DirectoryReposi
 	return &DirectoryRepository{db: db, log: log.WithOptions(zap.Fields(zap.String("module", "DirectoryRepository")))}
 }
 
-func (repo *DirectoryRepository) CreateDirectory(name string, dType string, level uint8, index uint8, father *uint64) error {
-	var err error
+func (repo *DirectoryRepository) CreateDirectory(name string, dType string, level uint8, index uint8, father *uint64) (err error) {
 	var tx *sqlx.Tx
 	local := zap.Fields(zap.String("Repo", "CreateDirectory"))
 	unique := uint64(tools.Ids())
