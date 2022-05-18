@@ -7,5 +7,5 @@ import (
 )
 
 func TestIds(t *testing.T) {
-	t.Log(tools.Ids())
+	t.Log(tools.SnowId())
 }
