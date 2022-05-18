@@ -52,12 +52,12 @@ func NewLogger(vp *viper.Viper) *zap.Logger {
 	var cores []zapcore.Core
 
 	if vp.GetBool("LOG.DEBUG") {
-		// Development
+		// Development Stdout
 		consoleEncoder := zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())
 		consoleDebugging := zapcore.Lock(os.Stdout)
 		cores = append(cores, zapcore.NewCore(consoleEncoder, consoleDebugging, lowPriority))
 	} else {
-		// Production
+		// Other (Test、Production) LogFile
 		fileEncoder := zapcore.NewJSONEncoder(NewProductionEncoderConfig())
 		writerHook := zapcore.AddSync(FileLogHook(vp))
 		cores = append(cores, zapcore.NewCore(fileEncoder, writerHook, highPriority))

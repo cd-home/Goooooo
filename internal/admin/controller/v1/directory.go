@@ -18,12 +18,15 @@ type DirectoryController struct {
 func NewDirectoryController(engine *gin.Engine, log *zap.Logger, logic domain.DirectoryLogicFace) {
 	ctl := &DirectoryController{
 		logic: logic,
-		log:   log.WithOptions(zap.Fields(zap.String("module", "UserController"))),
+		log:   log.WithOptions(zap.Fields(zap.String("module", "DirectoryController"))),
 	}
 	directory := engine.Group("/api/v1/directory")
 	{
 		directory.POST("/create", ctl.CreateDirectory)
 		directory.GET("/list", ctl.ListDirectory)
+		directory.PUT("/move", ctl.MoveDirectory)
+		directory.PUT("/rename", ctl.RenameDirectory)
+		directory.DELETE("/delete", ctl.DeleteDirectory)
 	}
 }
 
@@ -36,10 +39,10 @@ func NewDirectoryController(engine *gin.Engine, log *zap.Logger, logic domain.Di
 // @Router /create [POST]
 func (d DirectoryController) CreateDirectory(ctx *gin.Context) {
 	params := types.CreateDirectoryParam{}
-	common := types.CommonResponse{Code: 0}
+	resp := types.CommonResponse{Code: 0}
 	if err := ctx.ShouldBindJSON(&params); err != nil {
-		common.Message = errno.ParamsParseError
-		ctx.JSON(http.StatusOK, common)
+		resp.Message = errno.ParamsParseError
+		ctx.JSON(http.StatusOK, resp)
 		return
 	}
 	if err := d.logic.CreateDirectory(
@@ -47,15 +50,12 @@ func (d DirectoryController) CreateDirectory(ctx *gin.Context) {
 		params.DirectoryType,
 		params.DirectoryLevel,
 		params.DirectoryIndex, params.Father); err != nil {
-		common.Message = errno.Failure
-		ctx.JSON(200, common)
-		return
+		resp.Message = errno.Failure
 	} else {
-		common.Code = 1
-		common.Message = errno.Success
-		ctx.JSON(200, common)
-		return
+		resp.Code = 1
+		resp.Message = errno.Success
 	}
+	ctx.JSON(http.StatusOK, resp)
 }
 
 // ListDirectory
@@ -67,14 +67,82 @@ func (d DirectoryController) CreateDirectory(ctx *gin.Context) {
 // @Router /list [POST]
 func (d DirectoryController) ListDirectory(ctx *gin.Context) {
 	params := types.ListDirectoryParam{}
-	common := types.CommonResponse{Code: 0}
+	resp := types.CommonResponse{Code: 0}
 	if err := ctx.ShouldBind(&params); err != nil {
-		common.Message = err.Error()
-		ctx.JSON(http.StatusOK, common)
+		resp.Message = errno.ParamsParseError
+		ctx.JSON(http.StatusOK, resp)
 		return
 	}
-	common.Data = d.logic.ListDirectory(params.DirectoryLevel, params.Father)
-	common.Code = 1
-	common.Message = errno.Success
-	ctx.JSON(200, common)
+	resp.Data = d.logic.ListDirectory(params.DirectoryLevel, params.Father)
+	resp.Code = 1
+	resp.Message = errno.Success
+	ctx.JSON(http.StatusOK, resp)
+}
+
+// RenameDirectory
+// @Summary Rename Directory
+// @Description Rename Directory
+// @Tags Directory
+// @Accept  json
+// @Produce json
+// @Router /rename [PUT]
+func (d DirectoryController) RenameDirectory(ctx *gin.Context) {
+	params := types.RenameDirectoryParam{}
+	resp := types.CommonResponse{Code: 0}
+	if err := ctx.ShouldBind(&params); err != nil {
+		resp.Message = errno.ParamsParseError
+		ctx.JSON(http.StatusOK, resp)
+		return
+	}
+	data := d.logic.RenameDirectory(params.DirectoryId, params.DirectoryName)
+	if data == nil {
+		resp.Message = errno.Failure
+	} else {
+		resp.Code = 1
+		resp.Message = errno.Success
+		resp.Data = data
+	}
+	ctx.JSON(http.StatusOK, resp)
+}
+
+// DeleteDirectory
+// @Summary Delete Directory
+// @Description Delete Directory
+// @Tags Directory
+// @Accept  json
+// @Produce json
+// @Router /delete [PUT]
+func (d DirectoryController) DeleteDirectory(ctx *gin.Context) {
+	params := types.ListDirectoryParam{}
+	resp := types.CommonResponse{Code: 0}
+	if err := ctx.ShouldBind(&params); err != nil {
+		resp.Message = errno.ParamsParseError
+		ctx.JSON(http.StatusOK, resp)
+		return
+	}
+	resp.Data = d.logic.ListDirectory(params.DirectoryLevel, params.Father)
+	resp.Code = 1
+	resp.Message = errno.Success
+	ctx.JSON(http.StatusOK, resp)
+}
+
+// MoveDirectory
+// @Summary Move Directory
+// @Description Move Directory
+// @Tags Directory
+// @Accept  json
+// @Produce json
+// @Router /move [PUT]
+func (d DirectoryController) MoveDirectory(ctx *gin.Context) {
+	params := types.ListDirectoryParam{}
+	resp := types.CommonResponse{Code: 0}
+	if err := ctx.ShouldBind(&params); err != nil {
+		resp.Message = errno.ParamsParseError
+		ctx.JSON(http.StatusOK, resp)
+		return
+	}
+	resp.Data = d.logic.ListDirectory(params.DirectoryLevel, params.Father)
+	resp.Code = 1
+	resp.Message = errno.Success
+	ctx.JSON(http.StatusOK, resp)
 }
