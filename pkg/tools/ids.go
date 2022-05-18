@@ -8,7 +8,7 @@ const (
 	_Node = 1
 )
 
-func Ids() int64 {
+func SnowId() int64 {
 	node, _ := snowflake.NewNode(_Node)
 	return node.Generate().Int64()
 }

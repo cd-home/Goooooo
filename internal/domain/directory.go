@@ -3,11 +3,13 @@ package domain
 type DirectoryLogicFace interface {
 	CreateDirectory(name string, dType string, level uint8, index uint8, father *uint64) error
 	ListDirectory(level uint8, directory_id *uint64) []*DirectoryVO
+	RenameDirectory(directory_id uint64, name string) *DirectoryVO
 }
 
 type DirectoryRepositoryFace interface {
 	CreateDirectory(name string, dType string, level uint8, index uint8, father *uint64) error
 	ListDirectory(level uint8, directory_id *uint64) []*DirectoryDTO
+	RenameDirectory(directory_id uint64, name string) *DirectoryDTO
 }
 
 type DirectoryVO struct {
