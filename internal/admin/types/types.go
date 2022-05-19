@@ -13,10 +13,10 @@ type RegisterParam struct {
 	Password string `json:"password" binding:"required,min=6,max=18"`
 }
 
+// LoginParam [Request, POST, Body]
 type LoginParam struct {
-	Method   string `json:"method"`
-	Account  string `json:"account"`
-	Password string `json:"password"`
+	Account  string `json:"account" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }
 
 // CreateDirectoryParam [Request, POST, Body]

@@ -5,8 +5,9 @@ import (
 	"os"
 	"strings"
 
+	"github.com/GodYao1995/Goooooo/internal/pkg/errno"
 	"github.com/GodYao1995/Goooooo/pkg/config"
-	"github.com/GodYao1995/Goooooo/pkg/errno"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"go.uber.org/fx"

@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS `user` (
     `id` INT unsigned PRIMARY KEY AUTO_INCREMENT COMMENT '自增主键id',
     `username` VARCHAR(20) NOT NULL DEFAULT 'Mike' COMMENT '用户名',
     `nickname` VARCHAR(20) DEFAULT NULL COMMENT '昵称',
-    `password` VARCHAR(255) NOT NULL COMMENT '密码',
+    `password` VARCHAR(500) NOT NULL COMMENT '密码',
     `age` TINYINT DEFAULT NULL COMMENT '年龄',
     `gender` TINYINT DEFAULT NULL COMMENT '性别',
     `email` VARCHAR(100) DEFAULT NULL COMMENT '邮箱',

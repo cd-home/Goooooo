@@ -18,3 +18,8 @@
     MAXAGE      = 30
     MAXBACKUPS  = 20
     COMPRESS    = false
+
+[REDIS]
+    ADDR        = "127.0.0.1:6379"
+    PASSWD      = ""
+    DB          = 0
