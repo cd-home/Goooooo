@@ -57,7 +57,7 @@ func (u UserController) Login(ctx *gin.Context) {
 	// store
 	sessions, _ := json.Marshal(obj)
 	session.Values["user"] = sessions
-	if err := u.store.Save(ctx.Request, ctx.Writer, session); err != nil {
+	if err := session.Save(ctx.Request, ctx.Writer); err != nil {
 		resp.Message = err.Error()
 		ctx.JSON(http.StatusOK, resp)
 		return
