@@ -10,3 +10,11 @@
     USER        = "root"
     PASSWD      = "root@123456"
     DATABASE    = "admin_test"
+
+[LOG]
+    DEBUG       = true
+    PATH        = "../logs/app.log"
+    MAXSIZE     = 1024
+    MAXAGE      = 30
+    MAXBACKUPS  = 20
+    COMPRESS    = false
