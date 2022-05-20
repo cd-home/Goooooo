@@ -58,15 +58,15 @@ func (repo *UserRepository) CheckAccountExist(ctx context.Context, account strin
 	// database error
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		repo.log.WithOptions(local).Info(err.Error())
-		return nil, errno.DataBaseError
+		return nil, errno.ErrorDataBase
 	}
 	// user already exist
 	if err == nil {
 		logger := fmt.Sprint(user.UserName, " Registered At ", user.CreateAt)
 		repo.log.WithOptions(local).Debug(logger)
-		return &user, errno.UserRecordExistError
+		return &user, errno.ErrorUserRecordExist
 		// use not existing
 	} else {
-		return nil, errno.UserRecordNotExistError
+		return nil, errno.ErrorUserRecordNotExist
 	}
 }

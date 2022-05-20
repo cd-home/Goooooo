@@ -4,10 +4,10 @@ import "errors"
 
 // System Error
 var (
-	NotFoundServiceError    = errors.New("未找到服务应用与环境信息")
-	DataBaseError           = errors.New("数据库操作失败, 请重试")
-	UserRecordExistError    = errors.New("该用户名已经被注册")
-	UserRecordNotExistError = errors.New("该用户名记录不存在")
+	ErrorNotFoundService    = errors.New("未找到服务应用与环境信息")
+	ErrorDataBase           = errors.New("数据库操作失败, 请重试")
+	ErrorUserRecordNotExist = errors.New("该用户记录不存在")
+	ErrorRedisEmpty         = errors.New("缓存记录不存在")
 )
 
 // Response Message
@@ -18,6 +18,8 @@ const (
 
 // API Error
 var (
-	ParamsParseError  = errors.New("请求参数错误")
-	UserRegisterError = errors.New("注册失败, 请重试")
+	ErrorUserRecordExist = errors.New("该用户名已经被注册")
+	ErrorParamsParse     = errors.New("请求参数错误")
+	ErrorUserRegister    = errors.New("注册失败, 请重试")
+	ErrorUserNotLogin    = errors.New("未登录, 请重试")
 )

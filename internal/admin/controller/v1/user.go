@@ -5,8 +5,10 @@ import (
 	"net/http"
 
 	"github.com/GodYao1995/Goooooo/internal/admin/types"
+	"github.com/GodYao1995/Goooooo/internal/admin/version"
 	"github.com/GodYao1995/Goooooo/internal/domain"
 	"github.com/GodYao1995/Goooooo/internal/pkg/errno"
+	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/auth"
 	"github.com/GodYao1995/Goooooo/internal/pkg/session"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -18,17 +20,25 @@ type UserController struct {
 	store *session.RedisStore
 }
 
-func NewUserController(engine *gin.Engine, log *zap.Logger, logic domain.UserLogicFace, store *session.RedisStore) {
+func NewUserController(apiV1 *version.APIV1, log *zap.Logger, logic domain.UserLogicFace, store *session.RedisStore) {
 	ctl := &UserController{
 		logic: logic,
 		log:   log.WithOptions(zap.Fields(zap.String("module", "UserController"))),
 		store: store,
 	}
-	user := engine.Group("/api/v1/user")
+	// API version
+	v1 := apiV1.Group
+	// No Need Authorization
+	user := v1.Group("/user")
 	{
 		user.POST("/register", ctl.Register)
 		user.POST("/login", ctl.Login)
-		user.GET("/profile", ctl.GetUserProfile)
+	}
+	// Need Authorization
+	needAuth := v1.Group("/user")
+	needAuth.Use(auth.AuthMiddleware(store))
+	{
+		needAuth.GET("/profile", ctl.GetUserProfile)
 	}
 }
 
@@ -43,7 +53,7 @@ func (u UserController) Login(ctx *gin.Context) {
 	params := types.LoginParam{}
 	resp := types.CommonResponse{Code: 0}
 	if err := ctx.ShouldBindJSON(&params); err != nil {
-		resp.Message = errno.ParamsParseError.Error()
+		resp.Message = errno.ErrorParamsParse.Error()
 		ctx.JSON(http.StatusOK, resp)
 		return
 	}
@@ -81,7 +91,7 @@ func (user UserController) Register(ctx *gin.Context) {
 	params := types.RegisterParam{}
 	resp := types.CommonResponse{Code: 0}
 	if err := ctx.ShouldBindJSON(&params); err != nil {
-		resp.Message = errno.ParamsParseError.Error()
+		resp.Message = errno.ErrorParamsParse.Error()
 		ctx.JSON(http.StatusOK, resp)
 		return
 	}
@@ -102,10 +112,10 @@ func (user UserController) Register(ctx *gin.Context) {
 // @Produce json
 // @Router /profile [GET]
 func (u UserController) GetUserProfile(ctx *gin.Context) {
-	session, _ := u.store.New(ctx.Request, "SESSIONID")
-	var user domain.UserSession
-	json.Unmarshal(session.Values["user"].([]byte), &user)
-	ctx.JSON(200, map[string]interface{}{
-		"message": user,
-	})
+	if v, ok := ctx.Get("user"); ok {
+		session := v.(domain.UserSession)
+		ctx.JSON(200, map[string]interface{}{
+			"message": session,
+		})
+	}
 }

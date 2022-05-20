@@ -22,11 +22,11 @@ func NewUserLogic(repo domain.UserRepositoryFace, session *session.RedisStore) d
 func (logic *UserLogic) Register(ctx context.Context, account string, password string) error {
 	user, err := logic.repo.CheckAccountExist(ctx, account, password)
 	// DataBaseError
-	if user == nil && errors.Is(err, errno.DataBaseError) {
+	if user == nil && errors.Is(err, errno.ErrorDataBase) {
 		return err
 	}
 	// User exist
-	if user != nil && errors.Is(err, errno.UserRecordExistError) {
+	if user != nil && errors.Is(err, errno.ErrorUserRecordExist) {
 		return err
 	}
 	err = logic.repo.CreateUserByUserName(ctx, account, password)
