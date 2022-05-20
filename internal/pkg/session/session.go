@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/GodYao1995/Goooooo/internal/pkg/errno"
 	"github.com/go-redis/redis/v8"
 	"github.com/gorilla/sessions"
 	"go.uber.org/fx"
@@ -73,7 +74,7 @@ func (s *RedisStore) New(r *http.Request, name string) (*sessions.Session, error
 
 	c, err := r.Cookie(name)
 	if err != nil {
-		return session, nil
+		return session, err
 	}
 	session.ID = c.Value
 
@@ -81,7 +82,7 @@ func (s *RedisStore) New(r *http.Request, name string) (*sessions.Session, error
 	if err == nil {
 		session.IsNew = false
 	} else if err == redis.Nil {
-		err = nil // no data stored
+		err = errno.ErrorRedisEmpty
 	}
 	return session, err
 }

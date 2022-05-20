@@ -41,7 +41,7 @@ func (d DirectoryController) CreateDirectory(ctx *gin.Context) {
 	params := types.CreateDirectoryParam{}
 	resp := types.CommonResponse{Code: 0}
 	if err := ctx.ShouldBindJSON(&params); err != nil {
-		resp.Message = errno.ParamsParseError.Error()
+		resp.Message = errno.ErrorParamsParse.Error()
 		ctx.JSON(http.StatusOK, resp)
 		return
 	}
@@ -69,7 +69,7 @@ func (d DirectoryController) ListDirectory(ctx *gin.Context) {
 	params := types.ListDirectoryParam{}
 	resp := types.CommonResponse{Code: 0}
 	if err := ctx.ShouldBind(&params); err != nil {
-		resp.Message = errno.ParamsParseError.Error()
+		resp.Message = errno.ErrorParamsParse.Error()
 		ctx.JSON(http.StatusOK, resp)
 		return
 	}
@@ -90,7 +90,7 @@ func (d DirectoryController) RenameDirectory(ctx *gin.Context) {
 	params := types.RenameDirectoryParam{}
 	resp := types.CommonResponse{Code: 0}
 	if err := ctx.ShouldBind(&params); err != nil {
-		resp.Message = errno.ParamsParseError.Error()
+		resp.Message = errno.ErrorParamsParse.Error()
 		ctx.JSON(http.StatusOK, resp)
 		return
 	}
@@ -116,7 +116,7 @@ func (d DirectoryController) DeleteDirectory(ctx *gin.Context) {
 	params := types.ListDirectoryParam{}
 	resp := types.CommonResponse{Code: 0}
 	if err := ctx.ShouldBind(&params); err != nil {
-		resp.Message = errno.ParamsParseError.Error()
+		resp.Message = errno.ErrorParamsParse.Error()
 		ctx.JSON(http.StatusOK, resp)
 		return
 	}
@@ -137,7 +137,7 @@ func (d DirectoryController) MoveDirectory(ctx *gin.Context) {
 	params := types.ListDirectoryParam{}
 	resp := types.CommonResponse{Code: 0}
 	if err := ctx.ShouldBind(&params); err != nil {
-		resp.Message = errno.ParamsParseError.Error()
+		resp.Message = errno.ErrorParamsParse.Error()
 		ctx.JSON(http.StatusOK, resp)
 		return
 	}
