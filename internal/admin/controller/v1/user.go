@@ -11,6 +11,7 @@ import (
 	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/auth"
 	"github.com/GodYao1995/Goooooo/internal/pkg/session"
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/sessions"
 	"go.uber.org/zap"
 )
 
@@ -64,9 +65,17 @@ func (u UserController) Login(ctx *gin.Context) {
 		return
 	}
 	session, _ := u.store.Get(ctx.Request, "SESSIONID")
-	// store
-	sessions, _ := json.Marshal(obj)
-	session.Values["user"] = sessions
+	// store session
+	values, _ := json.Marshal(obj)
+	session.Values["user"] = values
+	// TODO 后期修改到配置项
+	session.Options = &sessions.Options{
+		Path:     "/",
+		MaxAge:   60 * 60 * 2,
+		HttpOnly: true,
+		Secure:   true,
+	}
+	// write Cookie and store to Redis Session
 	if err := session.Save(ctx.Request, ctx.Writer); err != nil {
 		resp.Message = err.Error()
 		ctx.JSON(http.StatusOK, resp)
