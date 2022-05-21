@@ -1,9 +1,10 @@
 import request from "../utils/request";
 
 export const login = (data) => {
+    console.log(111111)
     return request({
-        url: "/login",
-        method: "POST",
+        method: 'POST',
+        url: "/user/register",
         data: data
     })
 }
