@@ -1,12 +1,10 @@
 import axios from "axios";
 import ElMessage from "element-plus"
 
-
 const instance = axios.create({
-    baseURL: import.meta.env.VITE_APP_ADDR,
-    timeout: import.meta.env.VITE_APP_TIMEOUT,
+    baseURL: process.env.VITE_APP_ADDR,
+    timeout: process.env.VITE_APP_TIMEOUT,
 });
-
 
 // 请求拦截器
 // instance.interceptors.request.use(
@@ -75,17 +73,15 @@ instance.interceptors.request.use(
 // 封装请求方法
 const request = ({method, url, data, config}) => {
     method = method.toUpperCase();
-    const version = import.meta.env.VITE_APP_VERSION
-    const api = version + url
     switch (method) {
         case "POST":
-            return instance.post(api, data, {...config})
+            return instance.post(url, data, {...config})
         case "GET":
-            return instance.get(api, {params: data, ...config})
+            return instance.get(url, {params: data, ...config})
         case "PUT":
-            return instance.put(api, data, {...config})
+            return instance.put(url, data, {...config})
         case "DELETE":
-            return instance.delete(api, {params: data, ...config})
+            return instance.delete(url, {params: data, ...config})
         default:
             console.log("请求方法不被允许")
             return false

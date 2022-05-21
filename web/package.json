@@ -2,7 +2,9 @@
   "name": "v-onism",
   "version": "0.0.0",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --mode development --port 9090",
+    "staging": "vite --mode staging --port 9091",
+    "production": "vite --mode production --port 9092",
     "build": "vite build",
     "serve": "vite preview"
   },
@@ -14,8 +16,9 @@
   "devDependencies": {
     "@vitejs/plugin-vue": "^1.9.0",
     "axios": "^0.24.0",
+    "dotenv": "^16.0.1",
+    "element-plus": "^1.1.0-beta.24",
     "sass": "^1.43.4",
-    "vite": "^2.5.10",
-    "element-plus": "^1.1.0-beta.24"
+    "vite": "^2.5.10"
   }
 }

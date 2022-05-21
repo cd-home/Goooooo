@@ -61,16 +61,14 @@ export default {
     }
   },
   methods: {
-    // handler() {
-    //   login({}).then(data => {
-    //     alert(data.data)
-    //   }).catch(error => {
-    //     alert(111)
-    //     alert(error)
-    //   })
-    // }
     handler() {
-      this.TOP = '100px'
+      login({}).then(data => {
+        console.log(22222)
+        alert(data.data)
+      }).catch(error => {
+        alert(111)
+        alert(error)
+      })
     }
   },
   components: {
