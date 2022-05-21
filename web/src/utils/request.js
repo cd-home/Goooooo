@@ -6,26 +6,27 @@ const instance = axios.create({
     timeout: process.env.VITE_APP_TIMEOUT,
 });
 
-// 请求拦截器
-// instance.interceptors.request.use(
-//     config => {
-//         // 请求头设置、Token等
-//         return config
-//     },
-//     error => {
-//         // DEBUG 调试
-//         console.log(error)
-//         return Promise.reject(error)
-//     }
-// );
+请求拦截器
+instance.interceptors.request.use(
+    config => {
+        // 请求头设置、Token等
+        return config
+    },
+    error => {
+        // DEBUG 调试
+        console.log(error)
+        return Promise.reject(error)
+    }
+);
 
 // 响应拦截器
 instance.interceptors.request.use(
     response => {
         // 调用失败，根据code不同提示不同的业务信息，供参考
-        // if (resp.code === 0) {
-        //     return Promise.reject(new Error(resp.message))
-        // }
+        if (resp.code === 1) {
+            ElMessage.warn(message);
+            return Promise.reject(new Error(resp.message))
+        }
         // 调用成功
         return response
     },
