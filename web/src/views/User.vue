@@ -50,24 +50,34 @@ li {
 </style>
 
 <script>
-import Header from '../components/Header.vue'
-import {login} from "../api/user";
+import Header from '@/components/Header.vue'
+import {ElNotification} from 'element-plus'
 
 export default {
   data() {
     return {
       count: 0,
-      TOP: '-500px'
+      TOP: '-500px',
+      register: {
+        "account": "mary",
+        "password": "123456"
+      }
     }
   },
   methods: {
     handler() {
-      login({}).then(data => {
-        console.log(22222)
-        alert(data.data)
+      this.$api.login(this.register).then(resp => {
+       ElNotification({
+          title: 'Success',
+          message: resp.message,
+          type: 'success',
+        })
       }).catch(error => {
-        alert(111)
-        alert(error)
+         ElNotification({
+          title: 'Info',
+          message: error.message,
+          type: 'info',
+        })
       })
     }
   },

@@ -3,7 +3,7 @@
   </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .login {
   width: 400px;
   height: 600px;

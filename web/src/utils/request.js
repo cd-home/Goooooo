@@ -7,27 +7,29 @@ const instance = axios.create({
 });
 
 // 请求拦截器
-// instance.interceptors.request.use(
-//     config => {
-//         // 请求头设置、Token等
-//         return config
-//     },
-//     error => {
-//         // DEBUG 调试
-//         console.log(error)
-//         return Promise.reject(error)
-//     }
-// );
+instance.interceptors.request.use(
+    config => {
+        // 请求头设置、Token等
+        return config
+    },
+    error => {
+        // DEBUG 调试
+        console.log(error)
+        return Promise.reject(error)
+    }
+);
+
 
 // 响应拦截器
-instance.interceptors.request.use(
+instance.interceptors.response.use(
     response => {
         // 调用失败，根据code不同提示不同的业务信息，供参考
-        // if (resp.code === 0) {
-        //     return Promise.reject(new Error(resp.message))
-        // }
+        const resp = response.data
+        if (resp.code === 1) {
+            return Promise.reject(resp.message)
+        }
         // 调用成功
-        return response
+        return resp
     },
     error => {
         console.log(error)
@@ -63,7 +65,6 @@ instance.interceptors.request.use(
                     message = "网关超时!"
                     break;
             }
-            ElMessage.error(message);
             return Promise.reject(error);
         }
         return Promise.reject(error);

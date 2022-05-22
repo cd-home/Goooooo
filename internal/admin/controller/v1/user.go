@@ -52,7 +52,7 @@ func NewUserController(apiV1 *version.APIV1, log *zap.Logger, logic domain.UserL
 // @Router /login [POST]
 func (u UserController) Login(ctx *gin.Context) {
 	params := types.LoginParam{}
-	resp := types.CommonResponse{Code: 0}
+	resp := types.CommonResponse{Code: 1}
 	if err := ctx.ShouldBindJSON(&params); err != nil {
 		resp.Message = errno.ErrorParamsParse.Error()
 		ctx.JSON(http.StatusOK, resp)
@@ -82,6 +82,7 @@ func (u UserController) Login(ctx *gin.Context) {
 		return
 	}
 	resp.Data = view
+	resp.Code = 0
 	resp.Message = errno.Success
 	ctx.JSON(http.StatusOK, resp)
 }
@@ -98,7 +99,7 @@ func (u UserController) Login(ctx *gin.Context) {
 // @Router /register [POST]
 func (user UserController) Register(ctx *gin.Context) {
 	params := types.RegisterParam{}
-	resp := types.CommonResponse{Code: 0}
+	resp := types.CommonResponse{Code: 1}
 	if err := ctx.ShouldBindJSON(&params); err != nil {
 		resp.Message = errno.ErrorParamsParse.Error()
 		ctx.JSON(http.StatusOK, resp)
@@ -107,7 +108,7 @@ func (user UserController) Register(ctx *gin.Context) {
 	if err := user.logic.Register(ctx, params.Account, params.Password); err != nil {
 		resp.Message = err.Error()
 	} else {
-		resp.Code = 1
+		resp.Code = 0
 		resp.Message = errno.Success
 	}
 	ctx.JSON(http.StatusOK, resp)
