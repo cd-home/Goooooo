@@ -2,18 +2,26 @@
 
 </script>
 <template>
-  <div class="home">
-    <Header></Header>
-    <router-link to="/user">登陆或者注册</router-link>
+  <div class="common-layout">
+    <el-container>
+      <el-header>Header</el-header>
+      <el-container>
+        <el-aside width="200px">Aside</el-aside>
+        <el-container>
+          <el-main>Main</el-main>
+          <el-footer>Footer</el-footer>
+        </el-container>
+      </el-container>
+    </el-container>
   </div>
 </template>
 
 <style lang="scss" scoped>
-.home {
-  width: 100%;
-  height: 400px;
-  background-color: #559b90;
-}
+  .el-header {
+    width: 100%;
+    height: 50px;
+    background: pink;
+  }
 </style>
 
 <script>

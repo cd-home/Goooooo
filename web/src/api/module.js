@@ -1,8 +1,7 @@
 import {login} from '@/api/user'
 
-const api = {}
+const apis = {
+    login: login
+}
 
-api.login = login
-
-
-export default api
+export default apis

@@ -51,7 +51,7 @@ li {
 
 <script>
 import Header from '@/components/Header.vue'
-
+import {ElNotification} from 'element-plus'
 
 export default {
   data() {
@@ -67,9 +67,17 @@ export default {
   methods: {
     handler() {
       this.$api.login(this.register).then(resp => {
-       alert(resp.code)
+       ElNotification({
+          title: 'Success',
+          message: resp.message,
+          type: 'success',
+        })
       }).catch(error => {
-        alert(error)
+         ElNotification({
+          title: 'Info',
+          message: error.message,
+          type: 'info',
+        })
       })
     }
   },

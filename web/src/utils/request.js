@@ -19,13 +19,14 @@ instance.interceptors.request.use(
     }
 );
 
+
 // 响应拦截器
 instance.interceptors.response.use(
     response => {
         // 调用失败，根据code不同提示不同的业务信息，供参考
         const resp = response.data
         if (resp.code === 1) {
-            return Promise.reject(new Error(resp.message))
+            return Promise.reject(resp.message)
         }
         // 调用成功
         return resp
