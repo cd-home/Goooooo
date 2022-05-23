@@ -70,10 +70,11 @@ func (u UserController) Login(ctx *gin.Context) {
 	session.Values["user"] = values
 	// TODO 后期修改到配置项
 	session.Options = &sessions.Options{
-		Path:     "/",
-		MaxAge:   60 * 60 * 2,
-		HttpOnly: true,
-		Secure:   true,
+		Path:   "/",
+		MaxAge: 60 * 60 * 2,
+		// 需要false 否则前端无法读取Cookie
+		HttpOnly: false,
+		Secure:   false,
 	}
 	// write Cookie and store to Redis Session
 	if err := session.Save(ctx.Request, ctx.Writer); err != nil {

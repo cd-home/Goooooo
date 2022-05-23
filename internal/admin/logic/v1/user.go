@@ -44,7 +44,7 @@ func (logic *UserLogic) Login(ctx context.Context, account string, password stri
 	// Check Password
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, errno.ErrorUserPassword
 	}
 	obj := &domain.UserVO{
 		Id:       user.Id,
