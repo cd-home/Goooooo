@@ -12,6 +12,18 @@ const router = createRouter({
             path: "/login",
             component: () => import("@/views/Login.vue"),
         },
+        {
+            path: "/register",
+            component: () => import("@/views/Register.vue"),
+        },
+        {
+            path: "/404",
+            component: () => import("@/views/404.vue"),
+        },
+        {
+            path: "/500",
+            component: () => import("@/views/500.vue"),
+        },
     ]
 })
 
@@ -22,7 +34,7 @@ router.beforeEach((to, from, next) => {
     if (Cookie.get('SESSIONID')) {
         next();
     } else {
-       if (to.path === '/login') {
+       if (to.path === '/login' || to.path === '/register') {
            next();
        }
        next('/login');

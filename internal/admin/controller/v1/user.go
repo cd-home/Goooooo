@@ -84,7 +84,7 @@ func (u UserController) Login(ctx *gin.Context) {
 	}
 	resp.Data = view
 	resp.Code = 0
-	resp.Message = errno.Success
+	resp.Message = errno.LoginSuccess
 	ctx.JSON(http.StatusOK, resp)
 }
 
@@ -110,7 +110,7 @@ func (user UserController) Register(ctx *gin.Context) {
 		resp.Message = err.Error()
 	} else {
 		resp.Code = 0
-		resp.Message = errno.Success
+		resp.Message = errno.RegisterSuccess
 	}
 	ctx.JSON(http.StatusOK, resp)
 }
