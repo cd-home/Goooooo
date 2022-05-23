@@ -22,6 +22,8 @@ body {
 }
 
 #app {
+  background-image: url("@/assets/loginbg.jpeg");
+  background-size: cover;
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

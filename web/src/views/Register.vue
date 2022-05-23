@@ -1,24 +1,127 @@
 <template>
-  <div class="common-layout">
-    <el-container>
-      <el-header>Header</el-header>
-      <el-main>Main</el-main>
-      <el-footer>Footer</el-footer>
+  <el-container>
+      <el-main>
+        <el-header>Gooooooooo</el-header>
+         <el-form
+          :label-position="labelPosition"
+          label-width="100px"
+          :model="form"
+          style="max-width: 460px"
+          :rules="rules"
+          ref="form"
+        >
+          <el-form-item label="Account" prop="account">
+            <el-input v-model="form.account" autofocus="true" />
+          </el-form-item>
+          <el-form-item label="Password" prop="password">
+          <el-input v-model="form.password" type="password" show-password oncopy="false" />
+          </el-form-item>
+          <el-form-item label="ConfirmPwd" prop="ConfirmPwd">
+            <el-input v-model="form.ConfirmPwd" type="password" show-password oncopy="false" />
+          </el-form-item>
+          <el-button type="" size="small" @click="RegisterHand">注册</el-button>
+        </el-form>
+      </el-main>
     </el-container>
-  </div>
 </template>
 
-<style lang="scss" scoped>
 
+<style lang="scss">
+.el-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    .el-header {
+      font-size: 4rem;
+      color: #fff;
+      text-align: right;
+      padding: 0;
+    }
+    .el-main {
+      user-select: none;
+      position: absolute;
+      top: 10vh;
+      right: 8vh;
+      width: 56vh;
+      height: 60vh;
+      .el-form {
+        margin-top: 2vh;
+        .el-form-item {
+           .el-form-item__label {
+            color: #fff;
+          }
+          .el-input {
+            font-size: 1.5rem;
+            --el-input-font-color: rgb(59, 137, 201);
+            --el-input-background-color: transparent;
+            --el-input-border-radius: 5px;
+          }
+        }
+        .el-button {
+          margin-left: 28rem;
+          background-color: transparent;
+          font-size: 1rem;
+          color: #fff;
+        }
+      }
+    }
+  }
 </style>
 
 <script>
+import { reactive, ref } from 'vue'
+
+const labelPosition = ref('right')
+
+const form = reactive({
+  account: '',
+  password: '',
+  ConfirmPwd: '',
+})
 
 export default {
   data() {
-    return {}
+    // 自定义验证 需要写在data 里面
+    const ConfirmPwdRule = (rule, value, callback) => {
+      if (value != this.form.password) {
+        callback("两次输入密码不一致")
+      }
+    }
+     return {
+      form,
+      labelPosition,
+      rules: reactive({
+        account: [
+          {required: true, message: '账号不能为空', type: "string", trigger: 'blur'},
+          {min: 4, max: 18, message: '账号长度必须4-18位', trigger: 'blur'}
+        ],
+        password: [
+          {required: true, message: '密码不能为空', trigger: 'blur'},
+          {min: 6, max: 18, message: '密码长度必须4-18位', trigger: 'blur'},
+          // {
+          //   pattern: /^(?=.*\d)(?=.*[a-zA-Z])(?=.*[~!@#$%^&*])[\da-zA-Z~!@#$%^&*]{6,18}$/,
+          //   message: '密码长度6-18位, 必须包含数字、字母、特殊字符',
+          //   trigger: 'blur'
+          // },
+        ],
+        ConfirmPwd: [
+          {required: true, message: '密码不能为空', trigger: 'blur'},
+          {required: true, message: '两次输入密码不一致', validator: ConfirmPwdRule, trigger: 'blur'}
+        ]
+      }),
+    }
   },
   components: {
+  },
+  methods: {
+    RegisterHand() {
+      this.$api.register(this.form).then(response => {
+        this.$notify.SuccessNotify(response.message)
+        this.$router.push('/login')
+      }).catch(error => {
+        this.$notify.ErrorNotify(error)
+      })
+    }
   }
 }
 </script>

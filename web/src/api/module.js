@@ -1,7 +1,8 @@
-import {login} from '@/api/user'
+import {login, register} from '@/api/user'
 
 const apis = {
-    login: login
+    login,
+    register
 }
 
 export default apis

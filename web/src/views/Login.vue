@@ -1,6 +1,7 @@
 <template>
   <el-container>
       <el-main>
+         <el-header>Gooooooooo</el-header>
          <el-form
           :label-position="labelPosition"
           label-width="100px"
@@ -23,12 +24,16 @@
 
 <style lang="scss">
   .el-container {
-    background-image: url("@/assets/loginbg.jpeg");
-    background-size: cover;
     width: 100%;
     height: 100%;
     position: relative;
     .el-main {
+      .el-header {
+        font-size: 4rem;
+        color: #fff;
+        text-align: right;
+        padding: 0;
+      }
       user-select: none;
       position: absolute;
       top: 10vh;
@@ -36,7 +41,7 @@
       width: 56vh;
       height: 60vh;
       .el-form {
-        margin-top: 10vh;
+        margin-top: 2vh;
         .el-form-item {
            .el-form-item__label {
             color: #fff;
@@ -101,7 +106,6 @@ export default {
       this.$api.login(this.form).then(response => {
       this.$notify.SuccessNotify(response.message)
       this.$store.commit('login', response.data)
-      console.log(this.$store.state.user)
       this.$router.push("/home")
      }).catch(error => {
        this.$notify.ErrorNotify(error)
