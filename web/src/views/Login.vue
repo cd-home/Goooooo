@@ -95,11 +95,13 @@ export default {
   },
   methods: {
    LoginHand() {
-    //  let body = new FormData();
-    //  body.append("account", this.form.account);
-    //  body.append("password", this.form.password);
+      //  let body = new FormData();
+      //  body.append("account", this.form.account);
+      //  body.append("password", this.form.password);
       this.$api.login(this.form).then(response => {
       this.$notify.SuccessNotify(response.message)
+      this.$store.commit('login', response.data)
+      console.log(this.$store.state.user)
       this.$router.push("/home")
      }).catch(error => {
        this.$notify.ErrorNotify(error)

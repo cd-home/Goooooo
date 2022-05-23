@@ -33,3 +33,6 @@ type DirectoryRelation struct {
 	Descendant uint64 `db:"descendant"`
 	Distance   uint8  `db:"distance"`
 }
+
+type Directory struct {
+}
