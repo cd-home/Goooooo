@@ -4,14 +4,22 @@ import { createStore } from 'vuex'
 const store = createStore({
     state () {
       return {
-        count: 0
+        user: null,
       }
     },
+    getters: {
+      
+    },
     mutations: {
-      increment (state) {
-        state.count++
+      login(state, user) {
+        state.user = user
+      },
+      logout (state) {
+        state.user = null;
+        Cookie.remove("SESSIONID");
       }
-    }
+    },
+    actions: {}
 })
 
 export default store
