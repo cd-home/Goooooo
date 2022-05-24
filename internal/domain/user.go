@@ -3,11 +3,13 @@ package domain
 import (
 	"context"
 	"database/sql"
+	"net/http"
 )
 
 type UserLogicFace interface {
 	Register(ctx context.Context, account string, password string) error
 	Login(ctx context.Context, account string, password string) (*UserVO, *UserSession, error)
+	SetSession(r *http.Request, rw http.ResponseWriter, obj *UserSession) error
 }
 
 type UserRepositoryFace interface {
