@@ -20,7 +20,10 @@ type UserRepository struct {
 }
 
 func NewUserRepository(db *sqlx.DB, log *zap.Logger) domain.UserRepositoryFace {
-	return &UserRepository{db: db, log: log.WithOptions(zap.Fields(zap.String("module", "UserRepository")))}
+	return &UserRepository{
+		db:  db,
+		log: log.WithOptions(zap.Fields(zap.String("module", "UserRepository"))),
+	}
 }
 
 // CreateUserByUserName

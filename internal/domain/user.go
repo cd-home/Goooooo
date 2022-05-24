@@ -9,13 +9,17 @@ import (
 type UserLogicFace interface {
 	Register(ctx context.Context, account string, password string) error
 	Login(ctx context.Context, account string, password string) (*UserVO, *UserSession, error)
-	SetSession(r *http.Request, rw http.ResponseWriter, obj *UserSession) error
+	SetSession(r *http.Request, rw http.ResponseWriter, sessionObj *UserSession) error
 }
 
 type UserRepositoryFace interface {
 	CreateUserByUserName(ctx context.Context, account string, password string) error
 	CreateUserByEmail(ctx context.Context, account string, password string) error
 	CheckAccountExist(ctx context.Context, account string, password string) (*UserDTO, error)
+}
+
+type UserEsRepositoryFace interface {
+	CreateUserDocument(ctx context.Context, documents []*UserEsPO) error
 }
 
 // User DTO
@@ -35,6 +39,24 @@ type UserDTO struct {
 	UpdateAt  string         `db:"update_at"`
 	CreateAt  string         `db:"create_at"`
 	DeleteAt  sql.NullTime   `db:"delete_at"`
+}
+
+// UserEsPO
+type UserEsPO struct {
+	Id        uint64 `json:"id"`
+	UserName  string `json:"user"`
+	NickName  string `json:"nickname"`
+	Age       uint8  `json:"age"`
+	Gender    string `json:"gender"`
+	Email     string `json:"email"`
+	Avatar    string `json:"avatar"`
+	Phone     string `json:"phone"`
+	State     uint8  `json:"state"`
+	Ip        uint32 `json:"ip"`
+	LastLogin string `json:"last_login"`
+	UpdateAt  string `json:"update_at"`
+	CreateAt  string `json:"create_at"`
+	DeleteAt  string `json:"delete_at"`
 }
 
 // User VO

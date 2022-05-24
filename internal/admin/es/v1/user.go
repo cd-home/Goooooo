@@ -3,8 +3,13 @@ package v1
 import (
 	"context"
 
+	"github.com/GodYao1995/Goooooo/internal/domain"
 	"github.com/olivere/elastic/v7"
 	"go.uber.org/zap"
+)
+
+const (
+	USERINDEX = "user_index"
 )
 
 type UserEsRepo struct {
@@ -14,16 +19,24 @@ type UserEsRepo struct {
 	log     *zap.Logger
 }
 
-func NewUserEs(index string, client *elastic.Client, log *zap.Logger) *UserEsRepo {
-	ue := &UserEsRepo{index: index, mapping: "", client: client, log: log}
-	err := ue.InitIndex()
+func NewUserEs(client *elastic.Client, log *zap.Logger) domain.UserEsRepositoryFace {
+	ue := &UserEsRepo{index: USERINDEX, mapping: "", client: client, log: log}
+	err := _InitIndex(ue)
 	if err != nil {
 		ue.log.Warn(err.Error())
 	}
 	return ue
 }
 
-func (ue *UserEsRepo) InitIndex() error {
+func (ue *UserEsRepo) CreateUserDocument(ctx context.Context, documents []*domain.UserEsPO) error {
+	_, err := ue.client.Index().Index(ue.index).BodyJson(documents).Do(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func _InitIndex(ue *UserEsRepo) error {
 	ctx := context.Background()
 	exist, err := ue.client.IndexExists(ue.index).Do(ctx)
 	if err != nil {
