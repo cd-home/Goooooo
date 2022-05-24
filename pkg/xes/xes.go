@@ -21,7 +21,8 @@ func NewESClient(lifecycle fx.Lifecycle, vp *viper.Viper) *elastic.Client {
 			client, err = elastic.NewClient(
 				elastic.SetURL(addr),
 				elastic.SetSniff(false),
-				elastic.SetBasicAuth(user, pwd))
+				// elastic.SetBasicAuth(user, pwd),
+			)
 			if err != nil {
 				log.Println(err)
 				return err
@@ -31,7 +32,8 @@ func NewESClient(lifecycle fx.Lifecycle, vp *viper.Viper) *elastic.Client {
 				log.Println(err)
 				return err
 			}
-			log.Printf("\033[1;32;32m=========== ES RUNNING: [ %s: ] ============\033[0m", addr)
+			v, _ := client.ElasticsearchVersion(addr)
+			log.Printf("\033[1;32;32m=========== ES [%s] RUNNING: [ %s: ] ============\033[0m", v, addr)
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
