@@ -23,3 +23,8 @@
     ADDR        = "127.0.0.1:6379"
     PASSWD      = ""
     DB          = 0
+
+[ES]
+    ADDR        = "http://127.0.0.1:9200"
+    USER        = "elastic"
+    PASSWD      = "123456"
