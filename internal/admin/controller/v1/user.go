@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/GodYao1995/Goooooo/internal/admin/types"
@@ -11,7 +10,6 @@ import (
 	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/auth"
 	"github.com/GodYao1995/Goooooo/internal/pkg/session"
 	"github.com/gin-gonic/gin"
-	"github.com/gorilla/sessions"
 	"go.uber.org/zap"
 )
 
@@ -49,6 +47,9 @@ func NewUserController(apiV1 *version.APIV1, log *zap.Logger, logic domain.UserL
 // @Tags User
 // @Accept  json
 // @Produce json
+// @Param login body types.LoginParam true "login"
+// @Success 0 {object} domain.UserVO {"code":0,"data": domain.UserVO, "msg":"Success"}
+// @Failure 1 {object} types.CommonResponse {"code":1,"data":null,"msg":"Error"}
 // @Router /login [POST]
 func (u UserController) Login(ctx *gin.Context) {
 	params := types.LoginParam{}
@@ -64,20 +65,8 @@ func (u UserController) Login(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, resp)
 		return
 	}
-	session, _ := u.store.Get(ctx.Request, "SESSIONID")
-	// store session
-	values, _ := json.Marshal(obj)
-	session.Values["user"] = values
-	// TODO 后期修改到配置项
-	session.Options = &sessions.Options{
-		Path:   "/",
-		MaxAge: 60 * 60 * 2,
-		// 需要false 否则前端无法读取Cookie
-		HttpOnly: false,
-		Secure:   false,
-	}
-	// write Cookie and store to Redis Session
-	if err := session.Save(ctx.Request, ctx.Writer); err != nil {
+	// Set Session
+	if err := u.logic.SetSession(ctx.Request, ctx.Writer, obj); err != nil {
 		resp.Message = err.Error()
 		ctx.JSON(http.StatusOK, resp)
 		return
@@ -95,8 +84,8 @@ func (u UserController) Login(ctx *gin.Context) {
 // @Accept  json
 // @Produce json
 // @Param register body types.RegisterParam true "register"
-// @Success 1 {object} types.CommonResponse {"code":1,"data":null,"msg":"Success"}
-// @Failure 0 {object} types.CommonResponse {"code":0,"data":null,"msg":"Error"}
+// @Success 0 {object} types.CommonResponse {"code":1,"data":null,"msg":"Success"}
+// @Failure 1 {object} types.CommonResponse {"code":0,"data":null,"msg":"Error"}
 // @Router /register [POST]
 func (user UserController) Register(ctx *gin.Context) {
 	params := types.RegisterParam{}

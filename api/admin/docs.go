@@ -96,7 +96,31 @@ const docTemplate = `{
                     "User"
                 ],
                 "summary": "User Login",
-                "responses": {}
+                "parameters": [
+                    {
+                        "description": "login",
+                        "name": "login",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.LoginParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "0": {
+                        "description": "code\":0,\"data\": domain.UserVO, \"msg\":\"Success\"}",
+                        "schema": {
+                            "$ref": "#/definitions/domain.UserVO"
+                        }
+                    },
+                    "1": {
+                        "description": "code\":1,\"data\":null,\"msg\":\"Error\"}",
+                        "schema": {
+                            "$ref": "#/definitions/types.CommonResponse"
+                        }
+                    }
+                }
             }
         },
         "/move": {
@@ -157,13 +181,13 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "0": {
-                        "description": "code\":0,\"data\":null,\"msg\":\"Error\"}",
+                        "description": "code\":1,\"data\":null,\"msg\":\"Success\"}",
                         "schema": {
                             "$ref": "#/definitions/types.CommonResponse"
                         }
                     },
                     "1": {
-                        "description": "code\":1,\"data\":null,\"msg\":\"Success\"}",
+                        "description": "code\":0,\"data\":null,\"msg\":\"Error\"}",
                         "schema": {
                             "$ref": "#/definitions/types.CommonResponse"
                         }
@@ -189,6 +213,23 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "domain.UserVO": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "string"
+                },
+                "last_login": {
+                    "type": "string"
+                },
+                "nickname": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "types.CommonResponse": {
             "type": "object",
             "properties": {
@@ -197,6 +238,21 @@ const docTemplate = `{
                 },
                 "data": {},
                 "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.LoginParam": {
+            "type": "object",
+            "required": [
+                "account",
+                "password"
+            ],
+            "properties": {
+                "account": {
+                    "type": "string"
+                },
+                "password": {
                     "type": "string"
                 }
             }

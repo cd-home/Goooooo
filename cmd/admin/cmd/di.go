@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/GodYao1995/Goooooo/internal/admin/controller"
+	esrepo "github.com/GodYao1995/Goooooo/internal/admin/es"
 	"github.com/GodYao1995/Goooooo/internal/admin/logic"
 	"github.com/GodYao1995/Goooooo/internal/admin/repository"
 	"github.com/GodYao1995/Goooooo/internal/admin/version"
@@ -37,6 +38,7 @@ func inject() fx.Option {
 		// Provide
 		logic.Module,
 		repository.Module,
+		esrepo.Module,
 		// Options
 		// fx.WithLogger(
 		// 	func() fxevent.Logger {

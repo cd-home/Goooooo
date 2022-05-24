@@ -2,23 +2,27 @@ package v1
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"net/http"
 
 	"github.com/GodYao1995/Goooooo/internal/domain"
 	"github.com/GodYao1995/Goooooo/internal/pkg/errno"
 	"github.com/GodYao1995/Goooooo/internal/pkg/session"
+	"github.com/gorilla/sessions"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type UserLogic struct {
-	repo    domain.UserRepositoryFace
-	session *session.RedisStore
+	repo  domain.UserRepositoryFace
+	store *session.RedisStore
 }
 
-func NewUserLogic(repo domain.UserRepositoryFace, session *session.RedisStore) domain.UserLogicFace {
-	return &UserLogic{repo: repo, session: session}
+func NewUserLogic(repo domain.UserRepositoryFace, store *session.RedisStore) domain.UserLogicFace {
+	return &UserLogic{repo: repo, store: store}
 }
 
+// Register
 func (logic *UserLogic) Register(ctx context.Context, account string, password string) error {
 	user, err := logic.repo.CheckAccountExist(ctx, account, password)
 	// DataBaseError
@@ -36,6 +40,7 @@ func (logic *UserLogic) Register(ctx context.Context, account string, password s
 	return nil
 }
 
+// Login
 func (logic *UserLogic) Login(ctx context.Context, account string, password string) (*domain.UserVO, *domain.UserSession, error) {
 	user, err := logic.repo.CheckAccountExist(ctx, account, password)
 	if user == nil {
@@ -55,5 +60,25 @@ func (logic *UserLogic) Login(ctx context.Context, account string, password stri
 		UserName: user.UserName,
 	}
 	return obj, sessions, nil
+}
 
+// SetSession
+func (logic *UserLogic) SetSession(r *http.Request, rw http.ResponseWriter, obj *domain.UserSession) error {
+	session, _ := logic.store.Get(r, "SESSIONID")
+	// store session
+	values, _ := json.Marshal(obj)
+	session.Values["user"] = values
+	// TODO 后期修改到配置项
+	session.Options = &sessions.Options{
+		Path:   "/",
+		MaxAge: 60 * 60 * 2,
+		// 需要false 否则前端无法读取Cookie
+		HttpOnly: false,
+		Secure:   false,
+	}
+	// write Cookie and store to Redis Session
+	if err := session.Save(r, rw); err != nil {
+		return err
+	}
+	return nil
 }

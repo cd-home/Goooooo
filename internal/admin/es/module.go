@@ -1,7 +1,7 @@
 package xes
 
 import (
-	v1 "github.com/GodYao1995/Goooooo/internal/admin/xes/v1"
+	v1 "github.com/GodYao1995/Goooooo/internal/admin/es/v1"
 	"go.uber.org/fx"
 )
 
