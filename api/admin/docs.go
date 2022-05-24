@@ -19,6 +19,22 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/create": {
+            "post": {
+                "description": "Create Directory",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Directory"
+                ],
+                "summary": "Create Directory",
+                "responses": {}
+            }
+        },
         "/db": {
             "get": {
                 "description": "Sys DBStats",
@@ -35,6 +51,38 @@ const docTemplate = `{
                 "responses": {}
             }
         },
+        "/delete": {
+            "put": {
+                "description": "Delete Directory",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Directory"
+                ],
+                "summary": "Delete Directory",
+                "responses": {}
+            }
+        },
+        "/list": {
+            "post": {
+                "description": "List Directory",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Directory"
+                ],
+                "summary": "List Directory",
+                "responses": {}
+            }
+        },
         "/login": {
             "post": {
                 "description": "User Login",
@@ -48,6 +96,38 @@ const docTemplate = `{
                     "User"
                 ],
                 "summary": "User Login",
+                "responses": {}
+            }
+        },
+        "/move": {
+            "put": {
+                "description": "Move Directory",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Directory"
+                ],
+                "summary": "Move Directory",
+                "responses": {}
+            }
+        },
+        "/profile": {
+            "get": {
+                "description": "Get UserProfile",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get UserProfile",
                 "responses": {}
             }
         },
@@ -89,6 +169,22 @@ const docTemplate = `{
                         }
                     }
                 }
+            }
+        },
+        "/rename": {
+            "put": {
+                "description": "Rename Directory",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Directory"
+                ],
+                "summary": "Rename Directory",
+                "responses": {}
             }
         }
     },

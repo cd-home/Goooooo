@@ -30,6 +30,17 @@ info:
   description: this is Goooooo-Admin Sys.
   version: 1.0.0
 paths:
+  /create:
+    post:
+      consumes:
+      - application/json
+      description: Create Directory
+      produces:
+      - application/json
+      responses: {}
+      summary: Create Directory
+      tags:
+      - Directory
   /db:
     get:
       consumes:
@@ -41,6 +52,28 @@ paths:
       summary: Sys DBStats
       tags:
       - Sys
+  /delete:
+    put:
+      consumes:
+      - application/json
+      description: Delete Directory
+      produces:
+      - application/json
+      responses: {}
+      summary: Delete Directory
+      tags:
+      - Directory
+  /list:
+    post:
+      consumes:
+      - application/json
+      description: List Directory
+      produces:
+      - application/json
+      responses: {}
+      summary: List Directory
+      tags:
+      - Directory
   /login:
     post:
       consumes:
@@ -50,6 +83,28 @@ paths:
       - application/json
       responses: {}
       summary: User Login
+      tags:
+      - User
+  /move:
+    put:
+      consumes:
+      - application/json
+      description: Move Directory
+      produces:
+      - application/json
+      responses: {}
+      summary: Move Directory
+      tags:
+      - Directory
+  /profile:
+    get:
+      consumes:
+      - application/json
+      description: Get UserProfile
+      produces:
+      - application/json
+      responses: {}
+      summary: Get UserProfile
       tags:
       - User
   /register:
@@ -78,4 +133,15 @@ paths:
       summary: User Register
       tags:
       - User
+  /rename:
+    put:
+      consumes:
+      - application/json
+      description: Rename Directory
+      produces:
+      - application/json
+      responses: {}
+      summary: Rename Directory
+      tags:
+      - Directory
 swagger: "2.0"

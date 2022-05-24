@@ -10,6 +10,7 @@ import (
 	"github.com/GodYao1995/Goooooo/pkg/casbin"
 	"github.com/GodYao1995/Goooooo/pkg/db"
 	"github.com/GodYao1995/Goooooo/pkg/logger"
+	"github.com/GodYao1995/Goooooo/pkg/xes"
 	"github.com/GodYao1995/Goooooo/pkg/xhttp/server"
 	"go.uber.org/fx"
 )
@@ -29,6 +30,7 @@ func inject() fx.Option {
 		server.Module,
 		version.Module,
 		casbin.Module,
+		xes.Module,
 		// Invoke
 		controller.ModuleV1,
 		controller.ModuleV2,
