@@ -54,7 +54,7 @@ func (repo *DirectoryRepository) CreateDirectory(name string, dType string, leve
 			 VALUES(?, ?, ?)`, *father, unique, 1)
 
 		// 创建祖先与该目录的关系
-		relations := make([]*domain.DirectoryRelation, 0)
+		relations := make([]*domain.DirectoryRelationPO, 0)
 		tx.Select(&relations, `
 			SELECT 
 				ancestor, descendant, distance
