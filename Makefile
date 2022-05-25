@@ -14,8 +14,8 @@ build:
 
 run:
 	@echo "Build $(app) and Run"
-	cd cmd/$(app) && go build -o=../../bin && \
-	cd ../../bin && ./$(app) server --mode=$(mode) --app=$(app) --config=$(config)
+	cd cmd/$(app) && go build -o=../../bin/${app}_${mode} && \
+	cd ../../bin && ./$(app)_${mode} server --mode=$(mode) --app=$(app) --config=$(config)
 
 upx:
 	@echo 'Build $(app) command:'
