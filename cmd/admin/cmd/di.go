@@ -14,6 +14,7 @@ import (
 	"github.com/GodYao1995/Goooooo/pkg/xes"
 	"github.com/GodYao1995/Goooooo/pkg/xhttp/server"
 	"go.uber.org/fx"
+	"go.uber.org/fx/fxevent"
 )
 
 func Run() {
@@ -40,10 +41,10 @@ func inject() fx.Option {
 		repository.Module,
 		esrepo.Module,
 		// Options
-		// fx.WithLogger(
-		// 	func() fxevent.Logger {
-		// 		return fxevent.NopLogger
-		// 	},
-		// ),
+		fx.WithLogger(
+			func() fxevent.Logger {
+				return fxevent.NopLogger
+			},
+		),
 	)
 }

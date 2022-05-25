@@ -27,7 +27,7 @@ func NewSqlx(lifecycle fx.Lifecycle, vp *viper.Viper) *sqlx.DB {
 				db.SetMaxIdleConns(10)
 				db.SetMaxOpenConns(128)
 				db.SetConnMaxLifetime(time.Duration(7) * time.Hour)
-				log.Printf("\033[1;32;32m=========== DB RUNNING: [ %s:%s:%s ] ============\033[0m", host, port, database)
+				log.Printf("\033[1;32;32m===========   DB   Running: [ %s:%s:%s ] \033[0m", host, port, database)
 			}
 			return err
 		},
