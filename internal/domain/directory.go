@@ -28,11 +28,32 @@ type DirectoryDTO struct {
 	DirectoryIndex uint8  `db:"directory_index"`
 }
 
-type DirectoryRelation struct {
+type DirectoryRelationPO struct {
 	Ancestor   uint64 `db:"ancestor"`
 	Descendant uint64 `db:"descendant"`
 	Distance   uint8  `db:"distance"`
 }
 
+// Directory Domain Model
 type Directory struct {
+	Id             uint64
+	DirectoryId    uint64
+	DirectoryName  string
+	DirectoryType  string
+	DirectoryLevel uint8
+	DirectoryIndex uint8
+	UpdateAt       string
+	CreateAt       string
+	DeleteAt       string
+}
+
+// DirectoryRelation Domain Model
+type DirectoryRelation struct {
+	Id         uint64
+	Ancestor   uint64
+	Descendant uint64
+	Distance   uint8
+	UpdateAt   string
+	CreateAt   string
+	DeleteAt   string
 }

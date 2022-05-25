@@ -77,21 +77,21 @@ type UserSession struct {
 	LastLogin string `json:"last_login"`
 }
 
-// Domain Model And Interface
+// Domain Model
 type User struct {
-	Id        uint64 `json:"id"`
-	UserName  string `json:"user"`
-	NickName  string `json:"nickname"`
-	Password  string `json:"password"`
-	Age       uint8  `json:"age"`
-	Gender    string `json:"gender"`
-	Email     string `json:"email"`
-	Avatar    string `json:"avatar"`
-	Phone     string `json:"phone"`
-	State     uint8  `json:"state"`
-	Ip        uint32 `json:"ip"`
-	LastLogin string `json:"last_login"`
-	UpdateAt  string `json:"update_at"`
-	CreateAt  string `json:"create_at"`
-	DeleteAt  string `json:"delete_at"`
+	Id        uint64
+	UserName  string
+	NickName  string
+	Password  string
+	Age       uint8
+	Gender    string
+	Email     string
+	Avatar    string
+	Phone     string
+	State     uint8
+	Ip        uint32
+	LastLogin string
+	UpdateAt  string
+	CreateAt  string
+	DeleteAt  string
 }
