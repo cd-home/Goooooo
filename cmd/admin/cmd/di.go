@@ -6,6 +6,7 @@ import (
 	"github.com/GodYao1995/Goooooo/internal/admin/logic"
 	"github.com/GodYao1995/Goooooo/internal/admin/repository"
 	"github.com/GodYao1995/Goooooo/internal/admin/version"
+	"github.com/GodYao1995/Goooooo/internal/job"
 	"github.com/GodYao1995/Goooooo/internal/pkg/session"
 	"github.com/GodYao1995/Goooooo/pkg/cache"
 	"github.com/GodYao1995/Goooooo/pkg/casbin"
@@ -33,6 +34,7 @@ func inject() fx.Option {
 		version.Module,
 		casbin.Module,
 		xes.Module,
+		job.Module,
 		// Invoke
 		controller.ModuleV1,
 		controller.ModuleV2,
