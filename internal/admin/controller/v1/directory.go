@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/GodYao1995/Goooooo/internal/admin/types"
+	"github.com/GodYao1995/Goooooo/internal/admin/version"
 	"github.com/GodYao1995/Goooooo/internal/domain"
 	"github.com/GodYao1995/Goooooo/internal/pkg/errno"
 	"github.com/gin-gonic/gin"
@@ -15,12 +16,13 @@ type DirectoryController struct {
 	log   *zap.Logger
 }
 
-func NewDirectoryController(engine *gin.Engine, log *zap.Logger, logic domain.DirectoryLogicFace) {
+func NewDirectoryController(apiV1 *version.APIV1, log *zap.Logger, logic domain.DirectoryLogicFace) {
 	ctl := &DirectoryController{
 		logic: logic,
 		log:   log.WithOptions(zap.Fields(zap.String("module", "DirectoryController"))),
 	}
-	directory := engine.Group("/api/v1/directory")
+	v1 := apiV1.Group
+	directory := v1.Group("/directory")
 	{
 		directory.POST("/create", ctl.CreateDirectory)
 		directory.GET("/list", ctl.ListDirectory)
