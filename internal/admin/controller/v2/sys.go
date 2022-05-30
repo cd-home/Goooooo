@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"github.com/GodYao1995/Goooooo/internal/admin/version"
 	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/permission"
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
@@ -11,9 +12,10 @@ type SysController struct {
 	db *sqlx.DB
 }
 
-func NewSysController(engine *gin.Engine, db *sqlx.DB, e *casbin.Enforcer) {
+func NewSysController(apiV2 *version.APIV2, db *sqlx.DB, e *casbin.Enforcer) {
 	ctl := &SysController{db: db}
-	v1 := engine.Group("/api/v2/")
+	v2 := apiV2.Group
+	v1 := v2.Group("")
 	v1.Use(permission.PermissionMiddleware(e))
 	{
 		v1.GET("/db", ctl.DBStats)

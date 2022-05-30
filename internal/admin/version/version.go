@@ -23,6 +23,6 @@ type APIV2 struct {
 }
 
 func NewAPIV2(engine *gin.Engine) *APIV2 {
-	version := "/api/v1/admin"
+	version := "/api/v2/admin"
 	return &APIV2{Group: engine.Group(version), Version: version}
 }
