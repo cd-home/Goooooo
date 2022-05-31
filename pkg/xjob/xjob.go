@@ -6,15 +6,15 @@ import (
 	redisbroker "github.com/RichardKnop/machinery/v2/brokers/redis"
 	"github.com/RichardKnop/machinery/v2/config"
 	eagerlock "github.com/RichardKnop/machinery/v2/locks/eager"
+	"github.com/spf13/viper"
 	"go.uber.org/fx"
 )
 
 var Module = fx.Provide(NewJobServer)
 
-func NewJobServer() *machinery.Server {
+func NewJobServer(vp *viper.Viper) *machinery.Server {
 	cnf := &config.Config{
-		Broker:          "",
-		DefaultQueue:    "machinery_tasks",
+		DefaultQueue:    vp.GetString("JOB.QUEUE"),
 		ResultsExpireIn: 3600,
 		Redis: &config.RedisConfig{
 			MaxIdle:                3,
@@ -26,8 +26,8 @@ func NewJobServer() *machinery.Server {
 			DelayedTasksPollPeriod: 500,
 		},
 	}
-	broker := redisbroker.NewGR(cnf, []string{"127.0.0.1:6379"}, 0)
-	backend := redisbackend.NewGR(cnf, []string{"127.0.0.1:6379"}, 0)
+	broker := redisbroker.NewGR(cnf, vp.GetStringSlice("JOB.BROKER"), vp.GetInt("JOB.BROKERDB"))
+	backend := redisbackend.NewGR(cnf, vp.GetStringSlice("JOB.BACKEND"), vp.GetInt("JOB.BACKENDDB"))
 	lock := eagerlock.New()
 	JobServer := machinery.NewServer(cnf, broker, backend, lock)
 	return JobServer

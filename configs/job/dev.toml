@@ -28,3 +28,10 @@
     ADDR        = "http://127.0.0.1:9200"
     USER        = "elastic"
     PASSWD      = "123456"
+
+[JOB]
+    QUEUE       = "machinery_tasks"
+    BROKER      = ["127.0.0.1:6379", ]
+    BACKEND     = ["127.0.0.1:6379", ]
+    BROKERDB    = 0
+    BACKENDDB   = 0
