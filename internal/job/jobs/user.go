@@ -23,6 +23,10 @@ func (us UserESJob) UsersToES() error {
 	}
 	objs := make([]*domain.UserEsPO, 0)
 	for _, user := range users {
+		deleteAt := ""
+		if user.DeleteAt.Valid {
+			deleteAt = user.DeleteAt.Time.Format("2006-01-02 15:04:05")
+		}
 		objs = append(objs, &domain.UserEsPO{
 			UserName:  user.UserName,
 			NickName:  user.NickName.String,
@@ -35,7 +39,7 @@ func (us UserESJob) UsersToES() error {
 			LastLogin: user.LastLogin.String,
 			UpdateAt:  user.UpdateAt,
 			CreateAt:  user.CreateAt,
-			DeleteAt:  user.DeleteAt.Time.Format("2006-01-02 15:04:05"),
+			DeleteAt:  deleteAt,
 		})
 	}
 	return us.espo.CreateUserDocuments(context.Background(), objs)
