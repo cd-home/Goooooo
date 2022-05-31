@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"errors"
 
 	"github.com/GodYao1995/Goooooo/internal/domain"
 	"github.com/olivere/elastic/v7"
@@ -28,10 +29,39 @@ func NewUserEs(client *elastic.Client, log *zap.Logger) domain.UserEsRepositoryF
 	return ue
 }
 
-func (ue *UserEsRepo) CreateUserDocument(ctx context.Context, documents []*domain.UserEsPO) error {
-	_, err := ue.client.Index().Index(ue.index).BodyJson(documents).Do(ctx)
+// CreateUserDocument
+func (ue *UserEsRepo) CreateUserDocument(ctx context.Context, document *domain.UserEsPO) error {
+	_, err := ue.client.Index().Index(ue.index).BodyJson(document).Do(ctx)
 	if err != nil {
 		return err
+	}
+	return nil
+}
+
+// CreateUserDocuments Batch Add
+func (ue *UserEsRepo) CreateUserDocuments(ctx context.Context, documents []*domain.UserEsPO) error {
+	bulk := ue.client.Bulk().Index(ue.index)
+	for _, doc := range documents {
+		bulk.Add(elastic.NewBulkIndexRequest().Doc(doc))
+		if bulk.NumberOfActions() >= len(documents) {
+			// Commit
+			res, err := bulk.Do(ctx)
+			if err != nil {
+				return err
+			}
+			if res.Errors {
+				// Look up the failed documents with res.Failed(), and e.g. recommit
+				return errors.New("bulk commit failed")
+			}
+			// "bulk" is reset after Do, so you can reuse it
+		}
+		// Commit the final batch before exiting
+	}
+	if bulk.NumberOfActions() > 0 {
+		_, err := bulk.Do(ctx)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

@@ -18,20 +18,21 @@ type JobController struct {
 func NewJobController(apiV1 *version.APIV1, db *sqlx.DB, jobServer *machinery.Server) {
 	v1 := apiV1.Group
 	ctl := &JobController{db: db, jobServer: jobServer}
-	health := v1.Group("/health")
+	job := v1.Group("/jobs")
 	{
-		health.GET("/job", ctl.Job)
+		job.GET("/", ctl.GetJobs)
+		job.GET("/users2es", ctl.User2EsJobs)
 	}
 }
 
-// DBStats
-// @Summary Sys DBStats
-// @Description Sys DBStats
-// @Tags Sys
+// GetJobs
+// @Summary Get Jobs
+// @Description Get Jobs
+// @Tags Job
 // @Accept  json
 // @Produce json
-// @Router /db [GET]
-func (u JobController) Job(ctx *gin.Context) {
+// @Router /jobs [GET]
+func (u JobController) GetJobs(ctx *gin.Context) {
 	sum := tasks.Signature{
 		Name: "sum",
 		Args: []tasks.Arg{
@@ -46,6 +47,30 @@ func (u JobController) Job(ctx *gin.Context) {
 		},
 	}
 
+	_, err := u.jobServer.SendTaskWithContext(context.Background(), &sum)
+	if err != nil {
+		ctx.JSON(200, map[string]interface{}{
+			"message": err.Error(),
+		})
+		return
+	}
+	ctx.JSON(200, map[string]interface{}{
+		"message": "ok",
+	})
+}
+
+// GetJobs
+// @Summary Get Jobs
+// @Description Get Jobs
+// @Tags Job
+// @Accept  json
+// @Produce json
+// @Router /jobs [GET]
+func (u JobController) User2EsJobs(ctx *gin.Context) {
+	sum := tasks.Signature{
+		Name: "user2es",
+		Args: []tasks.Arg{},
+	}
 	_, err := u.jobServer.SendTaskWithContext(context.Background(), &sum)
 	if err != nil {
 		ctx.JSON(200, map[string]interface{}{

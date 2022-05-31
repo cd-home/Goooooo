@@ -16,10 +16,11 @@ import (
 type UserLogic struct {
 	repo  domain.UserRepositoryFace
 	store *session.RedisStore
+	espo  domain.UserEsRepositoryFace
 }
 
-func NewUserLogic(repo domain.UserRepositoryFace, store *session.RedisStore) domain.UserLogicFace {
-	return &UserLogic{repo: repo, store: store}
+func NewUserLogic(repo domain.UserRepositoryFace, store *session.RedisStore, espo domain.UserEsRepositoryFace) domain.UserLogicFace {
+	return &UserLogic{repo: repo, store: store, espo: espo}
 }
 
 // Register

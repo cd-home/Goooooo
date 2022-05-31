@@ -6,7 +6,6 @@ import (
 	"github.com/GodYao1995/Goooooo/internal/admin/logic"
 	"github.com/GodYao1995/Goooooo/internal/admin/repository"
 	"github.com/GodYao1995/Goooooo/internal/admin/version"
-	"github.com/GodYao1995/Goooooo/internal/job"
 	"github.com/GodYao1995/Goooooo/internal/pkg/session"
 	"github.com/GodYao1995/Goooooo/pkg/cache"
 	"github.com/GodYao1995/Goooooo/pkg/casbin"
@@ -14,6 +13,7 @@ import (
 	"github.com/GodYao1995/Goooooo/pkg/logger"
 	"github.com/GodYao1995/Goooooo/pkg/xes"
 	"github.com/GodYao1995/Goooooo/pkg/xhttp/server"
+	xjob "github.com/GodYao1995/Goooooo/pkg/xjob"
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxevent"
 )
@@ -34,7 +34,7 @@ func inject() fx.Option {
 		version.Module,
 		casbin.Module,
 		xes.Module,
-		job.Module,
+		xjob.Module,
 		// Invoke
 		controller.ModuleV1,
 		controller.ModuleV2,
