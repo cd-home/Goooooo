@@ -12,7 +12,7 @@
 
 [LOG]
     DEBUG       = true
-    PATH        = "../logs/app.log"
+    PATH        = "../logs/job.log"
     MAXSIZE     = 1024
     MAXAGE      = 30
     MAXBACKUPS  = 20
