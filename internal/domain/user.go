@@ -16,10 +16,12 @@ type UserRepositoryFace interface {
 	CreateUserByUserName(ctx context.Context, account string, password string) error
 	CreateUserByEmail(ctx context.Context, account string, password string) error
 	CheckAccountExist(ctx context.Context, account string, password string) (*UserDTO, error)
+	GetAllUsers(ctx context.Context) ([]*UserDTO, error)
 }
 
 type UserEsRepositoryFace interface {
-	CreateUserDocument(ctx context.Context, documents []*UserEsPO) error
+	CreateUserDocument(ctx context.Context, documents *UserEsPO) error
+	CreateUserDocuments(ctx context.Context, documents []*UserEsPO) error
 }
 
 // User DTO
@@ -33,7 +35,7 @@ type UserDTO struct {
 	Email     sql.NullString `db:"email"`
 	Avatar    sql.NullString `db:"avatar"`
 	Phone     sql.NullString `db:"phone"`
-	State     sql.NullString `db:"state"`
+	State     sql.NullInt16  `db:"state"`
 	Ip        sql.NullInt64  `db:"ip"`
 	LastLogin sql.NullString `db:"last_login"`
 	UpdateAt  string         `db:"update_at"`
@@ -43,16 +45,16 @@ type UserDTO struct {
 
 // UserEsPO
 type UserEsPO struct {
-	Id        uint64 `json:"id"`
-	UserName  string `json:"user"`
+	Id        uint64 `json:"-"`
+	UserName  string `json:"username"`
 	NickName  string `json:"nickname"`
 	Age       uint8  `json:"age"`
-	Gender    string `json:"gender"`
+	Gender    uint8  `json:"gender"`
 	Email     string `json:"email"`
 	Avatar    string `json:"avatar"`
 	Phone     string `json:"phone"`
 	State     uint8  `json:"state"`
-	Ip        uint32 `json:"ip"`
+	Ip        uint64 `json:"ip"`
 	LastLogin string `json:"last_login"`
 	UpdateAt  string `json:"update_at"`
 	CreateAt  string `json:"create_at"`

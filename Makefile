@@ -40,3 +40,9 @@ swag:
 
 db:
 	pwd && chmod +x ./scripts/database.sh && ./scripts/database.sh $(h) $(P) $(u) $(p) $(db)
+
+
+job:
+	@echo "Build $(app) and Run"
+	cd cmd/$(app) && go build -o=../../bin/${app}_${mode} && \
+	cd ../../bin && ./$(app)_${mode} job --mode=$(mode) --app=$(app) --config=$(config)

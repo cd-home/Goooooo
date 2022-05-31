@@ -1,0 +1,30 @@
+[APP]
+    NAME        = "admin"
+    MODE        = "dev"
+    SECRET      = "Admin Dev SECRET"
+    SERVER_HOST = ":8080"
+
+[DB]
+    HOST        = "localhost"
+    PORT        = "3306"
+    USER        = "root"
+    PASSWD      = "root@123456"
+    DATABASE    = "admin_dev"
+
+[LOG]
+    DEBUG       = true
+    PATH        = "../logs/app.log"
+    MAXSIZE     = 1024
+    MAXAGE      = 30
+    MAXBACKUPS  = 20
+    COMPRESS    = false
+
+[REDIS]
+    ADDR        = "127.0.0.1:6379"
+    PASSWD      = ""
+    DB          = 0
+
+[ES]
+    ADDR        = "http://127.0.0.1:9200"
+    USER        = "elastic"
+    PASSWD      = "123456"

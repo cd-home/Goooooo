@@ -21,6 +21,7 @@ func NewJobController(apiV1 *version.APIV1, db *sqlx.DB, jobServer *machinery.Se
 	job := v1.Group("/jobs")
 	{
 		job.GET("/", ctl.GetJobs)
+		job.GET("/users2es", ctl.User2EsJobs)
 	}
 }
 
@@ -46,6 +47,30 @@ func (u JobController) GetJobs(ctx *gin.Context) {
 		},
 	}
 
+	_, err := u.jobServer.SendTaskWithContext(context.Background(), &sum)
+	if err != nil {
+		ctx.JSON(200, map[string]interface{}{
+			"message": err.Error(),
+		})
+		return
+	}
+	ctx.JSON(200, map[string]interface{}{
+		"message": "ok",
+	})
+}
+
+// GetJobs
+// @Summary Get Jobs
+// @Description Get Jobs
+// @Tags Job
+// @Accept  json
+// @Produce json
+// @Router /jobs [GET]
+func (u JobController) User2EsJobs(ctx *gin.Context) {
+	sum := tasks.Signature{
+		Name: "user2es",
+		Args: []tasks.Arg{},
+	}
 	_, err := u.jobServer.SendTaskWithContext(context.Background(), &sum)
 	if err != nil {
 		ctx.JSON(200, map[string]interface{}{

@@ -73,3 +73,11 @@ func (repo *UserRepository) CheckAccountExist(ctx context.Context, account strin
 		return nil, errno.ErrorUserRecordNotExist
 	}
 }
+
+// GetAllUsers
+func (repo *UserRepository) GetAllUsers(ctx context.Context) ([]*domain.UserDTO, error) {
+	var err error
+	var users []*domain.UserDTO
+	err = repo.db.Select(&users, `SELECT * FROM user`)
+	return users, err
+}
