@@ -16,6 +16,8 @@ import (
 	"go.uber.org/fx/fxevent"
 )
 
+var JobWorkerModule = fx.Invoke(JobWorker)
+
 func Run() {
 	fx.New(inject()).Run()
 }
@@ -34,8 +36,6 @@ func JobWorker(lifecycle fx.Lifecycle, jobServer *machinery.Server, _jobs *jobs.
 		},
 	})
 }
-
-var JobWorkerModule = fx.Invoke(JobWorker)
 
 func inject() fx.Option {
 	return fx.Options(
