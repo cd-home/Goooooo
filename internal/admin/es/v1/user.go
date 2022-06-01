@@ -55,8 +55,8 @@ func (ue *UserEsRepo) CreateUserDocuments(ctx context.Context, documents []*doma
 			}
 			// "bulk" is reset after Do, so you can reuse it
 		}
-		// Commit the final batch before exiting
 	}
+	// Commit the final batch before exiting
 	if bulk.NumberOfActions() > 0 {
 		_, err := bulk.Do(ctx)
 		if err != nil {

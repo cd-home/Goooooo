@@ -3,6 +3,7 @@ package xes
 import (
 	"context"
 	"log"
+	"time"
 
 	"github.com/olivere/elastic/v7"
 	"github.com/spf13/viper"
@@ -12,12 +13,12 @@ import (
 var Module = fx.Provide(NewESClient)
 
 func NewESClient(lifecycle fx.Lifecycle, vp *viper.Viper) *elastic.Client {
-	addr, user, pwd := vp.GetString("ES.ADDR"), vp.GetString("ES.USER"), vp.GetString("ES.PASSWD")
-	log.Println(addr, user, pwd)
+	addr, _, _ := vp.GetString("ES.ADDR"), vp.GetString("ES.USER"), vp.GetString("ES.PASSWD")
 	var err error
 	client, err := elastic.NewClient(
 		elastic.SetURL(addr),
 		elastic.SetSniff(false),
+		elastic.SetHealthcheckInterval(60*time.Second),
 		// elastic.SetBasicAuth(user, pwd),
 	)
 	lifecycle.Append(fx.Hook{
