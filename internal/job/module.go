@@ -1,8 +1,8 @@
 package job
 
 import (
-	jobs "github.com/GodYao1995/Goooooo/internal/job/jobs"
+	tasks "github.com/GodYao1995/Goooooo/internal/job/tasks"
 	"go.uber.org/fx"
 )
 
-var Module = fx.Provide(jobs.NewUserESJob)
+var Module = fx.Provide(tasks.NewUserESJob)

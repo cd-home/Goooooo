@@ -4,7 +4,7 @@ import (
 	esrepo "github.com/GodYao1995/Goooooo/internal/admin/es"
 	"github.com/GodYao1995/Goooooo/internal/admin/repository"
 	job "github.com/GodYao1995/Goooooo/internal/job"
-	jobs "github.com/GodYao1995/Goooooo/internal/job/jobs"
+	tasks "github.com/GodYao1995/Goooooo/internal/job/tasks"
 	"github.com/GodYao1995/Goooooo/pkg/db"
 	"github.com/GodYao1995/Goooooo/pkg/logger"
 	"github.com/GodYao1995/Goooooo/pkg/xes"
@@ -20,8 +20,8 @@ func Run() {
 	fx.New(inject()).Run()
 }
 
-func JobWorker(jobServer *machinery.Server, _jobs *jobs.UserESJob) {
-	jobServer.RegisterTask("sum", jobs.Sum)
+func JobWorker(jobServer *machinery.Server, _jobs *tasks.UserESTask) {
+	jobServer.RegisterTask("sum", tasks.Sum)
 	jobServer.RegisterTask("user2es", _jobs.UsersToES)
 	worker := jobServer.NewWorker("worker", 0)
 	worker.Launch()

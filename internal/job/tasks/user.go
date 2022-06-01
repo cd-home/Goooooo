@@ -6,17 +6,17 @@ import (
 	"github.com/GodYao1995/Goooooo/internal/domain"
 )
 
-type UserESJob struct {
+type UserESTask struct {
 	repo domain.UserRepositoryFace
 	espo domain.UserEsRepositoryFace
 }
 
-func NewUserESJob(repo domain.UserRepositoryFace, espo domain.UserEsRepositoryFace) *UserESJob {
-	return &UserESJob{repo: repo, espo: espo}
+func NewUserESJob(repo domain.UserRepositoryFace, espo domain.UserEsRepositoryFace) *UserESTask {
+	return &UserESTask{repo: repo, espo: espo}
 }
 
 // Just for testing purposes
-func (us UserESJob) UsersToES() error {
+func (us UserESTask) UsersToES() error {
 	users, err := us.repo.GetAllUsers(context.Background())
 	if err != nil {
 		return err
