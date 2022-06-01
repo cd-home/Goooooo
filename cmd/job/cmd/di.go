@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"context"
+
 	esrepo "github.com/GodYao1995/Goooooo/internal/admin/es"
 	"github.com/GodYao1995/Goooooo/internal/admin/repository"
 	job "github.com/GodYao1995/Goooooo/internal/job"
@@ -18,11 +20,19 @@ func Run() {
 	fx.New(inject()).Run()
 }
 
-func JobWorker(jobServer *machinery.Server, _jobs *jobs.UserESJob) {
+func JobWorker(lifecycle fx.Lifecycle, jobServer *machinery.Server, _jobs *jobs.UserESJob) {
 	jobServer.RegisterTask("sum", jobs.Sum)
 	jobServer.RegisterTask("user2es", _jobs.UsersToES)
 	worker := jobServer.NewWorker("worker", 0)
-	worker.Launch()
+	lifecycle.Append(fx.Hook{
+		OnStart: func(ctx context.Context) error {
+			return worker.Launch()
+		},
+		OnStop: func(ctx context.Context) error {
+			worker.Quit()
+			return nil
+		},
+	})
 }
 
 var JobWorkerModule = fx.Invoke(JobWorker)
