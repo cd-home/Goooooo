@@ -36,6 +36,5 @@ func NewESClient(lifecycle fx.Lifecycle, vp *viper.Viper) *elastic.Client {
 			return nil
 		},
 	})
-	log.Println(client)
 	return client
 }

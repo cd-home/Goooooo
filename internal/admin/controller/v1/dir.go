@@ -113,7 +113,7 @@ func (d DirectoryController) RenameDirectory(ctx *gin.Context) {
 // @Tags Directory
 // @Accept  json
 // @Produce json
-// @Router /delete [PUT]
+// @Router /delete [DELETE]
 func (d DirectoryController) DeleteDirectory(ctx *gin.Context) {
 	params := types.ListDirectoryParam{}
 	resp := types.CommonResponse{Code: 1}

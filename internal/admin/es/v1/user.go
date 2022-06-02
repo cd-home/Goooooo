@@ -29,6 +29,24 @@ func NewUserEs(client *elastic.Client, log *zap.Logger) domain.UserEsRepositoryF
 	return ue
 }
 
+// _InitIndex
+func _InitIndex(ue *UserEsRepo) error {
+	ctx := context.Background()
+	exist, err := ue.client.IndexExists(ue.index).Do(ctx)
+	if err != nil {
+		return err
+	}
+	if !exist {
+		if len(ue.mapping) > 0 {
+			_, err = ue.client.CreateIndex(ue.index).BodyString(ue.mapping).Do(ctx)
+			return err
+		}
+		_, err = ue.client.CreateIndex(ue.index).Do(ctx)
+		return err
+	}
+	return nil
+}
+
 // CreateUserDocument
 func (ue *UserEsRepo) CreateUserDocument(ctx context.Context, document *domain.UserEsPO) error {
 	_, err := ue.client.Index().Index(ue.index).BodyJson(document).Do(ctx)
@@ -66,19 +84,12 @@ func (ue *UserEsRepo) CreateUserDocuments(ctx context.Context, documents []*doma
 	return nil
 }
 
-func _InitIndex(ue *UserEsRepo) error {
-	ctx := context.Background()
-	exist, err := ue.client.IndexExists(ue.index).Do(ctx)
-	if err != nil {
-		return err
-	}
-	if !exist {
-		if len(ue.mapping) > 0 {
-			_, err = ue.client.CreateIndex(ue.index).BodyString(ue.mapping).Do(ctx)
-			return err
-		}
-		_, err = ue.client.CreateIndex(ue.index).Do(ctx)
-		return err
-	}
+// DeleteUserDocument
+func (ue *UserEsRepo) DeleteUserDocument(ctx context.Context) error {
+	return nil
+}
+
+// DeleteUserDocuments Batch Delete
+func (ue *UserEsRepo) DeleteUserDocuments(ctx context.Context) error {
 	return nil
 }
