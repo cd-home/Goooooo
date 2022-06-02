@@ -8,7 +8,7 @@
           :model="form"
           style="max-width: 460px"
           :rules="rules"
-          ref="form"
+          ref="formRef"
         >
           <el-form-item label="Account" prop="account">
             <el-input v-model="form.account" autofocus="true" />
@@ -81,7 +81,7 @@ const rules = reactive({
   ],
   password: [
     {required: true, message: '密码不能为空', trigger: 'blur'},
-    // {min: 6, max: 18, message: '密码长度必须4-18位', trigger: 'blur'},
+    {min: 6, max: 18, message: '密码长度必须4-18位', trigger: 'blur'},
     // {
     //   pattern: /^(?=.*\d)(?=.*[a-zA-Z])(?=.*[~!@#$%^&*])[\da-zA-Z~!@#$%^&*]{6,18}$/,
     //   message: '密码长度6-18位, 必须包含数字、字母、特殊字符',
@@ -103,13 +103,19 @@ export default {
       //  let body = new FormData();
       //  body.append("account", this.form.account);
       //  body.append("password", this.form.password);
-      this.$api.login(this.form).then(response => {
-      this.$notify.SuccessNotify(response.message)
-      this.$store.commit('login', response.data)
-      this.$router.push("/home")
-     }).catch(error => {
-       this.$notify.ErrorNotify(error)
-     })
+      this.$refs.formRef.validate((valid) => {
+        if (valid) {
+          this.$api.login(this.form).then(response => {
+          this.$notify.SuccessNotify(response.message)
+          this.$store.commit('login', response.data)
+          this.$router.push("/home")
+          }).catch(error => {
+            this.$notify.ErrorNotify(error)
+          })
+        } else {
+          this.$notify.InfoNotify("参数校验不通过")
+        }
+      })
    }
   }
 }

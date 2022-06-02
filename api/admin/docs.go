@@ -67,6 +67,38 @@ const docTemplate = `{
                 "responses": {}
             }
         },
+        "/health": {
+            "get": {
+                "description": "Sys HealthyCheck",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sys"
+                ],
+                "summary": "Sys HealthyCheck",
+                "responses": {}
+            }
+        },
+        "/jobs": {
+            "get": {
+                "description": "Get Jobs",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Job"
+                ],
+                "summary": "Get Jobs",
+                "responses": {}
+            }
+        },
         "/list": {
             "post": {
                 "description": "List Directory",

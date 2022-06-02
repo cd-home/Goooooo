@@ -8,7 +8,7 @@
           :model="form"
           style="max-width: 460px"
           :rules="rules"
-          ref="form"
+          ref="formRef"
         >
           <el-form-item label="Account" prop="account">
             <el-input v-model="form.account" autofocus="true" />
@@ -115,11 +115,18 @@ export default {
   },
   methods: {
     RegisterHand() {
-      this.$api.register(this.form).then(response => {
-        this.$notify.SuccessNotify(response.message)
-        this.$router.push('/login')
-      }).catch(error => {
-        this.$notify.ErrorNotify(error)
+      // formRef 
+      this.$refs.formRef.validate((valid) => {
+        if (valid) {
+          this.$api.register(this.form).then(response => {
+          this.$notify.SuccessNotify(response.message)
+          this.$router.push('/login')
+          }).catch(error => {
+            this.$notify.ErrorNotify(error)
+          })
+        } else {
+          this.$notify.InfoNotify("参数校验不通过")
+        }
       })
     }
   }

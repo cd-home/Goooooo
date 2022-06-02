@@ -84,6 +84,28 @@ paths:
       summary: Delete Directory
       tags:
       - Directory
+  /health:
+    get:
+      consumes:
+      - application/json
+      description: Sys HealthyCheck
+      produces:
+      - application/json
+      responses: {}
+      summary: Sys HealthyCheck
+      tags:
+      - Sys
+  /jobs:
+    get:
+      consumes:
+      - application/json
+      description: Get Jobs
+      produces:
+      - application/json
+      responses: {}
+      summary: Get Jobs
+      tags:
+      - Job
   /list:
     post:
       consumes:

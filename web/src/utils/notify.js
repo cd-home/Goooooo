@@ -12,9 +12,16 @@ const ErrorNotify = (error) => ElNotification({
     type: 'error',
 })
 
+const InfoNotify = (info) => ElNotification({
+    title: 'Info',
+    message: info,
+    type: 'info',
+})
+
 const notify = {
     SuccessNotify,
     ErrorNotify,
+    InfoNotify
 }
 
 export default notify
