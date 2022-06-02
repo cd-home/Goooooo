@@ -16,6 +16,7 @@ const (
 	Failure         = "失败"
 	LoginSuccess    = "登录成功"
 	RegisterSuccess = "注册成功"
+	UploadSuccess   = "文件上传成功"
 )
 
 // API Error
@@ -25,4 +26,5 @@ var (
 	ErrorUserRegister    = errors.New("注册失败, 请重试")
 	ErrorUserNotLogin    = errors.New("未登录, 请重试")
 	ErrorUserPassword    = errors.New("密码错误, 请重试")
+	ErrorUploadFile      = errors.New("上传文件失败")
 )
