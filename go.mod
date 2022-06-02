@@ -15,6 +15,7 @@ require (
 	github.com/spf13/cobra v1.4.0
 	github.com/swaggo/swag v1.8.1
 	go.uber.org/zap v1.21.0
+	golang.org/x/time v0.0.0-20201208040808-7e3f01d25324
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )
 
