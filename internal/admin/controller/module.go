@@ -11,6 +11,7 @@ var ModuleV1 = fx.Invoke(
 	v1.NewSysController,
 	v1.NewDirectoryController,
 	v1.NewJobController,
+	v1.NewFileController,
 )
 
 var ModuleV2 = fx.Invoke(
