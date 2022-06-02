@@ -40,7 +40,7 @@ func NewFileController(apiV1 *version.APIV1, log *zap.Logger) {
 // @Accept  json
 // @Produce json
 // @Router /list [GET]
-func (d FileController) ListFile(ctx *gin.Context) {
+func (f FileController) ListFile(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "OK",
 	})
@@ -50,19 +50,20 @@ func (d FileController) ListFile(ctx *gin.Context) {
 // @Summary UploadLocal
 // @Description List File
 // @Tags File
-// @Accept  json
+// @Accept multipart/form-data
+// @Param file formData file true "文件上传"
 // @Produce json
 // @Router /upload [POST]
-func (d FileController) UploadLocal(ctx *gin.Context) {
+func (f FileController) UploadLocal(ctx *gin.Context) {
 	resp := types.CommonResponse{Code: 1}
-	f, err := ctx.FormFile(d.file)
+	fileObj, err := ctx.FormFile(f.file)
 	if err != nil {
 		resp.Message = errno.ErrorUploadFile.Error()
 		ctx.JSON(http.StatusOK, resp)
 		return
 	}
-	target := d.upload + f.Filename + strconv.Itoa(int(tools.SnowId()))
-	if err = ctx.SaveUploadedFile(f, target); err != nil {
+	target := f.upload + fileObj.Filename + strconv.Itoa(int(tools.SnowId()))
+	if err = ctx.SaveUploadedFile(fileObj, target); err != nil {
 		resp.Message = errno.ErrorUploadFile.Error()
 		ctx.JSON(http.StatusOK, resp)
 		return
@@ -76,10 +77,11 @@ func (d FileController) UploadLocal(ctx *gin.Context) {
 // @Summary UploadOss
 // @Description Upload Oss
 // @Tags File
-// @Accept  json
+// @Accept multipart/form-data
+// @Param file formData file true "文件上传Oss"
 // @Produce json
 // @Router /oss [POST]
-func (d FileController) UploadOss(ctx *gin.Context) {
+func (f FileController) UploadOss(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "OK",
 	})
