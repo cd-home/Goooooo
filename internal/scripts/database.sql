@@ -43,6 +43,21 @@ CREATE TABLE IF NOT EXISTS `directory_relation` (
     `update_at` DATETIME(0) DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
     `create_at` DATETIME(0) DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `delete_at` DATETIME(0) DEFAULT NULL COMMENT '删除时间',
-    UNIQUE KEY `unique_idx_anc_dessc` (`ancestor`, `descendant`),
+    UNIQUE KEY `unique_idx_anc_desc` (`ancestor`, `descendant`),
+    KEY `idx_delete_at` (`delete_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `file` (
+    `id` INT unsigned PRIMARY KEY AUTO_INCREMENT COMMENT '自增主键id',
+    `file_id` BIGINT unsigned NOT NULL COMMENT '文件唯一id',
+    `file_name` VARCHAR(30) NOT NULL COMMENT '文件名',
+    `file_size` INT unsigned  COMMENT '文件大小',
+    `file_url` VARCHAR(100) DEFAULT NULL COMMENT '地址',
+    `directory_id` BIGINT unsigned NOT NULL COMMENT '所属文件夹',
+    `uploader` INT unsigned COMMENT '上传者',
+    `update_at` DATETIME(0) DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+    `create_at` DATETIME(0) DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `delete_at` DATETIME(0) DEFAULT NULL COMMENT '删除时间',
+    KEY `idx_file_id` (`file_id`),
     KEY `idx_delete_at` (`delete_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
