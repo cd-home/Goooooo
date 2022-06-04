@@ -38,6 +38,7 @@ swag:
 	swag init -g cmd/admin/main.go --output ./api/admin --exclude ./internal/api && \
 	swag init -g cmd/api/main.go --output ./api/api --exclude ./internal/admin
 
+# make db h=127.0.0.1 P=3306 u=root p=root@123456 db=admin_dev
 db:
 	pwd && chmod +x ./scripts/database.sh && ./scripts/database.sh $(h) $(P) $(u) $(p) $(db)
 

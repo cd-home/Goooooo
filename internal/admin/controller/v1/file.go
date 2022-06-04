@@ -6,7 +6,10 @@ import (
 
 	"github.com/GodYao1995/Goooooo/internal/admin/types"
 	"github.com/GodYao1995/Goooooo/internal/admin/version"
+	"github.com/GodYao1995/Goooooo/internal/domain"
 	"github.com/GodYao1995/Goooooo/internal/pkg/errno"
+	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/auth"
+	"github.com/GodYao1995/Goooooo/internal/pkg/session"
 	"github.com/GodYao1995/Goooooo/pkg/tools"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -16,16 +19,20 @@ type FileController struct {
 	log    *zap.Logger
 	file   string
 	upload string
+	store  *session.RedisStore
+	logic  domain.FileLogicFace
 }
 
-func NewFileController(apiV1 *version.APIV1, log *zap.Logger) {
+func NewFileController(apiV1 *version.APIV1, log *zap.Logger, store *session.RedisStore, logic domain.FileLogicFace) {
 	ctl := &FileController{
 		log:    log.WithOptions(zap.Fields(zap.String("module", "FileController"))),
 		file:   "file",
 		upload: "../upload/",
+		store:  store,
+		logic:  logic,
 	}
 	v1 := apiV1.Group
-	file := v1.Group("/file")
+	file := v1.Group("/file").Use(auth.AuthMiddleware(store))
 	{
 		file.GET("/list", ctl.ListFile)
 		file.POST("/upload", ctl.UploadLocal)
@@ -40,7 +47,7 @@ func NewFileController(apiV1 *version.APIV1, log *zap.Logger) {
 // @Accept  json
 // @Produce json
 // @Router /list [GET]
-func (d FileController) ListFile(ctx *gin.Context) {
+func (f FileController) ListFile(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "OK",
 	})
@@ -50,20 +57,37 @@ func (d FileController) ListFile(ctx *gin.Context) {
 // @Summary UploadLocal
 // @Description List File
 // @Tags File
-// @Accept  json
+// @Accept multipart/form-data
+// @Param file formData file true "文件上传"
 // @Produce json
 // @Router /upload [POST]
-func (d FileController) UploadLocal(ctx *gin.Context) {
+func (f FileController) UploadLocal(ctx *gin.Context) {
 	resp := types.CommonResponse{Code: 1}
-	f, err := ctx.FormFile(d.file)
+	fileObj, err := ctx.FormFile(f.file)
 	if err != nil {
 		resp.Message = errno.ErrorUploadFile.Error()
 		ctx.JSON(http.StatusOK, resp)
 		return
 	}
-	target := d.upload + f.Filename + strconv.Itoa(int(tools.SnowId()))
-	if err = ctx.SaveUploadedFile(f, target); err != nil {
+	target := f.upload + fileObj.Filename + strconv.Itoa(int(tools.SnowId()))
+	if err = ctx.SaveUploadedFile(fileObj, target); err != nil {
 		resp.Message = errno.ErrorUploadFile.Error()
+		ctx.JSON(http.StatusOK, resp)
+		return
+	}
+	var user uint64
+	if v, ok := ctx.Get("user"); ok {
+		session := v.(domain.UserSession)
+		user = session.Id
+	} else {
+		resp.Message = errno.ErrorUserNotLogin.Error()
+		ctx.JSON(http.StatusOK, resp)
+		return
+	}
+	// Just for testing purposes 1526448643605794816
+	err = f.logic.UploadFile(fileObj.Filename, fileObj.Size, target, 1526448643605794816, user)
+	if err != nil {
+		resp.Message = err.Error()
 		ctx.JSON(http.StatusOK, resp)
 		return
 	}
@@ -76,10 +100,11 @@ func (d FileController) UploadLocal(ctx *gin.Context) {
 // @Summary UploadOss
 // @Description Upload Oss
 // @Tags File
-// @Accept  json
+// @Accept multipart/form-data
+// @Param file formData file true "文件上传Oss"
 // @Produce json
 // @Router /oss [POST]
-func (d FileController) UploadOss(ctx *gin.Context) {
+func (f FileController) UploadOss(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "OK",
 	})
