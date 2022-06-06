@@ -55,7 +55,6 @@ export default {
         this.$notify.SuccessNotify(response.message);
       })
       .catch(error => {
-        alert(error)
         this.$notify.WarnNotify(error)
       })
     }
