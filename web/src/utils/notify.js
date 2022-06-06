@@ -18,10 +18,18 @@ const InfoNotify = (info) => ElNotification({
     type: 'info',
 })
 
+const WarnNotify = (warn) => ElNotification({
+    title: 'Warning',
+    message: warn,
+    type: 'warning',
+})
+
+
 const notify = {
     SuccessNotify,
     ErrorNotify,
-    InfoNotify
+    InfoNotify,
+    WarnNotify
 }
 
 export default notify

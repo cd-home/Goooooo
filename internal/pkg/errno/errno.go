@@ -17,6 +17,7 @@ const (
 	LoginSuccess    = "登录成功"
 	RegisterSuccess = "注册成功"
 	UploadSuccess   = "文件上传成功"
+	NoPermission    = "无操作权限"
 )
 
 // API Error

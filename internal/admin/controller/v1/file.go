@@ -11,8 +11,10 @@ import (
 	"github.com/GodYao1995/Goooooo/internal/domain"
 	"github.com/GodYao1995/Goooooo/internal/pkg/errno"
 	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/auth"
+	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/permission"
 	"github.com/GodYao1995/Goooooo/internal/pkg/session"
 	"github.com/GodYao1995/Goooooo/pkg/tools"
+	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -23,24 +25,29 @@ type FileController struct {
 	upload string
 	store  *session.RedisStore
 	logic  domain.FileLogicFace
+	perm   *casbin.Enforcer
 }
 
-func NewFileController(apiV1 *version.APIV1, log *zap.Logger, store *session.RedisStore, logic domain.FileLogicFace) {
+func NewFileController(apiV1 *version.APIV1, log *zap.Logger, store *session.RedisStore, logic domain.FileLogicFace, perm *casbin.Enforcer) {
 	ctl := &FileController{
 		log:    log.WithOptions(zap.Fields(zap.String("module", "FileController"))),
 		file:   "file",
 		upload: "../upload/",
 		store:  store,
 		logic:  logic,
+		perm:   perm,
 	}
 	v1 := apiV1.Group
 	file := v1.Group("/file").Use(auth.AuthMiddleware(store))
 	{
 		file.GET("/list", ctl.ListFile)
 		file.POST("/upload", ctl.UploadLocal)
-		file.GET("/download", ctl.DownloadLocal)
-		file.GET("/stream", ctl.DownloadLocalFileStream)
 		file.POST("/oss", ctl.UploadOss)
+	}
+	needAuth := v1.Group("/file").Use(permission.PermissionMiddleware(perm))
+	{
+		needAuth.GET("/download", ctl.DownloadLocal)
+		needAuth.GET("/stream", ctl.DownloadLocalFileStream)
 	}
 }
 
