@@ -9,7 +9,9 @@
         <el-aside>
         </el-aside>
         <el-container>
-          <el-main></el-main>
+          <el-main>
+            <el-button icon="el-icon-download" @click="downloadStream">下载</el-button>
+          </el-main>
           <el-footer></el-footer>
         </el-container>
       </el-container>
@@ -31,13 +33,31 @@
 </style>
 
 <script>
-import Header from "@/components/Header.vue";
 export default {
   data() {
     return {}
   },
-  components: {
-    Header
+  methods: {
+    downloadStream() {
+      let query = {"filename": "1533726291776245760Untitled Diagram.svg"}
+      this.$api.downloadFileStream(query)
+      .then((file) => {
+        // Blob => URL
+        let url = window.URL.createObjectURL(new Blob([file]));
+        let link = document.createElement('a');
+        link.style.display = 'none';
+        link.href = url;
+        link.setAttribute('download', query.filename);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link); // 下载完成移除元素
+        window.URL.revokeObjectURL(url); // 释放掉blob对象
+        this.$notify.SuccessNotify(response.message);
+      })
+      .catch(error => {
+        this.$notify.WarnNotify(error)
+      })
+    }
   }
 }
 </script>

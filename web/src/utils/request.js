@@ -32,7 +32,6 @@ instance.interceptors.response.use(
         return resp
     },
     error => {
-        console.log(error)
         const status = error.response.status
         if (error.response && status) {
             let message = "请求失败!"

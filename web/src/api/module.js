@@ -1,8 +1,10 @@
 import {login, register} from '@/api/user'
+import {downloadFileStream, } from '@/api/file'
 
 const apis = {
     login,
-    register
+    register,
+    downloadFileStream
 }
 
 export default apis
