@@ -84,7 +84,7 @@ func (f FileController) UploadLocal(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, resp)
 		return
 	}
-	// Just for testing purposes 1526448643605794816
+	// Just for testing purposes 1526448643605794816 [Temp]
 	err = f.logic.UploadFile(fileObj.Filename, fileObj.Size, target, 1526448643605794816, user)
 	if err != nil {
 		resp.Message = err.Error()
