@@ -36,6 +36,7 @@ func NewFileController(apiV1 *version.APIV1, log *zap.Logger, store *session.Red
 	{
 		file.GET("/list", ctl.ListFile)
 		file.POST("/upload", ctl.UploadLocal)
+		file.GET("/download", ctl.DownloadLocal)
 		file.POST("/oss", ctl.UploadOss)
 	}
 }
@@ -94,6 +95,22 @@ func (f FileController) UploadLocal(ctx *gin.Context) {
 	resp.Code = 0
 	resp.Message = errno.UploadSuccess
 	ctx.JSON(http.StatusOK, resp)
+}
+
+// DownloadLocal
+// @Summary Download Local File
+// @Description Download Local File
+// @Tags File
+// @Accept json
+// @Param q query string true  "download file"
+// @Produce json
+// @Success 0 {object} application/octet-stream
+// @Failure 1 {object}
+// @Router /download [GET]
+func (f FileController) DownloadLocal(ctx *gin.Context) {
+	path := f.upload
+	filename := ctx.Query("filename")
+	ctx.FileAttachment(path+filename, filename)
 }
 
 // UploadOss
