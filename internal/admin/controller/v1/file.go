@@ -1,7 +1,9 @@
 package v1
 
 import (
+	"io"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/GodYao1995/Goooooo/internal/admin/types"
@@ -37,6 +39,7 @@ func NewFileController(apiV1 *version.APIV1, log *zap.Logger, store *session.Red
 		file.GET("/list", ctl.ListFile)
 		file.POST("/upload", ctl.UploadLocal)
 		file.GET("/download", ctl.DownloadLocal)
+		file.GET("/stream", ctl.DownloadLocalFileStream)
 		file.POST("/oss", ctl.UploadOss)
 	}
 }
@@ -70,7 +73,7 @@ func (f FileController) UploadLocal(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, resp)
 		return
 	}
-	target := f.upload + fileObj.Filename + strconv.Itoa(int(tools.SnowId()))
+	target := f.upload + strconv.Itoa(int(tools.SnowId())) + fileObj.Filename
 	if err = ctx.SaveUploadedFile(fileObj, target); err != nil {
 		resp.Message = errno.ErrorUploadFile.Error()
 		ctx.JSON(http.StatusOK, resp)
@@ -111,6 +114,35 @@ func (f FileController) DownloadLocal(ctx *gin.Context) {
 	path := f.upload
 	filename := ctx.Query("filename")
 	ctx.FileAttachment(path+filename, filename)
+}
+
+// DownloadLocalFileStream
+// @Summary DownloadLocalFileStream
+// @Description DownloadLocalFileStream
+// @Tags File
+// @Accept json
+// @Param q query string true  "download file"
+// @Produce json
+// @Success 0 {object} application/octet-stream
+// @Failure 1 {object}
+// @Router /stream [GET]
+func (f FileController) DownloadLocalFileStream(ctx *gin.Context) {
+	resp := types.CommonResponse{Code: 1}
+	path := f.upload
+	filename := ctx.Query("filename")
+	sourceFile, err := os.Open(path + filename)
+	if err != nil {
+		resp.Message = err.Error()
+		ctx.JSON(http.StatusOK, resp)
+		return
+	}
+	data, err := io.ReadAll(sourceFile)
+	if err != nil {
+		resp.Message = err.Error()
+		ctx.JSON(http.StatusOK, resp)
+		return
+	}
+	ctx.Data(http.StatusOK, "application/octet-stream", data)
 }
 
 // UploadOss
