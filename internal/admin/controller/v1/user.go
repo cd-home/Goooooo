@@ -25,17 +25,18 @@ func NewUserController(apiV1 *version.APIV1, log *zap.Logger, logic domain.UserL
 		log:   log.WithOptions(zap.Fields(zap.String("module", "UserController"))),
 		store: store,
 	}
+
 	// API version
-	v1 := apiV1.Group
+	v1 := apiV1.Group.Group("/user")
+
 	// No Need Authorization
-	user := v1.Group("/user")
 	{
-		user.POST("/register", ctl.Register)
-		user.POST("/login", ctl.Login)
+		v1.POST("/register", ctl.Register)
+		v1.POST("/login", ctl.Login)
 	}
+	
 	// Need Authorization
-	needAuth := v1.Group("/user")
-	needAuth.Use(auth.AuthMiddleware(store))
+	needAuth := v1.Use(auth.AuthMiddleware(store))
 	{
 		needAuth.GET("/profile", ctl.GetUserProfile)
 	}

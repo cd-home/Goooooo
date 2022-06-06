@@ -37,17 +37,23 @@ func NewFileController(apiV1 *version.APIV1, log *zap.Logger, store *session.Red
 		logic:  logic,
 		perm:   perm,
 	}
-	v1 := apiV1.Group
-	file := v1.Group("/file").Use(auth.AuthMiddleware(store))
+
+	// API version
+	v1 := apiV1.Group.Group("/file")
+
+	// Need Authorization
+	needAuth := v1.Use(auth.AuthMiddleware(store))
 	{
-		file.GET("/list", ctl.ListFile)
-		file.POST("/upload", ctl.UploadLocal)
-		file.POST("/oss", ctl.UploadOss)
+		needAuth.GET("/list", ctl.ListFile)
+		needAuth.POST("/upload", ctl.UploadLocal)
+		needAuth.POST("/oss", ctl.UploadOss)
 	}
-	needAuth := v1.Group("/file").Use(permission.PermissionMiddleware(perm))
+	
+	// Need Authorization And Permission
+	needPerm := needAuth.Use(permission.PermissionMiddleware(perm))
 	{
-		needAuth.GET("/download", ctl.DownloadLocal)
-		needAuth.GET("/stream", ctl.DownloadLocalFileStream)
+		needPerm.GET("/download", ctl.DownloadLocal)
+		needPerm.GET("/stream", ctl.DownloadLocalFileStream)
 	}
 }
 
