@@ -37,11 +37,3 @@ type RoleRelationEntity struct {
 	CreateAt   string `db:"create_at"`
 	DeleteAt   string `db:"delete_at"`
 }
-
-// RolePO [Write To DB, For Insert]
-type RolePO struct {
-	RoleId    uint64 `db:"role_id"`
-	RoleName  string `db:"role_name"`
-	RoleLevel uint8  `db:"role_level"`
-	RoleIndex uint8  `db:"role_index"`
-}

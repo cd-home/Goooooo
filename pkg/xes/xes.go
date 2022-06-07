@@ -28,7 +28,7 @@ func NewESClient(lifecycle fx.Lifecycle, vp *viper.Viper) *elastic.Client {
 				return err
 			}
 			v, _ := client.ElasticsearchVersion(addr)
-			log.Printf("\033[1;32;32m=========== ES [%s] RUNNING: [ %s ] ============\033[0m", v, addr)
+			log.Printf("\033[1;32;32m=========== ES [%s] Running: [ %s ] \033[0m", v, addr)
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
