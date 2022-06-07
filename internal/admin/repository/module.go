@@ -9,4 +9,5 @@ var Module = fx.Provide(
 	v1.NewUserRepository,
 	v1.NewDirectoryRepository,
 	v1.NewFileRepository,
+	v1.NewRoleRepository,
 )
