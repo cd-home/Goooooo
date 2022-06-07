@@ -41,7 +41,7 @@ func New(lifecycle fx.Lifecycle, vp *viper.Viper) *gin.Engine {
 
 	lifecycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			log.Printf("\033[1;32;32m=========== Server Running: [%s] \033[0m", srv.Addr)
+			log.Printf("\033[1;32;32m=========== Server     Running: [ %s ] \033[0m", srv.Addr)
 			go func() {
 				if err := srv.ListenAndServe(); err != nil {
 					log.Fatal(err)

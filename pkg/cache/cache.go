@@ -24,7 +24,7 @@ func NewRedisClient(lifecycle fx.Lifecycle, vp *viper.Viper) *redis.Client {
 				log.Fatal(err)
 				return err
 			}
-			log.Printf("\033[1;32;32m=========== Redis  Running: [ %s ] \033[0m", opts.Addr)
+			log.Printf("\033[1;32;32m=========== Redis      Running: [ %s ] \033[0m", opts.Addr)
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
