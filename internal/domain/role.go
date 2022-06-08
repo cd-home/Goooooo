@@ -3,13 +3,12 @@ package domain
 import "context"
 
 type RoleLogicFace interface {
-	CreateRole(ctx context.Context)
+	CreateRole(ctx context.Context, roleName string, roleLevel uint8, roleIndex uint8, parent *uint64) error
 }
 
 // RoleRepositoryFace
 type RoleRepositoryFace interface {
-	CreateRole(ctx context.Context) error
-	CreateRelation(ctx context.Context) error
+	CreateRole(ctx context.Context, roleId uint64, roleName string, roleLevel uint8, roleIndex uint8, parent *uint64) error
 	Delete(ctx context.Context)
 	Update(ctx context.Context)
 	Retrieve(ctx context.Context)
@@ -36,4 +35,11 @@ type RoleRelationEntity struct {
 	UpdateAt   string `db:"update_at"`
 	CreateAt   string `db:"create_at"`
 	DeleteAt   string `db:"delete_at"`
+}
+
+// RoleRelationPO [For Write DB]
+type RoleRelationPO struct {
+	Ancestor   uint64 `db:"ancestor"`
+	Descendant uint64 `db:"descendant"`
+	Distance   uint8  `db:"distance"`
 }

@@ -61,3 +61,29 @@ CREATE TABLE IF NOT EXISTS `file` (
     KEY `idx_file_id` (`file_id`),
     KEY `idx_delete_at` (`delete_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE IF NOT EXISTS `role` (
+    `id` INT unsigned PRIMARY KEY AUTO_INCREMENT COMMENT '自增主键id',
+    `role_id` BIGINT unsigned NOT NULL COMMENT '角色唯一id',
+    `role_name` VARCHAR(30) NOT NULL COMMENT '角色名',
+    `role_level` TINYINT unsigned DEFAULT NULL COMMENT '层级',
+    `role_index` TINYINT unsigned DEFAULT NULL COMMENT '同级排序',
+    `update_at` DATETIME(0) DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+    `create_at` DATETIME(0) DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `delete_at` DATETIME(0) DEFAULT NULL COMMENT '删除时间',
+    KEY `role_id` (`role_id`),
+    KEY `idx_delete_at` (`delete_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `role_relation` (
+    `id` INT unsigned PRIMARY KEY AUTO_INCREMENT COMMENT '自增主键id',
+    `ancestor` BIGINT NOT NULL COMMENT '起始',
+    `descendant` BIGINT NOT NULL COMMENT '终止',
+    `distance` TINYINT NOT NULL COMMENT '距离',
+    `update_at` DATETIME(0) DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+    `create_at` DATETIME(0) DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `delete_at` DATETIME(0) DEFAULT NULL COMMENT '删除时间',
+    UNIQUE KEY `unique_idx_anc_desc` (`ancestor`, `descendant`),
+    KEY `idx_delete_at` (`delete_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

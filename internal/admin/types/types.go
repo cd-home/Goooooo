@@ -55,3 +55,11 @@ type RenameDirectoryParam struct {
 	DirectoryId   uint64 `json:"directory_id" binding:"required"`
 	DirectoryName string `json:"directory_name" binding:"required"`
 }
+
+// CreateRoleParam [Request, POST, Body]
+type CreateRoleParam struct {
+	RoleName  string  `json:"role_name" binding:"required"`
+	RoleLevel uint8   `json:"role_level" binding:"required"`
+	RoleIndex uint8   `json:"role_index" binding:"required"`
+	Parent    *uint64 `json:"parent"`
+}
