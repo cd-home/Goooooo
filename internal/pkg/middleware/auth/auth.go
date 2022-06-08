@@ -14,7 +14,7 @@ import (
 
 func AuthMiddleware(store *session.RedisStore) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		resp := types.CommonResponse{Code: 0}
+		resp := types.CommonResponse{Code: 1}
 		var user domain.UserSession
 		session, err := store.New(ctx.Request, "SESSIONID")
 		if errors.Is(err, errno.ErrorRedisEmpty) || errors.Is(err, http.ErrNoCookie) {

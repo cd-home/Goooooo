@@ -7,6 +7,8 @@ import (
 	"github.com/GodYao1995/Goooooo/internal/admin/version"
 	"github.com/GodYao1995/Goooooo/internal/domain"
 	"github.com/GodYao1995/Goooooo/internal/pkg/errno"
+	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/auth"
+	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/permission"
 	"github.com/GodYao1995/Goooooo/internal/pkg/session"
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
@@ -16,22 +18,23 @@ import (
 type RoleController struct {
 	logic domain.RoleLogicFace
 	log   *zap.Logger
-	store *session.RedisStore
-	perm  *casbin.Enforcer
 }
 
 func NewRoleController(apiV1 *version.APIV1, log *zap.Logger, logic domain.RoleLogicFace, store *session.RedisStore, perm *casbin.Enforcer) {
 	ctl := &RoleController{
 		logic: logic,
 		log:   log.WithOptions(zap.Fields(zap.String("module", "RoleController"))),
-		store: store,
-		perm:  perm,
 	}
 	// API version
-	// v1 := apiV1.Group.Group("/role").Use(auth.AuthMiddleware(store)).Use(permission.PermissionMiddleware(perm))
 	v1 := apiV1.Group.Group("/role")
+	needAuth := v1.Use(auth.AuthMiddleware(store))
 	{
-		v1.POST("/create", ctl.CreateRole)
+		needAuth.POST("/list", ctl.ListRole)
+	}
+	needPerm := needAuth.Use(permission.PermissionMiddleware(perm))
+	{
+		needPerm.POST("/create", ctl.CreateRole)
+		needPerm.POST("/delete", ctl.CreateRole)
 	}
 }
 
@@ -58,5 +61,29 @@ func (r RoleController) CreateRole(ctx *gin.Context) {
 		resp.Message = errno.RoleCreateSuccess
 		resp.Code = 0
 	}
+	ctx.JSON(http.StatusOK, resp)
+}
+
+// DeleteRole
+// @Summary Delete Role
+// @Description Delete Role
+// @Tags Role
+// @Accept  json
+// @Produce json
+// @Router /delete [POST]
+func (r RoleController) DeleteRole(ctx *gin.Context) {
+	resp := types.CommonResponse{Code: 1}
+	ctx.JSON(http.StatusOK, resp)
+}
+
+// ListRole
+// @Summary List Role
+// @Description List Role
+// @Tags Role
+// @Accept  json
+// @Produce json
+// @Router /list [POST]
+func (r RoleController) ListRole(ctx *gin.Context) {
+	resp := types.CommonResponse{Code: 1}
 	ctx.JSON(http.StatusOK, resp)
 }
