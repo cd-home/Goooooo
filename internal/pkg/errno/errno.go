@@ -12,12 +12,13 @@ var (
 
 // Response Message
 const (
-	Success         = "成功"
-	Failure         = "失败"
-	LoginSuccess    = "登录成功"
-	RegisterSuccess = "注册成功"
-	UploadSuccess   = "文件上传成功"
-	NoPermission    = "无操作权限"
+	Success           = "成功"
+	Failure           = "失败"
+	LoginSuccess      = "登录成功"
+	RegisterSuccess   = "注册成功"
+	UploadSuccess     = "文件上传成功"
+	NoPermission      = "无操作权限"
+	RoleCreateSuccess = "角色创建成功"
 )
 
 // API Error

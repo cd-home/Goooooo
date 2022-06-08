@@ -9,4 +9,5 @@ var Module = fx.Provide(
 	v1.NewUserLogic,
 	v1.NewDirectoryrLogic,
 	v1.NewFileLogic,
+	v1.NewRoleLogic,
 )
