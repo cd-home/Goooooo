@@ -14,7 +14,7 @@ COPY . .
 RUN chmod +x ./scripts/build.sh && ./scripts/build.sh admin linux admin
 
 
-FROM scratch
+FROM alpine:3.14
 LABEL stage=Run
 WORKDIR /app/release/
 COPY --from=Builder /app/build/ /app/release/
