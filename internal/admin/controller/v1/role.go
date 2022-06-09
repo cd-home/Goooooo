@@ -90,7 +90,7 @@ func (r RoleController) ListRole(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, resp)
 		return
 	}
-	views, err := r.logic.Retrieve(ctx, params.RoleLevel, params.Father)
+	views, err := r.logic.RetrieveRoles(ctx, params.RoleLevel, params.Father)
 	if err != nil {
 		resp.Message = err.Error()
 		ctx.JSON(http.StatusOK, resp)

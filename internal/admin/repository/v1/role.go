@@ -20,7 +20,7 @@ func NewRoleRepository(db *sqlx.DB, log *zap.Logger) domain.RoleRepositoryFace {
 	}
 }
 
-func (repo RoleRepository) CreateRole(ctx context.Context, roleId uint64, roleName string, roleLevel uint8, roleIndex uint8, father *uint64) (err error) {
+func (repo RoleRepository) Create(ctx context.Context, roleId uint64, roleName string, roleLevel uint8, roleIndex uint8, father *uint64) (err error) {
 	var tx *sqlx.Tx
 	local := zap.Fields(zap.String("Repo", "CreateRole"))
 	defer func() {
@@ -74,10 +74,6 @@ func (repo RoleRepository) CreateRole(ctx context.Context, roleId uint64, roleNa
 		}
 	}
 	return
-}
-
-func (repo RoleRepository) CreateRelation(ctx context.Context) error {
-	return nil
 }
 
 func (repo RoleRepository) Delete(ctx context.Context) {
