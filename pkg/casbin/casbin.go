@@ -15,7 +15,11 @@ type Adapter struct {
 }
 
 func NewCasbinEnforcer(db *sqlx.DB) *casbin.Enforcer {
-	e, _ := casbin.NewEnforcer(_RuleConfPath, NewSqlxAdapter(db))
+	e, err := casbin.NewEnforcer(_RuleConfPath, NewSqlxAdapter(db))
+	if err != nil {
+		// JUST For VScode DEBUG
+		e, _ = casbin.NewEnforcer("../"+_RuleConfPath, NewSqlxAdapter(db))
+	}
 	e.LoadPolicy()
 	e.EnableAutoSave(true)
 	e.EnableLog(true)
