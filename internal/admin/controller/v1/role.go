@@ -8,7 +8,6 @@ import (
 	"github.com/GodYao1995/Goooooo/internal/domain"
 	"github.com/GodYao1995/Goooooo/internal/pkg/errno"
 	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/auth"
-	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/permission"
 	"github.com/GodYao1995/Goooooo/internal/pkg/session"
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
@@ -29,12 +28,12 @@ func NewRoleController(apiV1 *version.APIV1, log *zap.Logger, logic domain.RoleL
 	v1 := apiV1.Group.Group("/role")
 	needAuth := v1.Use(auth.AuthMiddleware(store))
 	{
-		needAuth.POST("/list", ctl.ListRole)
+		needAuth.GET("/list", ctl.ListRole)
 	}
-	needPerm := needAuth.Use(permission.PermissionMiddleware(perm))
+	// needPerm := needAuth.Use(permission.PermissionMiddleware(perm))
 	{
-		needPerm.POST("/create", ctl.CreateRole)
-		needPerm.POST("/delete", ctl.CreateRole)
+		needAuth.POST("/create", ctl.CreateRole)
+		needAuth.POST("/delete", ctl.CreateRole)
 	}
 }
 
@@ -54,7 +53,7 @@ func (r RoleController) CreateRole(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, resp)
 		return
 	}
-	err = r.logic.CreateRole(ctx, params.RoleName, params.RoleLevel, params.RoleIndex, params.Parent)
+	err = r.logic.CreateRole(ctx, params.RoleName, params.RoleLevel, params.RoleIndex, params.Father)
 	if err != nil {
 		resp.Message = err.Error()
 	} else {
@@ -82,8 +81,22 @@ func (r RoleController) DeleteRole(ctx *gin.Context) {
 // @Tags Role
 // @Accept  json
 // @Produce json
-// @Router /list [POST]
+// @Router /list [GET]
 func (r RoleController) ListRole(ctx *gin.Context) {
+	params := types.ListRoleParam{}
 	resp := types.CommonResponse{Code: 1}
+	if err := ctx.ShouldBind(&params); err != nil {
+		resp.Message = errno.ErrorParamsParse.Error()
+		ctx.JSON(http.StatusOK, resp)
+		return
+	}
+	views, err := r.logic.Retrieve(ctx, params.RoleLevel, params.Father)
+	if err != nil {
+		resp.Message = err.Error()
+		ctx.JSON(http.StatusOK, resp)
+		return
+	}
+	resp.Message = errno.Success
+	resp.Data = views
 	ctx.JSON(http.StatusOK, resp)
 }
