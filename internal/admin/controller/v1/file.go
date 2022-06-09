@@ -48,7 +48,7 @@ func NewFileController(apiV1 *version.APIV1, log *zap.Logger, store *session.Red
 		needAuth.POST("/upload", ctl.UploadLocal)
 		needAuth.POST("/oss", ctl.UploadOss)
 	}
-	
+
 	// Need Authorization And Permission
 	needPerm := needAuth.Use(permission.PermissionMiddleware(perm))
 	{

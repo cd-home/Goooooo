@@ -81,3 +81,11 @@ func (repo *UserRepository) GetAllUsers(ctx context.Context) ([]*domain.UserDTO,
 	err = repo.db.Select(&users, `SELECT * FROM user`)
 	return users, err
 }
+
+// GetRoleByUserId
+func (repo *UserRepository) GetRolesByUserId(ctx context.Context, userId uint64) ([]uint64, error) {
+	var err error
+	var roleIds []uint64
+	err = repo.db.Select(&roleIds, `SELECT role_id FROM user_role WHERE user_id = ?`, userId)
+	return roleIds, err
+}

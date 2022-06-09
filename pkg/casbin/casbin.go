@@ -18,6 +18,7 @@ func NewCasbinEnforcer(db *sqlx.DB) *casbin.Enforcer {
 	e, _ := casbin.NewEnforcer(_RuleConfPath, NewSqlxAdapter(db))
 	e.LoadPolicy()
 	e.EnableAutoSave(true)
+	e.EnableLog(true)
 	return e
 }
 

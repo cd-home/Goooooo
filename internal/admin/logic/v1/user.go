@@ -43,6 +43,7 @@ func (logic *UserLogic) Register(ctx context.Context, account string, password s
 
 // Login
 func (logic *UserLogic) Login(ctx context.Context, account string, password string) (*domain.UserVO, *domain.UserSession, error) {
+	//  CheckAccountExist
 	user, err := logic.repo.CheckAccountExist(ctx, account, password)
 	if user == nil {
 		return nil, nil, err
@@ -56,9 +57,15 @@ func (logic *UserLogic) Login(ctx context.Context, account string, password stri
 		Id:       user.Id,
 		UserName: user.UserName,
 	}
+	// GetRoleByUserId
+	roles, err := logic.repo.GetRolesByUserId(ctx, user.Id)
+	if err != nil {
+		return nil, nil, err
+	}
 	sessions := &domain.UserSession{
 		Id:       user.Id,
 		UserName: user.UserName,
+		Role:     roles,
 	}
 	return obj, sessions, nil
 }

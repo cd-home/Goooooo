@@ -87,3 +87,14 @@ CREATE TABLE IF NOT EXISTS `role_relation` (
     UNIQUE KEY `unique_idx_anc_desc` (`ancestor`, `descendant`),
     KEY `idx_delete_at` (`delete_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `user_role` (
+    `id` INT unsigned PRIMARY KEY AUTO_INCREMENT COMMENT '自增主键id',
+    `user_id` INT unsigned NOT NULL COMMENT '起始',
+    `role_id` BIGINT NOT NULL COMMENT '终止',
+    `update_at` DATETIME(0) DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+    `create_at` DATETIME(0) DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `delete_at` DATETIME(0) DEFAULT NULL COMMENT '删除时间',
+    UNIQUE KEY `unique_idx_user_role` (`user_id`, `role_id`),
+    KEY `idx_delete_at` (`delete_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

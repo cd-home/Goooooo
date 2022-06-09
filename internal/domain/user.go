@@ -17,6 +17,7 @@ type UserRepositoryFace interface {
 	CreateUserByEmail(ctx context.Context, account string, password string) error
 	CheckAccountExist(ctx context.Context, account string, password string) (*UserDTO, error)
 	GetAllUsers(ctx context.Context) ([]*UserDTO, error)
+	GetRolesByUserId(ctx context.Context, userId uint64) ([]uint64, error)
 }
 
 type UserEsRepositoryFace interface {
@@ -72,11 +73,12 @@ type UserVO struct {
 
 // User Session
 type UserSession struct {
-	Id        uint64 `json:"id"`
-	UserName  string `json:"username"`
-	NickName  string `json:"nickname"`
-	Avatar    string `json:"avatar"`
-	LastLogin string `json:"last_login"`
+	Id        uint64   `json:"id"`
+	UserName  string   `json:"username"`
+	NickName  string   `json:"nickname"`
+	Avatar    string   `json:"avatar"`
+	LastLogin string   `json:"last_login"`
+	Role      []uint64 `json:"role"`
 }
 
 // Domain Model
