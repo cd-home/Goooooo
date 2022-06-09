@@ -17,6 +17,25 @@ func NewRoleLogic(repo domain.RoleRepositoryFace, log *zap.Logger) domain.RoleLo
 	return &RoleLogic{repo: repo, log: log}
 }
 
-func (r RoleLogic) CreateRole(ctx context.Context, roleName string, roleLevel uint8, roleIndex uint8, parent *uint64) error {
-	return r.repo.CreateRole(ctx, uint64(tools.SnowId()), roleName, roleLevel, roleIndex, parent)
+func (r RoleLogic) CreateRole(ctx context.Context, roleName string, roleLevel uint8, roleIndex uint8, father *uint64) error {
+	return r.repo.CreateRole(ctx, uint64(tools.SnowId()), roleName, roleLevel, roleIndex, father)
+}
+
+func (r RoleLogic) Retrieve(ctx context.Context, roleLevel uint8, father *uint64) ([]*domain.RoleEntityVO, error) {
+	dto, err := r.repo.Retrieve(ctx, roleLevel, father)
+	if err != nil {
+		return nil, err
+	}
+	roleVos := make([]*domain.RoleEntityVO, 0)
+	for _, obj := range dto {
+		roleVos = append(roleVos, &domain.RoleEntityVO{
+			RoleId:    obj.RoleId,
+			RoleName:  obj.RoleName,
+			RoleLevel: obj.RoleLevel,
+			RoleIndex: obj.RoleIndex,
+			CreateAt:  obj.CreateAt,
+			UpdateAt:  obj.UpdateAt,
+		})
+	}
+	return roleVos, nil
 }

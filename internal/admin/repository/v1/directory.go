@@ -89,7 +89,7 @@ func (repo *DirectoryRepository) ListDirectory(level uint8, father *uint64) []*d
 	//	FROM directory AS d
 	//	JOIN directory_relation AS relation ON d.directory_id = relation.ancestor
 	//	JOIN directory AS d2 ON relation.descendant = d2.directory_id
-	//	JOINWHERE d.directory_id = ? AND d.delete_at IS NULL AND relation.distance = 1
+	//	WHERE d.directory_id = ? AND d.delete_at IS NULL AND relation.distance = 1
 	repo.db.Select(&directories, `
 		SELECT 
 			directory_id, directory_name, directory_type, directory_level, directory_index
