@@ -18,10 +18,10 @@ func NewRoleLogic(repo domain.RoleRepositoryFace, log *zap.Logger) domain.RoleLo
 }
 
 func (r RoleLogic) CreateRole(ctx context.Context, roleName string, roleLevel uint8, roleIndex uint8, father *uint64) error {
-	return r.repo.CreateRole(ctx, uint64(tools.SnowId()), roleName, roleLevel, roleIndex, father)
+	return r.repo.Create(ctx, uint64(tools.SnowId()), roleName, roleLevel, roleIndex, father)
 }
 
-func (r RoleLogic) Retrieve(ctx context.Context, roleLevel uint8, father *uint64) ([]*domain.RoleEntityVO, error) {
+func (r RoleLogic) RetrieveRoles(ctx context.Context, roleLevel uint8, father *uint64) ([]*domain.RoleEntityVO, error) {
 	dto, err := r.repo.Retrieve(ctx, roleLevel, father)
 	if err != nil {
 		return nil, err
