@@ -2,7 +2,6 @@ package v1
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/GodYao1995/Goooooo/internal/admin/types"
 	"github.com/GodYao1995/Goooooo/internal/admin/version"
@@ -36,6 +35,7 @@ func NewRoleController(apiV1 *version.APIV1, log *zap.Logger, logic domain.RoleL
 	{
 		needPerm.POST("/create", ctl.CreateRole)
 		needPerm.DELETE("/delete", ctl.DeleteRole)
+		needPerm.PUT("/update", ctl.UpdateRole)
 	}
 }
 
@@ -73,19 +73,42 @@ func (r RoleController) CreateRole(ctx *gin.Context) {
 // @Produce json
 // @Router /delete [DELETE]
 func (r RoleController) DeleteRole(ctx *gin.Context) {
+	params := types.DeleteRoleParam{}
 	resp := types.CommonResponse{Code: 1}
-	roleId, err := strconv.Atoi(ctx.Query("role_id"))
-	if err != nil {
+	if err := ctx.ShouldBindQuery(&params); err != nil {
 		resp.Message = err.Error()
-		ctx.JSON(http.StatusOK, resp)
 		return
 	}
-	err = r.logic.DeleteRole(ctx, uint64(roleId))
+	err := r.logic.DeleteRole(ctx, params.RoleId)
 	if err != nil {
 		resp.Message = err.Error()
 	} else {
 		resp.Message = errno.Success
 		resp.Code = 0
+	}
+	ctx.JSON(http.StatusOK, resp)
+}
+
+// UpdateRole
+// @Summary Update Role Name
+// @Description Update Role Name
+// @Tags Role
+// @Accept  json
+// @Produce json
+// @Router /update [PUT]
+func (r RoleController) UpdateRole(ctx *gin.Context) {
+	params := types.RenameRoleParam{}
+	resp := types.CommonResponse{Code: 1}
+	if err := ctx.ShouldBindJSON(&params); err != nil {
+		resp.Message = errno.ErrorParamsParse.Error()
+		ctx.JSON(http.StatusOK, resp)
+		return
+	}
+	if err := r.logic.UpdateRole(ctx, params.RoleId, params.RoleName); err != nil {
+		resp.Message = err.Error()
+	} else {
+		resp.Code = 0
+		resp.Message = errno.Success
 	}
 	ctx.JSON(http.StatusOK, resp)
 }
