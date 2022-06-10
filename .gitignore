@@ -25,4 +25,4 @@ logs
 
 web/node_modules
 web/dist
-upload
+uploads

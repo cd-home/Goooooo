@@ -8,6 +8,7 @@ import (
 	"github.com/GodYao1995/Goooooo/internal/domain"
 	"github.com/GodYao1995/Goooooo/internal/pkg/errno"
 	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/auth"
+	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/permission"
 	"github.com/GodYao1995/Goooooo/internal/pkg/session"
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
@@ -30,10 +31,10 @@ func NewRoleController(apiV1 *version.APIV1, log *zap.Logger, logic domain.RoleL
 	{
 		needAuth.GET("/list", ctl.ListRole)
 	}
-	// needPerm := needAuth.Use(permission.PermissionMiddleware(perm))
+	needPerm := needAuth.Use(permission.PermissionMiddleware(perm))
 	{
-		needAuth.POST("/create", ctl.CreateRole)
-		needAuth.POST("/delete", ctl.CreateRole)
+		needPerm.POST("/create", ctl.CreateRole)
+		needPerm.DELETE("/delete", ctl.DeleteRole)
 	}
 }
 
