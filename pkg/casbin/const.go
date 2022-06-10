@@ -24,10 +24,11 @@ const (
 
 	_MAXParamLength = 7
 
-	_SelectAllPolicy = "SELECT p_type,v0,v1,v2,v3,v4,v5 FROM %s"
-	_InsertPolicy    = "INSERT INTO %s (p_type,v0,v1,v2,v3,v4,v5) VALUES (?,?,?,?,?,?,?)"
-	_DeletePolicy    = "DELETE FROM %s WHERE p_type = ?"
-	_DeleteAllPolicy = "DELETE FROM %s"
+	_SelectAllPolicy  = "SELECT p_type,v0,v1,v2,v3,v4,v5 FROM %s"
+	_InsertPolicy     = "INSERT INTO %s (p_type,v0,v1,v2,v3,v4,v5) VALUES (?,?,?,?,?,?,?)"
+	_InsertNamePolicy = "INSERT INTO %s (p_type,v0,v1,v2,v3,v4,v5) VALUES (:p_type,:v0,:v1,:v2,:v3,:v4,:v5)"
+	_DeletePolicy     = "DELETE FROM %s WHERE p_type = ?"
+	_DeleteAllPolicy  = "DELETE FROM %s"
 )
 
 var (
@@ -35,8 +36,9 @@ var (
 	_PolicyTableSQL           = fmt.Sprintf(_PolicyTable, _PolicyTableName)
 	_SelectAllPolicyRecordSQL = fmt.Sprintf(_SelectAllPolicy, _PolicyTableName)
 	_InsertPolicyRecordSQL    = fmt.Sprintf(_InsertPolicy, _PolicyTableName)
+	_InsertNamePolicySQL      = fmt.Sprintf(_InsertNamePolicy, _PolicyTableName)
 	_DeletePolicyRecordSQL    = fmt.Sprintf(_DeletePolicy, _PolicyTableName)
-	_DeleteAllPolicySQL       = fmt.Sprintf(_DeletePolicy, _PolicyTableName)
+	_DeleteAllPolicySQL       = fmt.Sprintf(_DeleteAllPolicy, _PolicyTableName)
 )
 
 type _CasbinRule struct {

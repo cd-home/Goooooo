@@ -2,10 +2,12 @@ package casbin
 
 import (
 	"bytes"
+	"log"
 	"strconv"
 
 	"github.com/casbin/casbin/v2/model"
 	"github.com/casbin/casbin/v2/persist"
+	"github.com/jmoiron/sqlx"
 )
 
 func (adapter *Adapter) LoadPolicy(model model.Model) error {
@@ -55,52 +57,39 @@ func (adapter *Adapter) RemovePolicy(sec string, ptype string, rule []string) er
 	return err
 }
 
-func (adapter *Adapter) SavePolicy(model model.Model) error {
-	args := make([][]interface{}, 0, 64)
+func (adapter *Adapter) SavePolicy(model model.Model) (err error) {
+	var tx *sqlx.Tx
+	defer func() {
+		if e := recover(); e != nil {
+			err = e.(error)
+			tx.Rollback()
+		}
+		if err != nil {
+			tx.Rollback()
+		} else {
+			tx.Commit()
+		}
+	}()
+	argsP := make([]*_CasbinRule, 0, 64)
+	argsG := make([]*_CasbinRule, 0, 32)
 	for ptype, ast := range model["p"] {
 		for _, rule := range ast.Policy {
-			arg := _GetArgs(ptype, rule)
-			args = append(args, arg)
+			arg := _GetStructArgs(ptype, rule)
+			argsP = append(argsP, arg)
 		}
 	}
 	for ptype, ast := range model["g"] {
 		for _, rule := range ast.Policy {
-			arg := _GetArgs(ptype, rule)
-			args = append(args, arg)
+			arg := _GetStructArgs(ptype, rule)
+			argsG = append(argsG, arg)
 		}
 	}
-	// first delete all
-	if _, err := adapter.db.Exec(_DeleteAllPolicySQL); err != nil {
-		return err
-	}
-
-	// insert new
-	tx, err := adapter.db.Begin()
-	if err != nil {
-		return err
-	}
-	stmt, err := tx.Prepare(_InsertPolicyRecordSQL)
-	if err != nil {
-		return err
-	}
-	for _, rule := range args {
-		if _, err := stmt.Exec(rule...); err != nil {
-			goto Rollback
-		}
-	}
-	if err = stmt.Close(); err != nil {
-		goto Rollback
-	}
-
-	if err = tx.Commit(); err != nil {
-		goto Rollback
-	}
-
-Rollback:
-	if err := tx.Rollback(); err != nil {
-		return err
-	}
-	return nil
+	tx, err = adapter.db.Beginx()
+	tx.MustExec(_DeleteAllPolicySQL)
+	stmt, _ := tx.PrepareNamed(_InsertNamePolicySQL)
+	stmt.MustExec(argsP)
+	stmt.MustExec(argsG)
+	return err
 }
 
 func (adapter *Adapter) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int, fieldValues ...string) error {
@@ -140,4 +129,29 @@ func _GetArgs(ptype string, rule []string) []interface{} {
 		args[j] = ""
 	}
 	return args
+}
+
+func _GetStructArgs(ptype string, rule []string) *_CasbinRule {
+	arg := &_CasbinRule{}
+	arg.PType = ptype
+	arg.V0 = rule[0]
+	arg.V1 = rule[1]
+	log.Println(len(rule))
+	switch len(rule) {
+	case 3:
+		arg.V2 = rule[2]
+	case 4:
+		arg.V2 = rule[2]
+		arg.V3 = rule[3]
+	case 5:
+		arg.V2 = rule[2]
+		arg.V3 = rule[3]
+		arg.V4 = rule[4]
+	case 6:
+		arg.V2 = rule[2]
+		arg.V3 = rule[3]
+		arg.V4 = rule[4]
+		arg.V5 = rule[5]
+	}
+	return arg
 }

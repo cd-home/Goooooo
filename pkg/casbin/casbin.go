@@ -24,6 +24,8 @@ func NewCasbinEnforcer(db *sqlx.DB) *casbin.Enforcer {
 	e.LoadPolicy()
 	e.EnableAutoSave(true)
 	e.EnableLog(true)
+
+	e.SavePolicy()
 	return e
 }
 
