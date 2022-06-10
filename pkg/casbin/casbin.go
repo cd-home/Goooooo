@@ -2,6 +2,7 @@ package casbin
 
 import (
 	"log"
+	"path/filepath"
 
 	"github.com/casbin/casbin/v2"
 	"github.com/jmoiron/sqlx"
@@ -18,7 +19,7 @@ func NewCasbinEnforcer(db *sqlx.DB) *casbin.Enforcer {
 	e, err := casbin.NewEnforcer(_RuleConfPath, NewSqlxAdapter(db))
 	if err != nil {
 		// JUST For VScode DEBUG
-		e, _ = casbin.NewEnforcer("../"+_RuleConfPath, NewSqlxAdapter(db))
+		e, _ = casbin.NewEnforcer(filepath.Join("../", _RuleConfPath), NewSqlxAdapter(db))
 	}
 	e.LoadPolicy()
 	e.EnableAutoSave(true)
