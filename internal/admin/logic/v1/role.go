@@ -39,3 +39,7 @@ func (r RoleLogic) RetrieveRoles(ctx context.Context, roleLevel uint8, father *u
 	}
 	return roleVos, nil
 }
+
+func (r RoleLogic) DeleteRole(ctx context.Context, roleId uint64) error {
+	return r.repo.Delete(ctx, roleId)
+}

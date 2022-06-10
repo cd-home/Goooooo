@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"time"
 
 	"github.com/GodYao1995/Goooooo/internal/domain"
 	"github.com/jmoiron/sqlx"
@@ -76,7 +77,15 @@ func (repo RoleRepository) Create(ctx context.Context, roleId uint64, roleName s
 	return
 }
 
-func (repo RoleRepository) Delete(ctx context.Context) {
+func (repo RoleRepository) Delete(ctx context.Context, roleId uint64) error {
+	var err error
+	local := zap.Fields(zap.String("Repo", "DeleteRole"))
+	_, err = repo.db.Exec(`UPDATE role SET delete_at = ? WHERE role_id = ?`, time.Now(), roleId)
+	if err != nil {
+		repo.log.WithOptions(local).Warn(err.Error())
+		return err
+	}
+	return nil
 }
 
 func (repo RoleRepository) Update(ctx context.Context) {
@@ -102,14 +111,29 @@ func (repo RoleRepository) Retrieve(ctx context.Context, roleLevel uint8, father
 	err = repo.db.Select(&roles, `
 		SELECT
 			son.role_id, son.role_name, son.role_level, son.role_index, son.update_at, son.create_at
-		FROM role as role
-		JOIN role_relation as relation ON role.role_id = relation.ancestor
-		JOIN role as son ON relation.descendant = son.role_id
-		WHERE role.role_id = ? 
-		AND role.delete_at is NULL 
-		AND relation.delete_at is NULL
-		AND son.delete_at is NULL 
-		AND relation.distance = 1
+		FROM 
+		(
+			SELECT
+				role_id
+			FROM role 
+			WHERE role_id = ? AND delete_at is NULL
+		) AS role
+		JOIN
+		(
+			SELECT
+				ancestor, descendant
+			FROM role_relation 
+			WHERE delete_at is NULL AND distance = 1
+		) AS relation 
+		ON role.role_id = relation.ancestor
+		JOIN 
+		(
+			SELECT
+				role_id, role_name, role_level, role_index, update_at, create_at
+			FROM role 
+			WHERE delete_at is NULL
+		) AS son
+		ON relation.descendant = son.role_id
 		ORDER BY son.role_index`, *father)
 	if err != nil {
 		repo.log.WithOptions(local).Warn(err.Error())
