@@ -2,12 +2,14 @@ package v1
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/GodYao1995/Goooooo/internal/admin/types"
 	"github.com/GodYao1995/Goooooo/internal/admin/version"
 	"github.com/GodYao1995/Goooooo/internal/domain"
 	"github.com/GodYao1995/Goooooo/internal/pkg/errno"
 	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/auth"
+	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/permission"
 	"github.com/GodYao1995/Goooooo/internal/pkg/session"
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
@@ -30,10 +32,10 @@ func NewRoleController(apiV1 *version.APIV1, log *zap.Logger, logic domain.RoleL
 	{
 		needAuth.GET("/list", ctl.ListRole)
 	}
-	// needPerm := needAuth.Use(permission.PermissionMiddleware(perm))
+	needPerm := needAuth.Use(permission.PermissionMiddleware(perm))
 	{
-		needAuth.POST("/create", ctl.CreateRole)
-		needAuth.POST("/delete", ctl.CreateRole)
+		needPerm.POST("/create", ctl.CreateRole)
+		needPerm.DELETE("/delete", ctl.DeleteRole)
 	}
 }
 
@@ -69,9 +71,22 @@ func (r RoleController) CreateRole(ctx *gin.Context) {
 // @Tags Role
 // @Accept  json
 // @Produce json
-// @Router /delete [POST]
+// @Router /delete [DELETE]
 func (r RoleController) DeleteRole(ctx *gin.Context) {
 	resp := types.CommonResponse{Code: 1}
+	roleId, err := strconv.Atoi(ctx.Query("role_id"))
+	if err != nil {
+		resp.Message = err.Error()
+		ctx.JSON(http.StatusOK, resp)
+		return
+	}
+	err = r.logic.DeleteRole(ctx, uint64(roleId))
+	if err != nil {
+		resp.Message = err.Error()
+	} else {
+		resp.Message = errno.Success
+		resp.Code = 0
+	}
 	ctx.JSON(http.StatusOK, resp)
 }
 
@@ -87,6 +102,11 @@ func (r RoleController) ListRole(ctx *gin.Context) {
 	resp := types.CommonResponse{Code: 1}
 	if err := ctx.ShouldBind(&params); err != nil {
 		resp.Message = errno.ErrorParamsParse.Error()
+		ctx.JSON(http.StatusOK, resp)
+		return
+	}
+	if params.RoleLevel >= 2 && params.Father == nil {
+		resp.Message = errno.ErrorNotEnoughParam.Error()
 		ctx.JSON(http.StatusOK, resp)
 		return
 	}

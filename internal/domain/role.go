@@ -4,13 +4,14 @@ import "context"
 
 type RoleLogicFace interface {
 	CreateRole(ctx context.Context, roleName string, roleLevel uint8, roleIndex uint8, parent *uint64) error
+	DeleteRole(ctx context.Context, roleId uint64) error
 	RetrieveRoles(ctx context.Context, roleLevel uint8, father *uint64) ([]*RoleEntityVO, error)
 }
 
 // RoleRepositoryFace
 type RoleRepositoryFace interface {
 	Create(ctx context.Context, roleId uint64, roleName string, roleLevel uint8, roleIndex uint8, fa *uint64) error
-	Delete(ctx context.Context)
+	Delete(ctx context.Context, roleId uint64) error
 	Update(ctx context.Context)
 	Retrieve(ctx context.Context, roleLevel uint8, father *uint64) ([]*RoleEntityDTO, error)
 }

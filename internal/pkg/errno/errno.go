@@ -29,4 +29,5 @@ var (
 	ErrorUserNotLogin    = errors.New("未登录, 请重试")
 	ErrorUserPassword    = errors.New("密码错误, 请重试")
 	ErrorUploadFile      = errors.New("上传文件失败")
+	ErrorNotEnoughParam  = errors.New("参数不完整")
 )
