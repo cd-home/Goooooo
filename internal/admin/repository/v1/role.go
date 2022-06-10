@@ -88,7 +88,15 @@ func (repo RoleRepository) Delete(ctx context.Context, roleId uint64) error {
 	return nil
 }
 
-func (repo RoleRepository) Update(ctx context.Context) {
+func (repo RoleRepository) Update(ctx context.Context, roleId uint64, roleName string) error {
+	var err error
+	local := zap.Fields(zap.String("Repo", "DeleteRole"))
+	_, err = repo.db.Exec(`UPDATE role SET role_name = ? WHERE role_id = ?`, roleName, roleId)
+	if err != nil {
+		repo.log.WithOptions(local).Warn(err.Error())
+		return err
+	}
+	return nil
 }
 
 func (repo RoleRepository) Retrieve(ctx context.Context, roleLevel uint8, father *uint64) ([]*domain.RoleEntityDTO, error) {
