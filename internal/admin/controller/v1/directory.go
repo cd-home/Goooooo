@@ -7,6 +7,10 @@ import (
 	"github.com/GodYao1995/Goooooo/internal/admin/version"
 	"github.com/GodYao1995/Goooooo/internal/domain"
 	"github.com/GodYao1995/Goooooo/internal/pkg/errno"
+	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/auth"
+	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/permission"
+	"github.com/GodYao1995/Goooooo/internal/pkg/session"
+	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -16,13 +20,14 @@ type DirectoryController struct {
 	log   *zap.Logger
 }
 
-func NewDirectoryController(apiV1 *version.APIV1, log *zap.Logger, logic domain.DirectoryLogicFace) {
+func NewDirectoryController(apiV1 *version.APIV1, log *zap.Logger,
+	logic domain.DirectoryLogicFace, store *session.RedisStore, perm *casbin.Enforcer) {
 	ctl := &DirectoryController{
 		logic: logic,
 		log:   log.WithOptions(zap.Fields(zap.String("module", "DirectoryController"))),
 	}
 	v1 := apiV1.Group
-	directory := v1.Group("/directory")
+	directory := v1.Group("/directory").Use(auth.AuthMiddleware(store)).Use(permission.PermissionMiddleware(perm))
 	{
 		directory.POST("/create", ctl.CreateDirectory)
 		directory.GET("/list", ctl.ListDirectory)
