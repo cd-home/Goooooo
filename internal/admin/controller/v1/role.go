@@ -27,10 +27,15 @@ func NewRoleController(apiV1 *version.APIV1, log *zap.Logger, logic domain.RoleL
 	}
 	// API version
 	v1 := apiV1.Group.Group("/role")
+
+	// Need Authorization
 	needAuth := v1.Use(auth.AuthMiddleware(store))
 	{
 		needAuth.GET("/list", ctl.ListRole)
+		needAuth.POST("/move", ctl.MoveRole)
 	}
+
+	// Need Permission
 	needPerm := needAuth.Use(permission.PermissionMiddleware(perm))
 	{
 		needPerm.POST("/create", ctl.CreateRole)
@@ -45,6 +50,9 @@ func NewRoleController(apiV1 *version.APIV1, log *zap.Logger, logic domain.RoleL
 // @Tags Role
 // @Accept  json
 // @Produce json
+// @Param CreateRole body types.CreateRoleParam true "CreateRole"
+// @Success 0 {object} types.CommonResponse {"code":1,"data":null,"msg":"Success"}
+// @Failure 1 {object} types.CommonResponse {"code":1,"data":null,"msg":"Error"}
 // @Router /create [POST]
 func (r RoleController) CreateRole(ctx *gin.Context) {
 	params := types.CreateRoleParam{}
@@ -71,6 +79,9 @@ func (r RoleController) CreateRole(ctx *gin.Context) {
 // @Tags Role
 // @Accept  json
 // @Produce json
+// @Param DeleteRole body types.DeleteRoleParam true "DeleteRole"
+// @Success 0 {object} types.CommonResponse {"code":1,"data":null,"msg":"Success"}
+// @Failure 1 {object} types.CommonResponse {"code":1,"data":null,"msg":"Error"}
 // @Router /delete [DELETE]
 func (r RoleController) DeleteRole(ctx *gin.Context) {
 	params := types.DeleteRoleParam{}
@@ -95,6 +106,9 @@ func (r RoleController) DeleteRole(ctx *gin.Context) {
 // @Tags Role
 // @Accept  json
 // @Produce json
+// @Param UpdateRole body types.RenameRoleParam true "UpdateRole"
+// @Success 0 {object} types.CommonResponse {"code":1,"data":null,"msg":"Success"}
+// @Failure 1 {object} types.CommonResponse {"code":1,"data":null,"msg":"Error"}
 // @Router /update [PUT]
 func (r RoleController) UpdateRole(ctx *gin.Context) {
 	params := types.RenameRoleParam{}
@@ -119,6 +133,9 @@ func (r RoleController) UpdateRole(ctx *gin.Context) {
 // @Tags Role
 // @Accept  json
 // @Produce json
+// @Param ListRole body types.ListRoleParam true "ListRole"
+// @Success 0 {object} types.CommonResponse {"code":1,"data":null,"msg":"Success"}
+// @Failure 1 {object} types.CommonResponse {"code":1,"data":null,"msg":"Error"}
 // @Router /list [GET]
 func (r RoleController) ListRole(ctx *gin.Context) {
 	params := types.ListRoleParam{}
@@ -141,5 +158,31 @@ func (r RoleController) ListRole(ctx *gin.Context) {
 	}
 	resp.Message = errno.Success
 	resp.Data = views
+	ctx.JSON(http.StatusOK, resp)
+}
+
+// MoveRole
+// @Summary Move Role
+// @Description Move Role
+// @Tags Role
+// @Accept  json
+// @Produce json
+// @Param ListRole body types.ListRoleParam true "ListRole"
+// @Success 0 {object} types.CommonResponse {"code":1,"data":null,"msg":"Success"}
+// @Failure 1 {object} types.CommonResponse {"code":1,"data":null,"msg":"Error"}
+// @Router /move [POST]
+func (r RoleController) MoveRole(ctx *gin.Context) {
+	resp := types.CommonResponse{Code: 1}
+	params := types.MoveRoleParam{}
+	if err := ctx.ShouldBindJSON(&params); err != nil {
+		resp.Message = errno.ErrorParamsParse.Error()
+		return
+	}
+	if err := r.logic.MoveRole(ctx, params.RoleId, params.Father); err != nil {
+		resp.Message = err.Error()
+	} else {
+		resp.Code = 0
+		resp.Message = errno.Success
+	}
 	ctx.JSON(http.StatusOK, resp)
 }

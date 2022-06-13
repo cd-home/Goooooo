@@ -80,3 +80,9 @@ type RenameRoleParam struct {
 	RoleId   uint64 `json:"role_id" binding:"required"`
 	RoleName string `json:"role_name" binding:"required"`
 }
+
+// ListDirectoryParam [Request, GET, Query]
+type MoveRoleParam struct {
+	RoleId uint64 `json:"role_id" binding:"required"`
+	Father uint64 `json:"father" binding:"required"`
+}

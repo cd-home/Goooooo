@@ -7,6 +7,7 @@ type RoleLogicFace interface {
 	DeleteRole(ctx context.Context, roleId uint64) error
 	UpdateRole(ctx context.Context, roleId uint64, roleName string) error
 	RetrieveRoles(ctx context.Context, roleLevel uint8, father *uint64) ([]*RoleEntityVO, error)
+	MoveRole(ctx context.Context, roleId uint64, father uint64) error
 }
 
 // RoleRepositoryFace
@@ -15,6 +16,7 @@ type RoleRepositoryFace interface {
 	Delete(ctx context.Context, roleId uint64) error
 	Update(ctx context.Context, roleId uint64, roleName string) error
 	Retrieve(ctx context.Context, roleLevel uint8, father *uint64) ([]*RoleEntityDTO, error)
+	Move(ctx context.Context, roleId uint64, father uint64) error
 }
 
 // RoleEntity [Mapping To DB Fields, For Select]
