@@ -53,6 +53,7 @@ func (d DirectoryController) CreateDirectory(ctx *gin.Context) {
 		return
 	}
 	if err := d.logic.CreateDirectory(
+		ctx,
 		params.DirectoryName,
 		params.DirectoryType,
 		params.DirectoryLevel,
@@ -80,7 +81,7 @@ func (d DirectoryController) ListDirectory(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, resp)
 		return
 	}
-	resp.Data = d.logic.ListDirectory(params.DirectoryLevel, params.Father)
+	resp.Data = d.logic.ListDirectory(ctx, params.DirectoryLevel, params.Father)
 	resp.Code = 0
 	resp.Message = errno.Success
 	ctx.JSON(http.StatusOK, resp)
@@ -101,7 +102,7 @@ func (d DirectoryController) RenameDirectory(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, resp)
 		return
 	}
-	data := d.logic.RenameDirectory(params.DirectoryId, params.DirectoryName)
+	data := d.logic.RenameDirectory(ctx, params.DirectoryId, params.DirectoryName)
 	if data == nil {
 		resp.Message = errno.Failure
 	} else {
@@ -127,7 +128,7 @@ func (d DirectoryController) DeleteDirectory(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, resp)
 		return
 	}
-	resp.Data = d.logic.ListDirectory(params.DirectoryLevel, params.Father)
+	resp.Data = d.logic.ListDirectory(ctx, params.DirectoryLevel, params.Father)
 	resp.Code = 0
 	resp.Message = errno.Success
 	ctx.JSON(http.StatusOK, resp)
@@ -148,7 +149,7 @@ func (d DirectoryController) MoveDirectory(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, resp)
 		return
 	}
-	resp.Data = d.logic.ListDirectory(params.DirectoryLevel, params.Father)
+	resp.Data = d.logic.ListDirectory(ctx, params.DirectoryLevel, params.Father)
 	resp.Code = 0
 	resp.Message = errno.Success
 	ctx.JSON(http.StatusOK, resp)

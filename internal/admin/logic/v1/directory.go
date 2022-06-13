@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/GodYao1995/Goooooo/internal/domain"
@@ -17,14 +18,14 @@ func NewDirectoryrLogic(repo domain.DirectoryRepositoryFace, log *zap.Logger) do
 }
 
 // CreateDirectory
-func (l *DirectoryrLogic) CreateDirectory(name string, dType string, level uint8, index uint8, father *uint64) error {
-	return l.repo.Create(name, dType, level, index, father)
+func (l *DirectoryrLogic) CreateDirectory(ctx context.Context, name string, dType string, level uint8, index uint8, father *uint64) error {
+	return l.repo.Create(ctx, name, dType, level, index, father)
 }
 
 // ListDirectory
-func (l *DirectoryrLogic) ListDirectory(level uint8, father *uint64) []*domain.DirectoryVO {
+func (l *DirectoryrLogic) ListDirectory(ctx context.Context, level uint8, father *uint64) []*domain.DirectoryVO {
 	local := zap.Fields(zap.String("Logic", "ListDirectory"))
-	objs := l.repo.Retrieve(level, father)
+	objs := l.repo.Retrieve(ctx, level, father)
 	// 预估一个容量
 	directoryVOs := make([]*domain.DirectoryVO, 0, 6)
 	for _, obj := range objs {
@@ -40,9 +41,9 @@ func (l *DirectoryrLogic) ListDirectory(level uint8, father *uint64) []*domain.D
 	return directoryVOs
 }
 
-func (l *DirectoryrLogic) RenameDirectory(directory_id uint64, name string) *domain.DirectoryVO {
+func (l *DirectoryrLogic) RenameDirectory(ctx context.Context, directory_id uint64, name string) *domain.DirectoryVO {
 	local := zap.Fields(zap.String("Logic", "RenameDirectory"))
-	obj := l.repo.Update(directory_id, name)
+	obj := l.repo.Update(ctx, directory_id, name)
 	if obj != nil {
 		directoryVO := &domain.DirectoryVO{
 			DirectoryId:    obj.DirectoryId,

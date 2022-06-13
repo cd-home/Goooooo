@@ -1,17 +1,19 @@
 package domain
 
+import "context"
+
 type DirectoryLogicFace interface {
-	CreateDirectory(name string, dType string, level uint8, index uint8, father *uint64) error
-	ListDirectory(level uint8, directory_id *uint64) []*DirectoryVO
-	RenameDirectory(directory_id uint64, name string) *DirectoryVO
+	CreateDirectory(ctx context.Context, name string, dType string, level uint8, index uint8, father *uint64) error
+	ListDirectory(ctx context.Context, level uint8, directory_id *uint64) []*DirectoryVO
+	RenameDirectory(ctx context.Context, directory_id uint64, name string) *DirectoryVO
 }
 
 type DirectoryRepositoryFace interface {
-	Create(name string, dType string, level uint8, index uint8, father *uint64) error
-	Delete(directory_id uint64) error
-	Update(directory_id uint64, name string) *DirectoryDTO
-	Retrieve(level uint8, directory_id *uint64) []*DirectoryDTO
-	Move(directory_id uint64, father uint64) error
+	Create(ctx context.Context, name string, dType string, level uint8, index uint8, father *uint64) error
+	Delete(ctx context.Context, directory_id uint64) error
+	Update(ctx context.Context, directory_id uint64, name string) *DirectoryDTO
+	Retrieve(ctx context.Context, level uint8, directory_id *uint64) []*DirectoryDTO
+	Move(ctx context.Context, directory_id uint64, father uint64) error
 }
 
 type DirectoryVO struct {

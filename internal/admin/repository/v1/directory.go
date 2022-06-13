@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"context"
 	"time"
 
 	"github.com/GodYao1995/Goooooo/internal/domain"
@@ -19,7 +20,7 @@ func NewDirectoryRepository(db *sqlx.DB, log *zap.Logger) domain.DirectoryReposi
 }
 
 // CreateDirectory
-func (repo DirectoryRepository) Create(name string, dType string, level uint8, index uint8, father *uint64) (err error) {
+func (repo DirectoryRepository) Create(ctx context.Context, name string, dType string, level uint8, index uint8, father *uint64) (err error) {
 	var tx *sqlx.Tx
 	local := zap.Fields(zap.String("Repo", "CreateDirectory"))
 	// 是否考虑换一种唯一资源标识
@@ -74,7 +75,7 @@ func (repo DirectoryRepository) Create(name string, dType string, level uint8, i
 	return err
 }
 
-func (repo DirectoryRepository) Delete(directory_id uint64) error {
+func (repo DirectoryRepository) Delete(ctx context.Context, directory_id uint64) error {
 	var err error
 	local := zap.Fields(zap.String("Repo", "Delete"))
 	_, err = repo.db.Exec(`UPDATE directory SET delete_at = ? WHERE directory_id = ?`, time.Now(), directory_id)
@@ -86,9 +87,9 @@ func (repo DirectoryRepository) Delete(directory_id uint64) error {
 	return nil
 }
 
-func (repo DirectoryRepository) Update(directory_id uint64, name string) *domain.DirectoryDTO {
+func (repo DirectoryRepository) Update(ctx context.Context, directory_id uint64, name string) *domain.DirectoryDTO {
 	var err error
-	local := zap.Fields(zap.String("Repo", "RenameDirectory"))
+	local := zap.Fields(zap.String("Repo", "Update"))
 	_, err = repo.db.Exec(`UPDATE directory SET directory_name = ? WHERE directory_id = ?`, name, directory_id)
 	if err != nil {
 		repo.log.WithOptions(local).Warn(err.Error())
@@ -107,7 +108,7 @@ func (repo DirectoryRepository) Update(directory_id uint64, name string) *domain
 }
 
 // ListDirectory GET Direct Children Directory
-func (repo DirectoryRepository) Retrieve(level uint8, father *uint64) []*domain.DirectoryDTO {
+func (repo DirectoryRepository) Retrieve(ctx context.Context, level uint8, father *uint64) []*domain.DirectoryDTO {
 	// First Class Directory
 	directories := make([]*domain.DirectoryDTO, 0)
 	if father == nil && level == 1 {
@@ -140,6 +141,6 @@ func (repo DirectoryRepository) Retrieve(level uint8, father *uint64) []*domain.
 	return directories
 }
 
-func (repo DirectoryRepository) Move(directory_id uint64, father uint64) error {
+func (repo DirectoryRepository) Move(ctx context.Context, directory_id uint64, father uint64) error {
 	return nil
 }
