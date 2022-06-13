@@ -85,6 +85,7 @@ func (repo RoleRepository) Delete(ctx context.Context, roleId uint64) error {
 		repo.log.WithOptions(local).Warn(err.Error())
 		return err
 	}
+	// TODO: Should Delete RoleRelation ?
 	return nil
 }
 
@@ -148,4 +149,121 @@ func (repo RoleRepository) Retrieve(ctx context.Context, roleLevel uint8, father
 		return nil, err
 	}
 	return roles, nil
+}
+
+func (repo RoleRepository) Move(ctx context.Context, roleId uint64, father uint64) (err error) {
+	var tx *sqlx.Tx
+	local := zap.Fields(zap.String("Repo", "Move"))
+	defer func() {
+		if e := recover(); e != nil {
+			err = e.(error)
+			repo.log.WithOptions(local).Error(err.Error())
+			tx.Rollback()
+		} else if err != nil {
+			repo.log.WithOptions(local).Warn(err.Error())
+			tx.Rollback()
+		} else {
+			tx.Commit()
+		}
+	}()
+	tx, err = repo.db.Beginx()
+	if err != nil {
+		repo.log.WithOptions(local).Warn(err.Error())
+		return err
+	}
+	// rolId 的孩子
+	relations := make([]*domain.RoleRelationPO, 0)
+	err = tx.Select(&relations, `
+		SELECT 
+			ancestor, descendant, distance
+		FROM role_relation WHERE ancestor = ? AND delete_at is NULL AND distance != 0`, roleId)
+	if err != nil {
+		repo.log.WithOptions(local).Warn(err.Error())
+		return err
+	}
+	dests := make([]uint64, 0)
+	for _, r := range relations {
+		dests = append(dests, r.Descendant)
+	}
+	// 解除 roleId 与其 祖先 的关系
+	tx.MustExec(`
+		DELETE FROM role_relation 
+		WHERE descendant = ? AND delete_at is NULL AND distance != 0`, roleId)
+
+	// 解除 roleId 的 孩子与 roleId 祖先的关系
+	query, args, err := sqlx.In(`
+		DELETE FROM role_relation 
+		WHERE descendant in (?) AND delete_at is NULL AND distance > 1`, dests)
+
+	if err != nil {
+		return err
+	}
+	tx.MustExec(query, args...)
+
+	// Rebuild New Relation
+	// 先创建于父级目录关系
+	tx.MustExec(
+		`INSERT INTO role_relation (ancestor, descendant, distance)
+		 VALUES(?, ?, ?)`, father, roleId, 1)
+
+	// 创建祖先与该目录的关系
+	grandsRelations := make([]*domain.RoleRelationPO, 0)
+	childsRelations := make([]*domain.RoleRelationPO, 0)
+	
+	tx.Select(&grandsRelations, `
+		SELECT 
+			ancestor, descendant, distance
+		FROM role_relation WHERE descendant = ? AND distance != 0 AND delete_at is NULL`, father)
+
+	// 移动到的father 本身就是顶层角色
+	if len(grandsRelations) == 0 {
+		for _, child := range relations {
+			childsRelations = append(childsRelations, &domain.RoleRelationPO{
+				Ancestor:   father,
+				Descendant: child.Descendant,
+				Distance:   child.Distance + 1,
+			})
+		}
+		_, err = tx.NamedExec(`
+			INSERT INTO role_relation (ancestor, descendant, distance) 
+			VALUES(:ancestor, :descendant, :distance)`, childsRelations)
+		if err != nil {
+			repo.log.Sugar().Debug(childsRelations)
+			repo.log.WithOptions(local).Warn(err.Error())
+			return err
+		}
+	}
+
+	// 移动到的father 有 father
+	if len(grandsRelations) > 0 {
+		for _, relation := range grandsRelations {
+			relation.Descendant = roleId
+			relation.Distance = relation.Distance + 1
+			for _, child := range relations {
+				childsRelations = append(childsRelations, &domain.RoleRelationPO{
+					Ancestor:   relation.Ancestor,
+					Descendant: child.Descendant,
+					Distance:   relation.Distance + child.Distance,
+				})
+			}
+		}
+		_, err = tx.NamedExec(`
+			INSERT INTO role_relation (ancestor, descendant, distance) 
+			VALUES(:ancestor, :descendant, :distance)`, grandsRelations)
+		if err != nil {
+			repo.log.Sugar().Debug(relations)
+			repo.log.WithOptions(local).Warn(err.Error())
+			return err
+		}
+		_, err = tx.NamedExec(`
+			INSERT INTO role_relation (ancestor, descendant, distance) 
+			VALUES(:ancestor, :descendant, :distance)`, childsRelations)
+		if err != nil {
+			repo.log.Sugar().Debug(childsRelations)
+			repo.log.WithOptions(local).Warn(err.Error())
+			return err
+		}
+	}
+
+	return err
 }

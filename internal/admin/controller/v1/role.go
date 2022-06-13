@@ -32,6 +32,7 @@ func NewRoleController(apiV1 *version.APIV1, log *zap.Logger, logic domain.RoleL
 	needAuth := v1.Use(auth.AuthMiddleware(store))
 	{
 		needAuth.GET("/list", ctl.ListRole)
+		needAuth.POST("/move", ctl.MoveRole)
 	}
 
 	// Need Permission
@@ -157,5 +158,31 @@ func (r RoleController) ListRole(ctx *gin.Context) {
 	}
 	resp.Message = errno.Success
 	resp.Data = views
+	ctx.JSON(http.StatusOK, resp)
+}
+
+// MoveRole
+// @Summary Move Role
+// @Description Move Role
+// @Tags Role
+// @Accept  json
+// @Produce json
+// @Param ListRole body types.ListRoleParam true "ListRole"
+// @Success 0 {object} types.CommonResponse {"code":1,"data":null,"msg":"Success"}
+// @Failure 1 {object} types.CommonResponse {"code":1,"data":null,"msg":"Error"}
+// @Router /move [POST]
+func (r RoleController) MoveRole(ctx *gin.Context) {
+	resp := types.CommonResponse{Code: 1}
+	params := types.MoveRoleParam{}
+	if err := ctx.ShouldBindJSON(&params); err != nil {
+		resp.Message = errno.ErrorParamsParse.Error()
+		return
+	}
+	if err := r.logic.MoveRole(ctx, params.RoleId, params.Father); err != nil {
+		resp.Message = err.Error()
+	} else {
+		resp.Code = 0
+		resp.Message = errno.Success
+	}
 	ctx.JSON(http.StatusOK, resp)
 }
