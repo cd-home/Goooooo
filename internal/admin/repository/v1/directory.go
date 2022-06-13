@@ -141,6 +141,113 @@ func (repo DirectoryRepository) Retrieve(ctx context.Context, level uint8, fathe
 	return directories
 }
 
-func (repo DirectoryRepository) Move(ctx context.Context, directory_id uint64, father uint64) error {
-	return nil
+func (repo DirectoryRepository) Move(ctx context.Context, directory_id uint64, father uint64) (err error) {
+	var tx *sqlx.Tx
+	local := zap.Fields(zap.String("Repo", "Move"))
+	defer func() {
+		if e := recover(); e != nil {
+			err = e.(error)
+			repo.log.WithOptions(local).Error(err.Error())
+			tx.Rollback()
+		} else if err != nil {
+			repo.log.WithOptions(local).Warn(err.Error())
+			tx.Rollback()
+		} else {
+			tx.Commit()
+		}
+	}()
+	tx, err = repo.db.Beginx()
+	if err != nil {
+		return
+	}
+	relations := make([]*domain.DirectoryRelationPO, 0)
+	err = tx.Select(&relations, `
+		SELECT 
+			ancestor, descendant, distance
+		FROM directory WHERE delete_at is NULL AND ancestor = ?`, directory_id)
+	if err != nil {
+		repo.log.WithOptions(local).Warn(err.Error())
+		return
+	}
+
+	// Current directory_id with ancestors => break up
+	tx.MustExec(`
+		DELETE FROM directory_relation 
+		WHERE descendant = ? AND delete_at is NULL AND distance != 0`, directory_id)
+
+	// Current directory_id`s Childs with directory_id`s ancestors => break up
+	var dests []uint64
+	for _, r := range relations {
+		dests = append(dests, r.Descendant)
+	}
+	query, args, err := sqlx.In(`
+		DELETE FROM directory_relation 
+		WHERE descendant in (?) AND delete_at is NULL AND distance > 1`, dests)
+	if err != nil {
+		return
+	}
+	tx.MustExec(query, args...)
+
+	// Rebuild Relation
+	tx.MustExec(
+		`INSERT INTO directory_relation (ancestor, descendant, distance)
+		 VALUES(?, ?, ?)`, father, directory_id, 1)
+
+	grandsRelations := make([]*domain.DirectoryRelationPO, 0)
+	childsRelations := make([]*domain.DirectoryRelationPO, 0)
+
+	tx.Select(&grandsRelations, `
+		SELECT 
+			ancestor, descendant, distance
+		FROM directory_relation WHERE descendant = ? AND distance != 0 AND delete_at is NULL`, father)
+
+	// 移动到的目标father 本身就是顶层目录
+	if len(grandsRelations) == 0 {
+		for _, child := range relations {
+			childsRelations = append(childsRelations, &domain.DirectoryRelationPO{
+				Ancestor:   father,
+				Descendant: child.Descendant,
+				Distance:   child.Distance + 1,
+			})
+		}
+		_, err = tx.NamedExec(`
+			INSERT INTO directory_relation (ancestor, descendant, distance) 
+			VALUES(:ancestor, :descendant, :distance)`, childsRelations)
+		if err != nil {
+			repo.log.Sugar().Debug(childsRelations)
+			repo.log.WithOptions(local).Warn(err.Error())
+			return
+		}
+		return
+	}
+
+	// 移动到的father 有 father
+	for _, relation := range grandsRelations {
+		relation.Descendant = directory_id
+		relation.Distance = relation.Distance + 1
+		for _, child := range relations {
+			childsRelations = append(childsRelations, &domain.DirectoryRelationPO{
+				Ancestor:   relation.Ancestor,
+				Descendant: child.Descendant,
+				Distance:   relation.Distance + child.Distance,
+			})
+		}
+	}
+	_, err = tx.NamedExec(`
+			INSERT INTO directory_relation (ancestor, descendant, distance) 
+			VALUES(:ancestor, :descendant, :distance)`, grandsRelations)
+	if err != nil {
+		repo.log.Sugar().Debug(relations)
+		repo.log.WithOptions(local).Warn(err.Error())
+		return
+	}
+	_, err = tx.NamedExec(`
+			INSERT INTO directory_relation (ancestor, descendant, distance) 
+			VALUES(:ancestor, :descendant, :distance)`, childsRelations)
+	if err != nil {
+		repo.log.Sugar().Debug(childsRelations)
+		repo.log.WithOptions(local).Warn(err.Error())
+		return
+	}
+	return
 }
