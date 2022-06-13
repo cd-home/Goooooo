@@ -2,6 +2,13 @@ FROM golang:1.17 AS Builder
 LABEL stage=Build
 WORKDIR /app/build/
 
+# Build Variables
+ARG APP
+ARG OS  = "linux"
+ARG ARCH = "amd64"
+ARG TARGET = ${APP}
+
+# Build Variables And Runtime Variables
 ENV GOOS=linux CGO_ENABLED=0 GOARCH=amd64 GOPROXY=https://goproxy.cn,direct
 
 # Cache
@@ -11,7 +18,7 @@ RUN go mod download
 
 COPY . .
 
-RUN chmod +x ./scripts/build.sh && ./scripts/build.sh admin linux admin
+RUN chmod +x ./scripts/build.sh && ./scripts/build.sh ${APP} ${OS} ${ARCH} ${TARGET}
 
 
 FROM alpine:3.14
