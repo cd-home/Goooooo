@@ -19,7 +19,6 @@ func NewDirectoryRepository(db *sqlx.DB, log *zap.Logger) domain.DirectoryReposi
 	return &DirectoryRepository{db: db, log: log.WithOptions(zap.Fields(zap.String("module", "DirectoryRepository")))}
 }
 
-// CreateDirectory
 func (repo DirectoryRepository) Create(ctx context.Context, name string, dType string, level uint8, index uint8, father *uint64) (err error) {
 	var tx *sqlx.Tx
 	local := zap.Fields(zap.String("Repo", "CreateDirectory"))
@@ -107,7 +106,6 @@ func (repo DirectoryRepository) Update(ctx context.Context, directory_id uint64,
 	return &directory
 }
 
-// ListDirectory GET Direct Children Directory
 func (repo DirectoryRepository) Retrieve(ctx context.Context, level uint8, father *uint64) []*domain.DirectoryDTO {
 	// First Class Directory
 	directories := make([]*domain.DirectoryDTO, 0)
