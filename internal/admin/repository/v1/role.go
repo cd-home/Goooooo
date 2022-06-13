@@ -171,7 +171,7 @@ func (repo RoleRepository) Move(ctx context.Context, roleId uint64, father uint6
 		repo.log.WithOptions(local).Warn(err.Error())
 		return err
 	}
-	// rolId 的孩子
+	// Current Role_id`s All Childs
 	relations := make([]*domain.RoleRelationPO, 0)
 	err = tx.Select(&relations, `
 		SELECT 
@@ -190,7 +190,7 @@ func (repo RoleRepository) Move(ctx context.Context, roleId uint64, father uint6
 		DELETE FROM role_relation 
 		WHERE descendant = ? AND delete_at is NULL AND distance != 0`, roleId)
 
-	// 解除 roleId 的 孩子与 roleId 祖先的关系
+	// 解除 roleId 的孩子与 roleId 祖先的关系
 	query, args, err := sqlx.In(`
 		DELETE FROM role_relation 
 		WHERE descendant in (?) AND delete_at is NULL AND distance > 1`, dests)
@@ -209,7 +209,7 @@ func (repo RoleRepository) Move(ctx context.Context, roleId uint64, father uint6
 	// 创建祖先与该目录的关系
 	grandsRelations := make([]*domain.RoleRelationPO, 0)
 	childsRelations := make([]*domain.RoleRelationPO, 0)
-	
+
 	tx.Select(&grandsRelations, `
 		SELECT 
 			ancestor, descendant, distance

@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"time"
+
 	"github.com/GodYao1995/Goooooo/internal/domain"
 	"github.com/GodYao1995/Goooooo/pkg/tools"
 	"github.com/jmoiron/sqlx"
@@ -17,7 +19,7 @@ func NewDirectoryRepository(db *sqlx.DB, log *zap.Logger) domain.DirectoryReposi
 }
 
 // CreateDirectory
-func (repo *DirectoryRepository) CreateDirectory(name string, dType string, level uint8, index uint8, father *uint64) (err error) {
+func (repo DirectoryRepository) Create(name string, dType string, level uint8, index uint8, father *uint64) (err error) {
 	var tx *sqlx.Tx
 	local := zap.Fields(zap.String("Repo", "CreateDirectory"))
 	// 是否考虑换一种唯一资源标识
@@ -72,8 +74,40 @@ func (repo *DirectoryRepository) CreateDirectory(name string, dType string, leve
 	return err
 }
 
+func (repo DirectoryRepository) Delete(directory_id uint64) error {
+	var err error
+	local := zap.Fields(zap.String("Repo", "Delete"))
+	_, err = repo.db.Exec(`UPDATE directory SET delete_at = ? WHERE directory_id = ?`, time.Now(), directory_id)
+	if err != nil {
+		repo.log.WithOptions(local).Warn(err.Error())
+		return err
+	}
+	// TODO: Should Delete RoleRelation ?
+	return nil
+}
+
+func (repo DirectoryRepository) Update(directory_id uint64, name string) *domain.DirectoryDTO {
+	var err error
+	local := zap.Fields(zap.String("Repo", "RenameDirectory"))
+	_, err = repo.db.Exec(`UPDATE directory SET directory_name = ? WHERE directory_id = ?`, name, directory_id)
+	if err != nil {
+		repo.log.WithOptions(local).Warn(err.Error())
+		return nil
+	}
+	// An error is returned if the result set is empty.
+	var directory domain.DirectoryDTO
+	err = repo.db.Get(&directory, `
+		SELECT 
+			directory_id, directory_name, directory_type, directory_level, directory_index 
+		FROM directory WHERE directory_id = ?`, directory_id)
+	if err != nil {
+		return nil
+	}
+	return &directory
+}
+
 // ListDirectory GET Direct Children Directory
-func (repo *DirectoryRepository) ListDirectory(level uint8, father *uint64) []*domain.DirectoryDTO {
+func (repo DirectoryRepository) Retrieve(level uint8, father *uint64) []*domain.DirectoryDTO {
 	// First Class Directory
 	directories := make([]*domain.DirectoryDTO, 0)
 	if father == nil && level == 1 {
@@ -106,22 +140,6 @@ func (repo *DirectoryRepository) ListDirectory(level uint8, father *uint64) []*d
 	return directories
 }
 
-func (repo *DirectoryRepository) RenameDirectory(directory_id uint64, name string) *domain.DirectoryDTO {
-	var err error
-	local := zap.Fields(zap.String("Repo", "RenameDirectory"))
-	_, err = repo.db.Exec(`UPDATE directory SET directory_name = ? WHERE directory_id = ?`, name, directory_id)
-	if err != nil {
-		repo.log.WithOptions(local).Warn(err.Error())
-		return nil
-	}
-	// An error is returned if the result set is empty.
-	var directory domain.DirectoryDTO
-	err = repo.db.Get(&directory, `
-		SELECT 
-			directory_id, directory_name, directory_type, directory_level, directory_index 
-		FROM directory WHERE directory_id = ?`, directory_id)
-	if err != nil {
-		return nil
-	}
-	return &directory
+func (repo DirectoryRepository) Move(directory_id uint64, father uint64) error {
+	return nil
 }
