@@ -41,6 +41,7 @@ func (l *DirectoryrLogic) ListDirectory(ctx context.Context, level uint8, father
 	return directoryVOs
 }
 
+// RenameDirectory
 func (l *DirectoryrLogic) RenameDirectory(ctx context.Context, directory_id uint64, name string) *domain.DirectoryVO {
 	local := zap.Fields(zap.String("Logic", "RenameDirectory"))
 	obj := l.repo.Update(ctx, directory_id, name)
