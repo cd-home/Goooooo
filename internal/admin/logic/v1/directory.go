@@ -18,13 +18,13 @@ func NewDirectoryrLogic(repo domain.DirectoryRepositoryFace, log *zap.Logger) do
 
 // CreateDirectory
 func (l *DirectoryrLogic) CreateDirectory(name string, dType string, level uint8, index uint8, father *uint64) error {
-	return l.repo.CreateDirectory(name, dType, level, index, father)
+	return l.repo.Create(name, dType, level, index, father)
 }
 
 // ListDirectory
 func (l *DirectoryrLogic) ListDirectory(level uint8, father *uint64) []*domain.DirectoryVO {
 	local := zap.Fields(zap.String("Logic", "ListDirectory"))
-	objs := l.repo.ListDirectory(level, father)
+	objs := l.repo.Retrieve(level, father)
 	// 预估一个容量
 	directoryVOs := make([]*domain.DirectoryVO, 0, 6)
 	for _, obj := range objs {
@@ -42,7 +42,7 @@ func (l *DirectoryrLogic) ListDirectory(level uint8, father *uint64) []*domain.D
 
 func (l *DirectoryrLogic) RenameDirectory(directory_id uint64, name string) *domain.DirectoryVO {
 	local := zap.Fields(zap.String("Logic", "RenameDirectory"))
-	obj := l.repo.RenameDirectory(directory_id, name)
+	obj := l.repo.Update(directory_id, name)
 	if obj != nil {
 		directoryVO := &domain.DirectoryVO{
 			DirectoryId:    obj.DirectoryId,
