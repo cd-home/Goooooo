@@ -11,15 +11,15 @@ ARG TARGET = ${APP}
 # Build Variables And Runtime Variables
 ENV GOOS=${GOOS} CGO_ENABLED=0 GOARCH=${GOARCH} GOPROXY=https://goproxy.cn,direct
 
-# Cache
+# Cache Step
 COPY go.mod go.mod
 COPY go.sum go.sum
 RUN go mod download
 
 COPY . .
 
+# Build Execute Binary 
 RUN cd ./cmd/${APP} && CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o=../../bin/${TARGET} .
-
 
 FROM alpine:3.14
 LABEL stage=Run
