@@ -17,7 +17,7 @@ func NewUserESJob(repo domain.UserRepositoryFace, espo domain.UserEsRepositoryFa
 
 // Just for testing purposes
 func (us UserESTask) UsersToES() error {
-	users, err := us.repo.GetAllUsers(context.Background())
+	users, err := us.repo.RetrieveAllUsers(context.Background())
 	if err != nil {
 		return err
 	}

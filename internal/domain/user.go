@@ -8,16 +8,16 @@ import (
 
 type UserLogicFace interface {
 	Register(ctx context.Context, account string, password string) error
-	Login(ctx context.Context, account string, password string) (*UserVO, *UserSession, error)
-	SetSession(r *http.Request, rw http.ResponseWriter, sessionObj *UserSession) error
+	Login(ctx context.Context, r *http.Request, rw http.ResponseWriter, account string, password string) (*UserVO, error)
 }
 
 type UserRepositoryFace interface {
-	CreateUserByUserName(ctx context.Context, account string, password string) error
-	CreateUserByEmail(ctx context.Context, account string, password string) error
-	CheckAccountExist(ctx context.Context, account string, password string) (*UserDTO, error)
-	GetAllUsers(ctx context.Context) ([]*UserDTO, error)
-	GetRolesByUserId(ctx context.Context, userId uint64) ([]uint64, error)
+	CreateByUserName(ctx context.Context, username string, password string) error
+	CreateByEmail(ctx context.Context, email string, password string) error
+	DeleteByUserName(ctx context.Context, username string) error
+	RetrieveByUserName(ctx context.Context, username string, password string) (*UserDTO, error)
+	RetrieveAllUsers(ctx context.Context) ([]*UserDTO, error)
+	RetrieveRoleByUserId(ctx context.Context, userId uint64) ([]uint64, error)
 }
 
 type UserEsRepositoryFace interface {
