@@ -10,6 +10,7 @@ import (
 	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/auth"
 	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/permission"
 	"github.com/GodYao1995/Goooooo/internal/pkg/session"
+	"github.com/GodYao1995/Goooooo/pkg/xhttp/server"
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -58,8 +59,8 @@ func (r RoleController) CreateRole(ctx *gin.Context) {
 	params := types.CreateRoleParam{}
 	resp := types.CommonResponse{Code: 1}
 	var err error
-	if err = ctx.ShouldBindJSON(&params); err != nil {
-		resp.Message = errno.ErrorParamsParse.Error()
+	if ok, valid := server.ShouldBindJSON(ctx, &params); !ok {
+		resp.Message = valid
 		ctx.JSON(http.StatusOK, resp)
 		return
 	}

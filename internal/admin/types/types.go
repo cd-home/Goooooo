@@ -9,7 +9,7 @@ import (
 // CommonResponse [Response]
 type CommonResponse struct {
 	Code    int         `json:"code"`
-	Message string      `json:"message"`
+	Message interface{} `json:"message"`
 	Data    interface{} `json:"data"`
 }
 

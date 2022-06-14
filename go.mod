@@ -6,6 +6,7 @@ require (
 	github.com/RichardKnop/machinery/v2 v2.0.11
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/casbin/casbin/v2 v2.44.0
+	github.com/gin-contrib/pprof v1.3.0
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gorilla/sessions v1.2.1
