@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/GodYao1995/Goooooo/internal/admin/types"
@@ -8,9 +9,13 @@ import (
 	"github.com/GodYao1995/Goooooo/internal/domain"
 	"github.com/GodYao1995/Goooooo/internal/pkg/errno"
 	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/auth"
+	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/tracer"
 	"github.com/GodYao1995/Goooooo/internal/pkg/res"
 	"github.com/GodYao1995/Goooooo/internal/pkg/session"
+	"github.com/GodYao1995/Goooooo/pkg/xhttp/param"
+	"github.com/GodYao1995/Goooooo/pkg/xtracer"
 	"github.com/gin-gonic/gin"
+	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
 )
 
@@ -20,7 +25,11 @@ type UserController struct {
 	store *session.RedisStore
 }
 
-func NewUserController(apiV1 *version.APIV1, log *zap.Logger, logic domain.UserLogicFace, store *session.RedisStore) {
+func NewUserController(
+	apiV1 *version.APIV1,
+	log *zap.Logger,
+	logic domain.UserLogicFace,
+	store *session.RedisStore, xtracer *xtracer.XTracer) {
 	ctl := &UserController{
 		logic: logic,
 		log:   log.WithOptions(zap.Fields(zap.String("module", "UserController"))),
@@ -28,7 +37,7 @@ func NewUserController(apiV1 *version.APIV1, log *zap.Logger, logic domain.UserL
 	}
 
 	// API version
-	v1 := apiV1.Group.Group("/user")
+	v1 := apiV1.Group.Group("/user").Use(tracer.Tracing(xtracer))
 
 	// No Need Authorization
 	{
@@ -54,14 +63,20 @@ func NewUserController(apiV1 *version.APIV1, log *zap.Logger, logic domain.UserL
 // @Failure 1 {object} types.CommonResponse {"code":1,"data":null,"msg":"Error"}
 // @Router /login [POST]
 func (u UserController) Login(ctx *gin.Context) {
+	span, _ := opentracing.StartSpanFromContext(ctx.Request.Context(), "UserController-Login")
+	next := opentracing.ContextWithSpan(context.Background(), span)
+	defer func() {
+		span.SetTag("Controller", "Login")
+		span.Finish()
+	}()
 	params := types.LoginParam{}
 	resp := res.CommonResponse{Code: 1}
-	if err := ctx.ShouldBindJSON(&params); err != nil {
-		resp.Message = errno.ErrorParamsParse.Error()
+	if ok, valid := param.ShouldBindJSON(ctx, &params); !ok {
+		resp.Message = valid
 		ctx.JSON(http.StatusOK, resp)
 		return
 	}
-	view, err := u.logic.Login(ctx, ctx.Request, ctx.Writer, params.Account, params.Password)
+	view, err := u.logic.Login(next, ctx.Request, ctx.Writer, params.Account, params.Password)
 	if err != nil {
 		resp.Message = err.Error()
 	} else {
@@ -83,14 +98,20 @@ func (u UserController) Login(ctx *gin.Context) {
 // @Failure 1 {object} types.CommonResponse {"code":0,"data":null,"msg":"Error"}
 // @Router /register [POST]
 func (user UserController) Register(ctx *gin.Context) {
+	span, _ := opentracing.StartSpanFromContext(ctx.Request.Context(), "UserController-Register")
+	next := opentracing.ContextWithSpan(context.Background(), span)
+	defer func() {
+		span.SetTag("Controller", "Register")
+		span.Finish()
+	}()
 	params := types.RegisterParam{}
 	resp := res.CommonResponse{Code: 1}
-	if err := ctx.ShouldBindJSON(&params); err != nil {
-		resp.Message = errno.ErrorParamsParse.Error()
+	if ok, valid := param.ShouldBindJSON(ctx, &params); !ok {
+		resp.Message = valid
 		ctx.JSON(http.StatusOK, resp)
 		return
 	}
-	if err := user.logic.Register(ctx, params.Account, params.Password); err != nil {
+	if err := user.logic.Register(next, params.Account, params.Password); err != nil {
 		resp.Message = err.Error()
 	} else {
 		resp.Code = 0

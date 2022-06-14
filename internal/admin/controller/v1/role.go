@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/GodYao1995/Goooooo/internal/admin/types"
@@ -16,6 +17,7 @@ import (
 	"github.com/GodYao1995/Goooooo/pkg/xtracer"
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
+	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
 )
 
@@ -147,6 +149,12 @@ func (r RoleController) UpdateRole(ctx *gin.Context) {
 // @Failure 1 {object} types.CommonResponse {"code":1,"data":null,"msg":"Error"}
 // @Router /list [GET]
 func (r RoleController) ListRole(ctx *gin.Context) {
+	span, _ := opentracing.StartSpanFromContext(ctx.Request.Context(), "UserController-ListRole")
+	next := opentracing.ContextWithSpan(context.Background(), span)
+	defer func() {
+		span.SetTag("Controller", "ListRole")
+		span.Finish()
+	}()
 	params := types.ListRoleParam{}
 	resp := res.CommonResponse{Code: 1}
 	if err := ctx.ShouldBind(&params); err != nil {
@@ -159,7 +167,7 @@ func (r RoleController) ListRole(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, resp)
 		return
 	}
-	views, err := r.logic.RetrieveRoles(ctx.Request.Context(), params.RoleLevel, params.Father)
+	views, err := r.logic.RetrieveRoles(next, params.RoleLevel, params.Father)
 	if err != nil {
 		resp.Message = err.Error()
 		ctx.JSON(http.StatusOK, resp)
