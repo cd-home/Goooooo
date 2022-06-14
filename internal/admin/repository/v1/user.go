@@ -27,7 +27,7 @@ func NewUserRepository(db *sqlx.DB, log *zap.Logger) domain.UserRepositoryFace {
 }
 
 // CreateUserByUserName
-func (repo *UserRepository) CreateUserByUserName(ctx context.Context, account string, password string) error {
+func (repo *UserRepository) CreateByUserName(ctx context.Context, account string, password string) error {
 	local := zap.Fields(zap.String("Repo", "CreateUserByUserName"))
 	// create user by username
 	bcryptPwd, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
@@ -42,14 +42,14 @@ func (repo *UserRepository) CreateUserByUserName(ctx context.Context, account st
 }
 
 // CreateUserByEmail
-func (repo *UserRepository) CreateUserByEmail(ctx context.Context, account string, password string) error {
+func (repo *UserRepository) CreateByEmail(ctx context.Context, account string, password string) error {
 	bcryptPwd, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	_, err := repo.db.Exec(`INSERT INTO user (email, password) VALUES (?, ?)`, account, bcryptPwd)
 	return err
 }
 
 // CheckAccountExist
-func (repo *UserRepository) CheckAccountExist(ctx context.Context, account string, password string) (*domain.UserDTO, error) {
+func (repo *UserRepository) RetrieveByUserName(ctx context.Context, account string, password string) (*domain.UserDTO, error) {
 	// check if user already exist
 	var user domain.UserDTO
 	var err error
@@ -75,7 +75,7 @@ func (repo *UserRepository) CheckAccountExist(ctx context.Context, account strin
 }
 
 // GetAllUsers
-func (repo *UserRepository) GetAllUsers(ctx context.Context) ([]*domain.UserDTO, error) {
+func (repo *UserRepository) RetrieveAllUsers(ctx context.Context) ([]*domain.UserDTO, error) {
 	var err error
 	var users []*domain.UserDTO
 	err = repo.db.Select(&users, `SELECT * FROM user`)
@@ -83,9 +83,13 @@ func (repo *UserRepository) GetAllUsers(ctx context.Context) ([]*domain.UserDTO,
 }
 
 // GetRoleByUserId
-func (repo *UserRepository) GetRolesByUserId(ctx context.Context, userId uint64) ([]uint64, error) {
+func (repo *UserRepository) RetrieveRoleByUserId(ctx context.Context, userId uint64) ([]uint64, error) {
 	var err error
 	var roleIds []uint64
 	err = repo.db.Select(&roleIds, `SELECT role_id FROM user_role WHERE user_id = ?`, userId)
 	return roleIds, err
+}
+
+func (repo *UserRepository) DeleteByUserName(ctx context.Context, username string) error {
+	return nil
 }

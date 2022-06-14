@@ -25,7 +25,7 @@ func NewUserLogic(repo domain.UserRepositoryFace, store *session.RedisStore, esp
 
 // Register
 func (logic *UserLogic) Register(ctx context.Context, account string, password string) error {
-	user, err := logic.repo.CheckAccountExist(ctx, account, password)
+	user, err := logic.repo.RetrieveByUserName(ctx, account, password)
 	// DataBaseError
 	if user == nil && errors.Is(err, errno.ErrorDataBase) {
 		return err
@@ -34,7 +34,7 @@ func (logic *UserLogic) Register(ctx context.Context, account string, password s
 	if user != nil && errors.Is(err, errno.ErrorUserRecordExist) {
 		return err
 	}
-	err = logic.repo.CreateUserByUserName(ctx, account, password)
+	err = logic.repo.CreateByUserName(ctx, account, password)
 	if err != nil {
 		return err
 	}
@@ -42,39 +42,40 @@ func (logic *UserLogic) Register(ctx context.Context, account string, password s
 }
 
 // Login
-func (logic *UserLogic) Login(ctx context.Context, account string, password string) (*domain.UserVO, *domain.UserSession, error) {
+func (logic *UserLogic) Login(ctx context.Context,
+	r *http.Request, rw http.ResponseWriter, account string, password string) (*domain.UserVO, error) {
 	//  CheckAccountExist
-	user, err := logic.repo.CheckAccountExist(ctx, account, password)
+	user, err := logic.repo.RetrieveByUserName(ctx, account, password)
 	if user == nil {
-		return nil, nil, err
+		return nil, err
 	}
+
 	// Check Password
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
-		return nil, nil, errno.ErrorUserPassword
+		return nil, errno.ErrorUserPassword
 	}
-	obj := &domain.UserVO{
+
+	Vo := &domain.UserVO{
 		Id:       user.Id,
 		UserName: user.UserName,
 	}
+
 	// GetRoleByUserId
-	roles, err := logic.repo.GetRolesByUserId(ctx, user.Id)
+	roles, err := logic.repo.RetrieveRoleByUserId(ctx, user.Id)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	sessions := &domain.UserSession{
+
+	// store session
+	sessionObj := &domain.UserSession{
 		Id:       user.Id,
 		UserName: user.UserName,
 		Role:     roles,
 	}
-	return obj, sessions, nil
-}
-
-// SetSession
-func (logic *UserLogic) SetSession(r *http.Request, rw http.ResponseWriter, obj *domain.UserSession) error {
+	
 	session, _ := logic.store.Get(r, "SESSIONID")
-	// store session
-	values, _ := json.Marshal(obj)
+	values, _ := json.Marshal(sessionObj)
 	session.Values["user"] = values
 	// TODO 后期修改到配置项
 	session.Options = &sessions.Options{
@@ -86,7 +87,7 @@ func (logic *UserLogic) SetSession(r *http.Request, rw http.ResponseWriter, obj 
 	}
 	// write Cookie and store to Redis Session
 	if err := session.Save(r, rw); err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return Vo, nil
 }

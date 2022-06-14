@@ -34,7 +34,7 @@ func NewUserController(apiV1 *version.APIV1, log *zap.Logger, logic domain.UserL
 		v1.POST("/register", ctl.Register)
 		v1.POST("/login", ctl.Login)
 	}
-	
+
 	// Need Authorization
 	needAuth := v1.Use(auth.AuthMiddleware(store))
 	{
@@ -60,21 +60,14 @@ func (u UserController) Login(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, resp)
 		return
 	}
-	view, obj, err := u.logic.Login(ctx, params.Account, params.Password)
+	view, err := u.logic.Login(ctx, ctx.Request, ctx.Writer, params.Account, params.Password)
 	if err != nil {
 		resp.Message = err.Error()
-		ctx.JSON(http.StatusOK, resp)
-		return
+	} else {
+		resp.Data = view
+		resp.Code = 0
+		resp.Message = errno.LoginSuccess
 	}
-	// Set Session
-	if err := u.logic.SetSession(ctx.Request, ctx.Writer, obj); err != nil {
-		resp.Message = err.Error()
-		ctx.JSON(http.StatusOK, resp)
-		return
-	}
-	resp.Data = view
-	resp.Code = 0
-	resp.Message = errno.LoginSuccess
 	ctx.JSON(http.StatusOK, resp)
 }
 
