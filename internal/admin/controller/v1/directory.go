@@ -4,12 +4,12 @@ import (
 	"net/http"
 
 	"github.com/GodYao1995/Goooooo/internal/admin/types"
-	"github.com/GodYao1995/Goooooo/internal/pkg/res"
 	"github.com/GodYao1995/Goooooo/internal/admin/version"
 	"github.com/GodYao1995/Goooooo/internal/domain"
 	"github.com/GodYao1995/Goooooo/internal/pkg/errno"
 	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/auth"
 	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/permission"
+	"github.com/GodYao1995/Goooooo/internal/pkg/res"
 	"github.com/GodYao1995/Goooooo/internal/pkg/session"
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"

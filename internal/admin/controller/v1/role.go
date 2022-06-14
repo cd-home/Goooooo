@@ -9,9 +9,11 @@ import (
 	"github.com/GodYao1995/Goooooo/internal/pkg/errno"
 	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/auth"
 	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/permission"
+	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/tracer"
 	"github.com/GodYao1995/Goooooo/internal/pkg/res"
 	"github.com/GodYao1995/Goooooo/internal/pkg/session"
 	"github.com/GodYao1995/Goooooo/pkg/xhttp/param"
+	"github.com/GodYao1995/Goooooo/pkg/xtracer"
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -22,13 +24,18 @@ type RoleController struct {
 	log   *zap.Logger
 }
 
-func NewRoleController(apiV1 *version.APIV1, log *zap.Logger, logic domain.RoleLogicFace, store *session.RedisStore, perm *casbin.Enforcer) {
+func NewRoleController(
+	apiV1 *version.APIV1,
+	log *zap.Logger,
+	logic domain.RoleLogicFace,
+	store *session.RedisStore,
+	perm *casbin.Enforcer, xtracer *xtracer.XTracer) {
 	ctl := &RoleController{
 		logic: logic,
 		log:   log.WithOptions(zap.Fields(zap.String("module", "RoleController"))),
 	}
 	// API version
-	v1 := apiV1.Group.Group("/role")
+	v1 := apiV1.Group.Group("/role").Use(tracer.Tracing(xtracer))
 
 	// Need Authorization
 	needAuth := v1.Use(auth.AuthMiddleware(store))
@@ -152,7 +159,7 @@ func (r RoleController) ListRole(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, resp)
 		return
 	}
-	views, err := r.logic.RetrieveRoles(ctx, params.RoleLevel, params.Father)
+	views, err := r.logic.RetrieveRoles(ctx.Request.Context(), params.RoleLevel, params.Father)
 	if err != nil {
 		resp.Message = err.Error()
 		ctx.JSON(http.StatusOK, resp)

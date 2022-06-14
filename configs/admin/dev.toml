@@ -35,3 +35,7 @@
     BACKEND     = ["127.0.0.1:6379", ]
     BROKERDB    = 0
     BACKENDDB   = 0
+
+[TRACER]
+    SERVICENAME = "admin"
+    AGENTADDR   = "127.0.0.1:6831"

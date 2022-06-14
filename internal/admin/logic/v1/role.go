@@ -5,6 +5,7 @@ import (
 
 	"github.com/GodYao1995/Goooooo/internal/domain"
 	"github.com/GodYao1995/Goooooo/pkg/tools"
+	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
 )
 
@@ -22,6 +23,11 @@ func (r RoleLogic) CreateRole(ctx context.Context, roleName string, roleLevel ui
 }
 
 func (r RoleLogic) RetrieveRoles(ctx context.Context, roleLevel uint8, father *uint64) ([]*domain.RoleEntityVO, error) {
+	span, _ := opentracing.StartSpanFromContext(ctx, "RetrieveRoles")
+	defer func() {
+		span.SetTag("logic", "RetrieveRoles")
+		span.Finish()
+	}()
 	dto, err := r.repo.Retrieve(ctx, roleLevel, father)
 	if err != nil {
 		return nil, err
