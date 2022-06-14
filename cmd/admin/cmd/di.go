@@ -14,6 +14,7 @@ import (
 	"github.com/GodYao1995/Goooooo/pkg/xes"
 	"github.com/GodYao1995/Goooooo/pkg/xhttp/server"
 	xjob "github.com/GodYao1995/Goooooo/pkg/xjob"
+	"github.com/GodYao1995/Goooooo/pkg/xtracer"
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxevent"
 )
@@ -35,6 +36,7 @@ func inject() fx.Option {
 		casbin.Module,
 		xes.Module,
 		xjob.Module,
+		xtracer.Module,
 		// Invoke
 		controller.ModuleV1,
 		controller.ModuleV2,

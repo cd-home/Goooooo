@@ -3,29 +3,37 @@ LABEL stage=Build
 WORKDIR /app/build/
 
 # Build Variables
-ARG APP
-ARG OS  = "linux"
-ARG ARCH = "amd64"
+ARG APP = "admin"
+ARG GOOS  = "linux"
+ARG GOARCH = "amd64"
 ARG TARGET = ${APP}
 
 # Build Variables And Runtime Variables
-ENV GOOS=linux CGO_ENABLED=0 GOARCH=amd64 GOPROXY=https://goproxy.cn,direct
+ENV GOOS=${GOOS} CGO_ENABLED=0 GOARCH=${GOARCH} GOPROXY=https://goproxy.cn,direct
 
-# Cache
+# Cache Step
 COPY go.mod go.mod
 COPY go.sum go.sum
 RUN go mod download
 
 COPY . .
 
-RUN chmod +x ./scripts/build.sh && ./scripts/build.sh ${APP} ${OS} ${ARCH} ${TARGET}
-
+# Build Execute Binary 
+RUN cd ./cmd/${APP} && CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -o=../../bin/${TARGET} .
 
 FROM alpine:3.14
 LABEL stage=Run
 WORKDIR /app/release/
 COPY --from=Builder /app/build/ /app/release/
 EXPOSE 8080
-
+RUN apk update && \
+	apk add --no-cache \
+	vim && \
+	curl && \
+	ca-certificates && \
+	bash && \
+	tzdata && \
+	ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
+	echo Asia/Shanghai > /etc/timezone
 
 ENTRYPOINT ["./bin/admin", "server"]
