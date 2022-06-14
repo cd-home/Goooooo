@@ -6,12 +6,12 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/GodYao1995/Goooooo/internal/admin/types"
 	"github.com/GodYao1995/Goooooo/internal/admin/version"
 	"github.com/GodYao1995/Goooooo/internal/domain"
 	"github.com/GodYao1995/Goooooo/internal/pkg/errno"
 	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/auth"
 	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/permission"
+	"github.com/GodYao1995/Goooooo/internal/pkg/res"
 	"github.com/GodYao1995/Goooooo/internal/pkg/session"
 	"github.com/GodYao1995/Goooooo/pkg/tools"
 	"github.com/casbin/casbin/v2"
@@ -79,7 +79,7 @@ func (f FileController) ListFile(ctx *gin.Context) {
 // @Produce json
 // @Router /upload [POST]
 func (f FileController) UploadLocal(ctx *gin.Context) {
-	resp := types.CommonResponse{Code: 1}
+	resp := res.CommonResponse{Code: 1}
 	fileObj, err := ctx.FormFile(f.file)
 	if err != nil {
 		resp.Message = errno.ErrorUploadFile.Error()
@@ -140,7 +140,7 @@ func (f FileController) DownloadLocal(ctx *gin.Context) {
 // @Failure 1 {object}
 // @Router /stream [GET]
 func (f FileController) DownloadLocalFileStream(ctx *gin.Context) {
-	resp := types.CommonResponse{Code: 1}
+	resp := res.CommonResponse{Code: 1}
 	path := f.upload
 	filename := ctx.Query("filename")
 	sourceFile, err := os.Open(path + filename)

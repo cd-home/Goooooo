@@ -9,8 +9,9 @@ import (
 	"github.com/GodYao1995/Goooooo/internal/pkg/errno"
 	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/auth"
 	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/permission"
+	"github.com/GodYao1995/Goooooo/internal/pkg/res"
 	"github.com/GodYao1995/Goooooo/internal/pkg/session"
-	"github.com/GodYao1995/Goooooo/pkg/xhttp/server"
+	"github.com/GodYao1995/Goooooo/pkg/xhttp/param"
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -57,11 +58,11 @@ func NewRoleController(apiV1 *version.APIV1, log *zap.Logger, logic domain.RoleL
 // @Router /create [POST]
 func (r RoleController) CreateRole(ctx *gin.Context) {
 	params := types.CreateRoleParam{}
-	resp := types.CommonResponse{Code: 1}
+	resp := res.CommonResponse{Code: 1}
 	var err error
-	if ok, valid := server.ShouldBindJSON(ctx, &params); !ok {
+	if ok, valid := param.ShouldBindJSON(ctx, &params); !ok {
 		resp.Message = valid
-		ctx.JSON(http.StatusOK, resp)
+		resp.Failure(ctx)
 		return
 	}
 	err = r.logic.CreateRole(ctx, params.RoleName, params.RoleLevel, params.RoleIndex, params.Father)
@@ -86,7 +87,7 @@ func (r RoleController) CreateRole(ctx *gin.Context) {
 // @Router /delete [DELETE]
 func (r RoleController) DeleteRole(ctx *gin.Context) {
 	params := types.DeleteRoleParam{}
-	resp := types.CommonResponse{Code: 1}
+	resp := res.CommonResponse{Code: 1}
 	if err := ctx.ShouldBindQuery(&params); err != nil {
 		resp.Message = err.Error()
 		return
@@ -113,7 +114,7 @@ func (r RoleController) DeleteRole(ctx *gin.Context) {
 // @Router /update [PUT]
 func (r RoleController) UpdateRole(ctx *gin.Context) {
 	params := types.RenameRoleParam{}
-	resp := types.CommonResponse{Code: 1}
+	resp := res.CommonResponse{Code: 1}
 	if err := ctx.ShouldBindJSON(&params); err != nil {
 		resp.Message = errno.ErrorParamsParse.Error()
 		ctx.JSON(http.StatusOK, resp)
@@ -140,7 +141,7 @@ func (r RoleController) UpdateRole(ctx *gin.Context) {
 // @Router /list [GET]
 func (r RoleController) ListRole(ctx *gin.Context) {
 	params := types.ListRoleParam{}
-	resp := types.CommonResponse{Code: 1}
+	resp := res.CommonResponse{Code: 1}
 	if err := ctx.ShouldBind(&params); err != nil {
 		resp.Message = errno.ErrorParamsParse.Error()
 		ctx.JSON(http.StatusOK, resp)
@@ -173,7 +174,7 @@ func (r RoleController) ListRole(ctx *gin.Context) {
 // @Failure 1 {object} types.CommonResponse {"code":1,"data":null,"msg":"Error"}
 // @Router /move [POST]
 func (r RoleController) MoveRole(ctx *gin.Context) {
-	resp := types.CommonResponse{Code: 1}
+	resp := res.CommonResponse{Code: 1}
 	params := types.MoveRoleParam{}
 	if err := ctx.ShouldBindJSON(&params); err != nil {
 		resp.Message = errno.ErrorParamsParse.Error()

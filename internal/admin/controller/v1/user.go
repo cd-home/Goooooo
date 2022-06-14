@@ -8,6 +8,7 @@ import (
 	"github.com/GodYao1995/Goooooo/internal/domain"
 	"github.com/GodYao1995/Goooooo/internal/pkg/errno"
 	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/auth"
+	"github.com/GodYao1995/Goooooo/internal/pkg/res"
 	"github.com/GodYao1995/Goooooo/internal/pkg/session"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -54,7 +55,7 @@ func NewUserController(apiV1 *version.APIV1, log *zap.Logger, logic domain.UserL
 // @Router /login [POST]
 func (u UserController) Login(ctx *gin.Context) {
 	params := types.LoginParam{}
-	resp := types.CommonResponse{Code: 1}
+	resp := res.CommonResponse{Code: 1}
 	if err := ctx.ShouldBindJSON(&params); err != nil {
 		resp.Message = errno.ErrorParamsParse.Error()
 		ctx.JSON(http.StatusOK, resp)
@@ -83,7 +84,7 @@ func (u UserController) Login(ctx *gin.Context) {
 // @Router /register [POST]
 func (user UserController) Register(ctx *gin.Context) {
 	params := types.RegisterParam{}
-	resp := types.CommonResponse{Code: 1}
+	resp := res.CommonResponse{Code: 1}
 	if err := ctx.ShouldBindJSON(&params); err != nil {
 		resp.Message = errno.ErrorParamsParse.Error()
 		ctx.JSON(http.StatusOK, resp)

@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/GodYao1995/Goooooo/internal/admin/types"
+	"github.com/GodYao1995/Goooooo/internal/pkg/res"
 	"github.com/GodYao1995/Goooooo/internal/admin/version"
 	"github.com/GodYao1995/Goooooo/internal/domain"
 	"github.com/GodYao1995/Goooooo/internal/pkg/errno"
@@ -46,7 +47,7 @@ func NewDirectoryController(apiV1 *version.APIV1, log *zap.Logger,
 // @Router /create [POST]
 func (d DirectoryController) CreateDirectory(ctx *gin.Context) {
 	params := types.CreateDirectoryParam{}
-	resp := types.CommonResponse{Code: 1}
+	resp := res.CommonResponse{Code: 1}
 	if err := ctx.ShouldBindJSON(&params); err != nil {
 		resp.Message = errno.ErrorParamsParse.Error()
 		ctx.JSON(http.StatusOK, resp)
@@ -75,7 +76,7 @@ func (d DirectoryController) CreateDirectory(ctx *gin.Context) {
 // @Router /list [POST]
 func (d DirectoryController) ListDirectory(ctx *gin.Context) {
 	params := types.ListDirectoryParam{}
-	resp := types.CommonResponse{Code: 1}
+	resp := res.CommonResponse{Code: 1}
 	if err := ctx.ShouldBind(&params); err != nil {
 		resp.Message = errno.ErrorParamsParse.Error()
 		ctx.JSON(http.StatusOK, resp)
@@ -96,7 +97,7 @@ func (d DirectoryController) ListDirectory(ctx *gin.Context) {
 // @Router /rename [PUT]
 func (d DirectoryController) RenameDirectory(ctx *gin.Context) {
 	params := types.RenameDirectoryParam{}
-	resp := types.CommonResponse{Code: 1}
+	resp := res.CommonResponse{Code: 1}
 	if err := ctx.ShouldBind(&params); err != nil {
 		resp.Message = errno.ErrorParamsParse.Error()
 		ctx.JSON(http.StatusOK, resp)
@@ -122,7 +123,7 @@ func (d DirectoryController) RenameDirectory(ctx *gin.Context) {
 // @Router /delete [DELETE]
 func (d DirectoryController) DeleteDirectory(ctx *gin.Context) {
 	params := types.ListDirectoryParam{}
-	resp := types.CommonResponse{Code: 1}
+	resp := res.CommonResponse{Code: 1}
 	if err := ctx.ShouldBind(&params); err != nil {
 		resp.Message = errno.ErrorParamsParse.Error()
 		ctx.JSON(http.StatusOK, resp)
@@ -143,7 +144,7 @@ func (d DirectoryController) DeleteDirectory(ctx *gin.Context) {
 // @Router /move [PUT]
 func (d DirectoryController) MoveDirectory(ctx *gin.Context) {
 	params := types.ListDirectoryParam{}
-	resp := types.CommonResponse{Code: 1}
+	resp := res.CommonResponse{Code: 1}
 	if err := ctx.ShouldBind(&params); err != nil {
 		resp.Message = errno.ErrorParamsParse.Error()
 		ctx.JSON(http.StatusOK, resp)
