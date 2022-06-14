@@ -29,7 +29,7 @@ func New(lifecycle fx.Lifecycle, vp *viper.Viper) *gin.Engine {
 	pprof.Register(engine)
 
 	// Common Middlewares
-	engine.Use(gin.Logger(), NoCache(), Cors(), Secure(), RequestID())
+	engine.Use(gin.Logger(), NoCache(), Cors(), Secure(), RequestID(), Translations())
 
 	if mode := vp.GetString("APP.MODE"); mode == _Production || mode == _ShortProduction {
 		gin.SetMode(gin.ReleaseMode)
@@ -38,9 +38,9 @@ func New(lifecycle fx.Lifecycle, vp *viper.Viper) *gin.Engine {
 	engine.GET("/docs/*any", swagger.WrapHandler(swaggerFiles.Handler))
 
 	srv := &http.Server{
-		Addr:         vp.GetString("APP.SERVER_HOST"),
-		Handler:      engine,
-		ReadTimeout:  500 * time.Millisecond,
+		Addr:        vp.GetString("APP.SERVER_HOST"),
+		Handler:     engine,
+		ReadTimeout: 500 * time.Millisecond,
 		// WriteTimeout: 500 * time.Millisecond,
 	}
 
