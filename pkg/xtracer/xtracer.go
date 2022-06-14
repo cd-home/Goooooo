@@ -28,8 +28,9 @@ func NewJaegerTracer(vp *viper.Viper) *XTracer {
 			Param: 1,
 		},
 		Reporter: &config.ReporterConfig{
-			LogSpans:           true,
-			LocalAgentHostPort: vp.GetString("TRACER.AGENTADDR"),
+			LogSpans:            true,
+			BufferFlushInterval: vp.GetDuration("TRACER.FLUSHINTERVAL"),
+			LocalAgentHostPort:  vp.GetString("TRACER.AGENTADDR"),
 		},
 	}
 	tracer, closer, err := cfg.NewTracer(config.Logger(jaeger.StdLogger))

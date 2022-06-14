@@ -39,3 +39,4 @@
 [TRACER]
     SERVICENAME = "admin"
     AGENTADDR   = "127.0.0.1:6831"
+    FLUSHINTERVAL = 5s
