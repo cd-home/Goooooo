@@ -6,6 +6,9 @@ import (
 	"net/http"
 	"time"
 
+	_ "net/http/pprof"
+
+	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	swagger "github.com/swaggo/gin-swagger"
@@ -23,6 +26,8 @@ var Module = fx.Provide(New)
 func New(lifecycle fx.Lifecycle, vp *viper.Viper) *gin.Engine {
 	engine := gin.New()
 
+	pprof.Register(engine)
+
 	// Common Middlewares
 	engine.Use(gin.Logger(), NoCache(), Cors(), Secure(), RequestID())
 
@@ -36,7 +41,7 @@ func New(lifecycle fx.Lifecycle, vp *viper.Viper) *gin.Engine {
 		Addr:         vp.GetString("APP.SERVER_HOST"),
 		Handler:      engine,
 		ReadTimeout:  500 * time.Millisecond,
-		WriteTimeout: 500 * time.Millisecond,
+		// WriteTimeout: 500 * time.Millisecond,
 	}
 
 	lifecycle.Append(fx.Hook{
