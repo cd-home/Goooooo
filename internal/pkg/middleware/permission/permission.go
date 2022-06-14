@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/GodYao1995/Goooooo/internal/admin/types"
 	"github.com/GodYao1995/Goooooo/internal/domain"
 	"github.com/GodYao1995/Goooooo/internal/pkg/errno"
+	"github.com/GodYao1995/Goooooo/internal/pkg/res"
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 )
@@ -46,7 +46,7 @@ func PermissionMiddleware(e *casbin.Enforcer) gin.HandlerFunc {
 			}
 		}
 		if !ok && !okk {
-			resp := types.CommonResponse{Code: 1}
+			resp := res.CommonResponse{Code: 1}
 			resp.Message = errno.NoPermission
 			ctx.JSON(http.StatusOK, resp)
 			ctx.Abort()
