@@ -6,6 +6,7 @@ import (
 
 	"github.com/GodYao1995/Goooooo/internal/domain"
 	"github.com/jmoiron/sqlx"
+	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
 )
 
@@ -101,6 +102,11 @@ func (repo RoleRepository) Update(ctx context.Context, roleId uint64, roleName s
 }
 
 func (repo RoleRepository) Retrieve(ctx context.Context, roleLevel uint8, father *uint64) ([]*domain.RoleEntityDTO, error) {
+	span, _ := opentracing.StartSpanFromContext(ctx, "Retrieve")
+	defer func() {
+		span.SetTag("repo", "Retrieve")
+		span.Finish()
+	}()
 	var err error
 	local := zap.Fields(zap.String("Repo", "CreateRole"))
 	roles := make([]*domain.RoleEntityDTO, 0)

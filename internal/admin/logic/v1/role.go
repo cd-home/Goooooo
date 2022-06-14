@@ -24,11 +24,12 @@ func (r RoleLogic) CreateRole(ctx context.Context, roleName string, roleLevel ui
 
 func (r RoleLogic) RetrieveRoles(ctx context.Context, roleLevel uint8, father *uint64) ([]*domain.RoleEntityVO, error) {
 	span, _ := opentracing.StartSpanFromContext(ctx, "RetrieveRoles")
+	next := opentracing.ContextWithSpan(context.Background(), span)
 	defer func() {
 		span.SetTag("logic", "RetrieveRoles")
 		span.Finish()
 	}()
-	dto, err := r.repo.Retrieve(ctx, roleLevel, father)
+	dto, err := r.repo.Retrieve(next, roleLevel, father)
 	if err != nil {
 		return nil, err
 	}
