@@ -79,7 +79,7 @@ func (repo *UserRepository) RetrieveByUserName(ctx context.Context, account stri
 		logger := fmt.Sprint(user.UserName, " Registered At ", user.CreateAt)
 		repo.log.WithOptions(local).Debug(logger)
 		return &user, errno.ErrorUserRecordExist
-		// use not existing
+	// use not existing
 	} else {
 		return nil, errno.ErrorUserRecordNotExist
 	}

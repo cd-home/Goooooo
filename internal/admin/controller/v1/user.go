@@ -2,7 +2,6 @@ package v1
 
 import (
 	"context"
-	"net/http"
 
 	"github.com/GodYao1995/Goooooo/internal/admin/types"
 	"github.com/GodYao1995/Goooooo/internal/admin/version"
@@ -74,7 +73,7 @@ func (u UserController) Login(ctx *gin.Context) {
 	resp := res.CommonResponse{Code: 1}
 	if ok, valid := param.ShouldBindJSON(ctx, &params); !ok {
 		resp.Message = valid
-		ctx.JSON(http.StatusOK, resp)
+		resp.Failure(ctx)
 		return
 	}
 	view, err := u.logic.Login(next, ctx.Request, ctx.Writer, params.Account, params.Password)
@@ -85,7 +84,7 @@ func (u UserController) Login(ctx *gin.Context) {
 		resp.Code = 0
 		resp.Message = errno.LoginSuccess
 	}
-	ctx.JSON(http.StatusOK, resp)
+	resp.Success(ctx)
 }
 
 // Register
@@ -109,7 +108,7 @@ func (user UserController) Register(ctx *gin.Context) {
 	resp := res.CommonResponse{Code: 1}
 	if ok, valid := param.ShouldBindJSON(ctx, &params); !ok {
 		resp.Message = valid
-		ctx.JSON(http.StatusOK, resp)
+		resp.Failure(ctx)
 		return
 	}
 	if err := user.logic.Register(next, params.Account, params.Password); err != nil {
@@ -118,7 +117,7 @@ func (user UserController) Register(ctx *gin.Context) {
 		resp.Code = 0
 		resp.Message = errno.RegisterSuccess
 	}
-	ctx.JSON(http.StatusOK, resp)
+	resp.Success(ctx)
 }
 
 // GetUserProfile
