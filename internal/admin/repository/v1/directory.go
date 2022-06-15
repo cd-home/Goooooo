@@ -231,6 +231,14 @@ func (repo DirectoryRepository) Move(ctx context.Context, directory_id uint64, f
 			})
 		}
 	}
+	// father => childs 需要单独添加
+	for _, child := range relations {
+		childsRelations = append(childsRelations, &domain.DirectoryRelationPO{
+			Ancestor:   father,
+			Descendant: child.Descendant,
+			Distance:   child.Distance + 1,
+		})
+	}
 	_, err = tx.NamedExec(`
 			INSERT INTO directory_relation (ancestor, descendant, distance) 
 			VALUES(:ancestor, :descendant, :distance)`, grandsRelations)
