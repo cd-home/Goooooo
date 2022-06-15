@@ -135,3 +135,14 @@ func (u UserController) GetUserProfile(ctx *gin.Context) {
 		})
 	}
 }
+
+// GetAllUser
+// @Summary Get All User
+// @Description Get All User
+// @Tags User
+// @Accept  json
+// @Produce json
+// @Router /users [GET]
+func (u UserController) GetAllUser(ctx *gin.Context) {
+
+}
