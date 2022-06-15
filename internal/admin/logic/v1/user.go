@@ -157,6 +157,7 @@ func (logic UserLogic) RetrieveAllUser(ctx context.Context) ([]*domain.UserVO, e
 	return vos, nil
 }
 
+// ModifyPassword
 func (logic UserLogic) ModifyPassword(ctx context.Context, originPassword, newPassword string, uid uint64) error {
 	span, _ := opentracing.StartSpanFromContext(ctx, "UserLogic-ModifyPassword")
 	next := opentracing.ContextWithSpan(context.Background(), span)
@@ -177,6 +178,7 @@ func (logic UserLogic) ModifyPassword(ctx context.Context, originPassword, newPa
 	return logic.repo.ModifyPassword(next, originPassword, newPassword, uid)
 }
 
+// Logout
 func (logic UserLogic) Logout(ctx context.Context, r *http.Request, w http.ResponseWriter) error {
 	span, _ := opentracing.StartSpanFromContext(ctx, "UserLogic-Logout")
 	defer func() {
