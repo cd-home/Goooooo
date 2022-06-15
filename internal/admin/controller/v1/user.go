@@ -7,6 +7,7 @@ import (
 	"github.com/GodYao1995/Goooooo/internal/admin/types"
 	"github.com/GodYao1995/Goooooo/internal/admin/version"
 	"github.com/GodYao1995/Goooooo/internal/domain"
+	"github.com/GodYao1995/Goooooo/internal/pkg/consts"
 	"github.com/GodYao1995/Goooooo/internal/pkg/errno"
 	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/auth"
 	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/tracer"
@@ -128,7 +129,7 @@ func (user UserController) Register(ctx *gin.Context) {
 // @Produce json
 // @Router /profile [GET]
 func (u UserController) GetUserProfile(ctx *gin.Context) {
-	if v, ok := ctx.Get("user"); ok {
+	if v, ok := ctx.Get(consts.SROREKEY); ok {
 		session := v.(domain.UserSession)
 		ctx.JSON(200, map[string]interface{}{
 			"message": session,

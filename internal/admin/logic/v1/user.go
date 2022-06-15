@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/GodYao1995/Goooooo/internal/domain"
+	"github.com/GodYao1995/Goooooo/internal/pkg/consts"
 	"github.com/GodYao1995/Goooooo/internal/pkg/errno"
 	"github.com/GodYao1995/Goooooo/internal/pkg/session"
 	"github.com/gorilla/sessions"
@@ -87,9 +88,9 @@ func (logic *UserLogic) Login(ctx context.Context,
 		Role:     roles,
 	}
 
-	session, _ := logic.store.Get(r, "SESSIONID")
+	session, _ := logic.store.Get(r, consts.SESSIONID)
 	values, _ := json.Marshal(sessionObj)
-	session.Values["user"] = values
+	session.Values[consts.SROREKEY] = values
 	// TODO 后期修改到配置项
 	session.Options = &sessions.Options{
 		Path:   "/",
