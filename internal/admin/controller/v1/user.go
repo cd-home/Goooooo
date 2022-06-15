@@ -49,6 +49,7 @@ func NewUserController(
 	needAuth := v1.Use(auth.AuthMiddleware(store))
 	{
 		needAuth.GET("/profile", ctl.GetUserProfile)
+		needAuth.GET("/retrieves", ctl.GetAllUser)
 	}
 }
 
@@ -144,5 +145,21 @@ func (u UserController) GetUserProfile(ctx *gin.Context) {
 // @Produce json
 // @Router /users [GET]
 func (u UserController) GetAllUser(ctx *gin.Context) {
-
+	span, _ := opentracing.StartSpanFromContext(ctx.Request.Context(), "UserController-GetAllUser")
+	next := opentracing.ContextWithSpan(context.Background(), span)
+	defer func() {
+		span.SetTag("Controller", "GetAllUser")
+		span.Finish()
+	}()
+	resp := res.CommonResponse{Code: 1}
+	view, err := u.logic.RetrieveAllUser(next)
+	if err != nil {
+		resp.Message = err.Error()
+		resp.Failure(ctx)
+	} else {
+		resp.Data = view
+		resp.Code = 0
+		resp.Message = errno.Success
+	}
+	resp.Success(ctx)
 }

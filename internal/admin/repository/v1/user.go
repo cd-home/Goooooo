@@ -79,21 +79,26 @@ func (repo *UserRepository) RetrieveByUserName(ctx context.Context, account stri
 		logger := fmt.Sprint(user.UserName, " Registered At ", user.CreateAt)
 		repo.log.WithOptions(local).Debug(logger)
 		return &user, errno.ErrorUserRecordExist
-	// use not existing
+		// use not existing
 	} else {
 		return nil, errno.ErrorUserRecordNotExist
 	}
 }
 
-// GetAllUsers
+// RetrieveAllUsers
 func (repo *UserRepository) RetrieveAllUsers(ctx context.Context) ([]*domain.UserDTO, error) {
+	span, _ := opentracing.StartSpanFromContext(ctx, "UserRepository-RetrieveAllUsers")
+	defer func() {
+		span.SetTag("UserRepository", "RetrieveAllUsers")
+		span.Finish()
+	}()
 	var err error
 	var users []*domain.UserDTO
 	err = repo.db.Select(&users, `SELECT * FROM user`)
 	return users, err
 }
 
-// GetRoleByUserId
+// RetrieveRoleByUserId
 func (repo *UserRepository) RetrieveRoleByUserId(ctx context.Context, userId uint64) ([]uint64, error) {
 	span, _ := opentracing.StartSpanFromContext(ctx, "UserRepository-RetrieveRoleByUserId")
 	defer func() {
@@ -106,6 +111,7 @@ func (repo *UserRepository) RetrieveRoleByUserId(ctx context.Context, userId uin
 	return roleIds, err
 }
 
+// DeleteByUserName
 func (repo *UserRepository) DeleteByUserName(ctx context.Context, username string) error {
 	return nil
 }

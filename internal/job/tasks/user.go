@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/GodYao1995/Goooooo/internal/domain"
+	"github.com/GodYao1995/Goooooo/pkg/tools"
 )
 
 type UserESTask struct {
@@ -35,7 +36,7 @@ func (us UserESTask) UsersToES() error {
 			Email:     user.Email.String,
 			Phone:     user.Phone.String,
 			State:     uint8(user.State.Int16),
-			Ip:        uint64(user.Ip.Int64),
+			Ip:        tools.UintIpToString(uint32(user.Ip.Int64)),
 			LastLogin: user.LastLogin.String,
 			UpdateAt:  user.UpdateAt,
 			CreateAt:  user.CreateAt,
