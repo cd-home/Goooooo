@@ -2,7 +2,6 @@ package xtracer
 
 import (
 	"io"
-	"log"
 
 	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/spf13/viper"
@@ -28,13 +27,13 @@ func NewJaegerTracer(vp *viper.Viper) *XTracer {
 			Param: 1,
 		},
 		Reporter: &config.ReporterConfig{
-			LogSpans:           true,
-			LocalAgentHostPort: vp.GetString("TRACER.AGENTADDR"),
+			LogSpans:            true,
+			BufferFlushInterval: vp.GetDuration("TRACER.FLUSHINTERVAL"),
+			LocalAgentHostPort:  vp.GetString("TRACER.AGENTADDR"),
 		},
 	}
 	tracer, closer, err := cfg.NewTracer(config.Logger(jaeger.StdLogger))
 	if err != nil {
-		log.Println(err.Error())
 		return nil
 	}
 	opentracing.SetGlobalTracer(tracer)

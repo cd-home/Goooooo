@@ -7,9 +7,11 @@ import (
 	"net/http"
 
 	"github.com/GodYao1995/Goooooo/internal/domain"
+	"github.com/GodYao1995/Goooooo/internal/pkg/consts"
 	"github.com/GodYao1995/Goooooo/internal/pkg/errno"
 	"github.com/GodYao1995/Goooooo/internal/pkg/session"
 	"github.com/gorilla/sessions"
+	"github.com/opentracing/opentracing-go"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -25,7 +27,13 @@ func NewUserLogic(repo domain.UserRepositoryFace, store *session.RedisStore, esp
 
 // Register
 func (logic *UserLogic) Register(ctx context.Context, account string, password string) error {
-	user, err := logic.repo.RetrieveByUserName(ctx, account, password)
+	span, _ := opentracing.StartSpanFromContext(ctx, "UserLogic-Register")
+	next := opentracing.ContextWithSpan(context.Background(), span)
+	defer func() {
+		span.SetTag("UserLogic", "Register")
+		span.Finish()
+	}()
+	user, err := logic.repo.RetrieveByUserName(next, account, password)
 	// DataBaseError
 	if user == nil && errors.Is(err, errno.ErrorDataBase) {
 		return err
@@ -34,7 +42,7 @@ func (logic *UserLogic) Register(ctx context.Context, account string, password s
 	if user != nil && errors.Is(err, errno.ErrorUserRecordExist) {
 		return err
 	}
-	err = logic.repo.CreateByUserName(ctx, account, password)
+	err = logic.repo.CreateByUserName(next, account, password)
 	if err != nil {
 		return err
 	}
@@ -44,8 +52,14 @@ func (logic *UserLogic) Register(ctx context.Context, account string, password s
 // Login
 func (logic *UserLogic) Login(ctx context.Context,
 	r *http.Request, rw http.ResponseWriter, account string, password string) (*domain.UserVO, error) {
+	span, _ := opentracing.StartSpanFromContext(ctx, "UserLogic-Login")
+	next := opentracing.ContextWithSpan(context.Background(), span)
+	defer func() {
+		span.SetTag("UserLogic", "Login")
+		span.Finish()
+	}()
 	//  CheckAccountExist
-	user, err := logic.repo.RetrieveByUserName(ctx, account, password)
+	user, err := logic.repo.RetrieveByUserName(next, account, password)
 	if user == nil {
 		return nil, err
 	}
@@ -62,7 +76,7 @@ func (logic *UserLogic) Login(ctx context.Context,
 	}
 
 	// GetRoleByUserId
-	roles, err := logic.repo.RetrieveRoleByUserId(ctx, user.Id)
+	roles, err := logic.repo.RetrieveRoleByUserId(next, user.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -73,10 +87,10 @@ func (logic *UserLogic) Login(ctx context.Context,
 		UserName: user.UserName,
 		Role:     roles,
 	}
-	
-	session, _ := logic.store.Get(r, "SESSIONID")
+
+	session, _ := logic.store.Get(r, consts.SESSIONID)
 	values, _ := json.Marshal(sessionObj)
-	session.Values["user"] = values
+	session.Values[consts.SROREKEY] = values
 	// TODO 后期修改到配置项
 	session.Options = &sessions.Options{
 		Path:   "/",

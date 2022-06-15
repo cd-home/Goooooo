@@ -10,6 +10,7 @@ import (
 	"github.com/GodYao1995/Goooooo/internal/domain"
 	"github.com/GodYao1995/Goooooo/internal/pkg/errno"
 	"github.com/jmoiron/sqlx"
+	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -28,6 +29,11 @@ func NewUserRepository(db *sqlx.DB, log *zap.Logger) domain.UserRepositoryFace {
 
 // CreateUserByUserName
 func (repo *UserRepository) CreateByUserName(ctx context.Context, account string, password string) error {
+	span, _ := opentracing.StartSpanFromContext(ctx, "UserRepository-CreateByUserName")
+	defer func() {
+		span.SetTag("UserRepository", "CreateByUserName")
+		span.Finish()
+	}()
 	local := zap.Fields(zap.String("Repo", "CreateUserByUserName"))
 	// create user by username
 	bcryptPwd, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
@@ -50,6 +56,11 @@ func (repo *UserRepository) CreateByEmail(ctx context.Context, account string, p
 
 // CheckAccountExist
 func (repo *UserRepository) RetrieveByUserName(ctx context.Context, account string, password string) (*domain.UserDTO, error) {
+	span, _ := opentracing.StartSpanFromContext(ctx, "UserRepository-RetrieveByUserName")
+	defer func() {
+		span.SetTag("UserRepository", "RetrieveByUserName")
+		span.Finish()
+	}()
 	// check if user already exist
 	var user domain.UserDTO
 	var err error
@@ -84,6 +95,11 @@ func (repo *UserRepository) RetrieveAllUsers(ctx context.Context) ([]*domain.Use
 
 // GetRoleByUserId
 func (repo *UserRepository) RetrieveRoleByUserId(ctx context.Context, userId uint64) ([]uint64, error) {
+	span, _ := opentracing.StartSpanFromContext(ctx, "UserRepository-RetrieveRoleByUserId")
+	defer func() {
+		span.SetTag("UserRepository", "RetrieveRoleByUserId")
+		span.Finish()
+	}()
 	var err error
 	var roleIds []uint64
 	err = repo.db.Select(&roleIds, `SELECT role_id FROM user_role WHERE user_id = ?`, userId)

@@ -29,7 +29,7 @@ func New(lifecycle fx.Lifecycle, vp *viper.Viper) *gin.Engine {
 	pprof.Register(engine)
 
 	// Common Middlewares
-	engine.Use(gin.Logger(), NoCache(), Cors(), Secure(), RequestID(), Translations())
+	engine.Use(gin.Logger(), gin.Recovery(), NoCache(), Cors(), Secure(), RequestID(), Translations())
 
 	if mode := vp.GetString("APP.MODE"); mode == _Production || mode == _ShortProduction {
 		gin.SetMode(gin.ReleaseMode)
