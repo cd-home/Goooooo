@@ -53,14 +53,12 @@ func (logic *UserLogic) Register(ctx context.Context, account string, password s
 
 // Login
 func (logic *UserLogic) Login(ctx context.Context, r *http.Request, rw http.ResponseWriter, account string, password string) (*domain.UserVO, error) {
-
 	span, _ := opentracing.StartSpanFromContext(ctx, "UserLogic-Login")
 	next := opentracing.ContextWithSpan(context.Background(), span)
 	defer func() {
 		span.SetTag("UserLogic", "Login")
 		span.Finish()
 	}()
-
 	//  CheckAccountExist
 	user, err := logic.repo.RetrieveByUserName(next, account, password)
 	if user == nil {
@@ -104,6 +102,7 @@ func (logic *UserLogic) Login(ctx context.Context, r *http.Request, rw http.Resp
 	return Vo, nil
 }
 
+// RetrieveAllUser
 func (logic UserLogic) RetrieveAllUser(ctx context.Context) ([]*domain.UserVO, error) {
 	span, _ := opentracing.StartSpanFromContext(ctx, "UserLogic-RetrieveAllUser")
 	next := opentracing.ContextWithSpan(context.Background(), span)

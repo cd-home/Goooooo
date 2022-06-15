@@ -69,22 +69,20 @@ func (repo *UserRepository) RetrieveByUserName(ctx context.Context, account stri
 		SELECT 
 			id, username, nickname, password, create_at 
 		FROM user WHERE username = ? AND delete_at is null`, account)
-	// database error
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+	// User Not Exist
+	if err != nil && errors.Is(err, sql.ErrNoRows) {
 		repo.log.WithOptions(local).Info(err.Error())
-		return nil, errno.ErrorDataBase
-	}
-	// user already exist
-	if err == nil {
-		logger := fmt.Sprint(user.UserName, " Registered At ", user.CreateAt)
-		repo.log.WithOptions(local).Debug(logger)
-		return &user, errno.ErrorUserRecordExist
-		// use not existing
-	} else {
 		return nil, errno.ErrorUserRecordNotExist
 	}
+	// database error
+	if err != nil {
+		return nil, err
+	}
+	repo.log.WithOptions(local).Debug(fmt.Sprint(user.UserName, " Registered At ", user.CreateAt))
+	return &user, errno.ErrorUserRecordExist
 }
 
+// RetrieveByUserId
 func (repo *UserRepository) RetrieveByUserId(ctx context.Context, uid uint64) (*domain.UserDTO, error) {
 	span, _ := opentracing.StartSpanFromContext(ctx, "UserRepository-RetrieveByUserName")
 	defer func() {
