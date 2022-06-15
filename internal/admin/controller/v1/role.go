@@ -2,7 +2,6 @@ package v1
 
 import (
 	"context"
-	"net/http"
 
 	"github.com/GodYao1995/Goooooo/internal/admin/types"
 	"github.com/GodYao1995/Goooooo/internal/admin/version"
@@ -66,22 +65,27 @@ func NewRoleController(
 // @Failure 1 {object} types.CommonResponse {"code":1,"data":null,"msg":"Error"}
 // @Router /create [POST]
 func (r RoleController) CreateRole(ctx *gin.Context) {
+	span, _ := opentracing.StartSpanFromContext(ctx.Request.Context(), "RoleController-CreateRole")
+	next := opentracing.ContextWithSpan(context.Background(), span)
+	defer func() {
+		span.SetTag("Controller", "CreateRole")
+		span.Finish()
+	}()
 	params := types.CreateRoleParam{}
 	resp := res.CommonResponse{Code: 1}
-	var err error
 	if ok, valid := param.ShouldBindJSON(ctx, &params); !ok {
 		resp.Message = valid
 		resp.Failure(ctx)
 		return
 	}
-	err = r.logic.CreateRole(ctx, params.RoleName, params.RoleLevel, params.RoleIndex, params.Father)
+	err := r.logic.CreateRole(next, params.RoleName, params.RoleLevel, params.RoleIndex, params.Father)
 	if err != nil {
 		resp.Message = err.Error()
 	} else {
-		resp.Message = errno.RoleCreateSuccess
 		resp.Code = 0
+		resp.Message = errno.RoleCreateSuccess
 	}
-	ctx.JSON(http.StatusOK, resp)
+	resp.Success(ctx)
 }
 
 // DeleteRole
@@ -95,20 +99,27 @@ func (r RoleController) CreateRole(ctx *gin.Context) {
 // @Failure 1 {object} types.CommonResponse {"code":1,"data":null,"msg":"Error"}
 // @Router /delete [DELETE]
 func (r RoleController) DeleteRole(ctx *gin.Context) {
+	span, _ := opentracing.StartSpanFromContext(ctx.Request.Context(), "RoleController-DeleteRole")
+	next := opentracing.ContextWithSpan(context.Background(), span)
+	defer func() {
+		span.SetTag("Controller", "DeleteRole")
+		span.Finish()
+	}()
 	params := types.DeleteRoleParam{}
 	resp := res.CommonResponse{Code: 1}
-	if err := ctx.ShouldBindQuery(&params); err != nil {
-		resp.Message = err.Error()
+	if ok, valid := param.ShouldBindQuery(ctx, &params); !ok {
+		resp.Message = valid
+		resp.Failure(ctx)
 		return
 	}
-	err := r.logic.DeleteRole(ctx, params.RoleId)
+	err := r.logic.DeleteRole(next, params.RoleId)
 	if err != nil {
 		resp.Message = err.Error()
 	} else {
 		resp.Message = errno.Success
 		resp.Code = 0
 	}
-	ctx.JSON(http.StatusOK, resp)
+	resp.Success(ctx)
 }
 
 // UpdateRole
@@ -122,20 +133,26 @@ func (r RoleController) DeleteRole(ctx *gin.Context) {
 // @Failure 1 {object} types.CommonResponse {"code":1,"data":null,"msg":"Error"}
 // @Router /update [PUT]
 func (r RoleController) UpdateRole(ctx *gin.Context) {
+	span, _ := opentracing.StartSpanFromContext(ctx.Request.Context(), "RoleController-UpdateRole")
+	next := opentracing.ContextWithSpan(context.Background(), span)
+	defer func() {
+		span.SetTag("Controller", "UpdateRole")
+		span.Finish()
+	}()
 	params := types.RenameRoleParam{}
 	resp := res.CommonResponse{Code: 1}
-	if err := ctx.ShouldBindJSON(&params); err != nil {
-		resp.Message = errno.ErrorParamsParse.Error()
-		ctx.JSON(http.StatusOK, resp)
+	if ok, valid := param.ShouldBindJSON(ctx, &params); !ok {
+		resp.Message = valid
+		resp.Failure(ctx)
 		return
 	}
-	if err := r.logic.UpdateRole(ctx, params.RoleId, params.RoleName); err != nil {
+	if err := r.logic.UpdateRole(next, params.RoleId, params.RoleName); err != nil {
 		resp.Message = err.Error()
 	} else {
 		resp.Code = 0
 		resp.Message = errno.Success
 	}
-	ctx.JSON(http.StatusOK, resp)
+	resp.Success(ctx)
 }
 
 // ListRole
@@ -149,7 +166,7 @@ func (r RoleController) UpdateRole(ctx *gin.Context) {
 // @Failure 1 {object} types.CommonResponse {"code":1,"data":null,"msg":"Error"}
 // @Router /list [GET]
 func (r RoleController) ListRole(ctx *gin.Context) {
-	span, _ := opentracing.StartSpanFromContext(ctx.Request.Context(), "UserController-ListRole")
+	span, _ := opentracing.StartSpanFromContext(ctx.Request.Context(), "RoleController-ListRole")
 	next := opentracing.ContextWithSpan(context.Background(), span)
 	defer func() {
 		span.SetTag("Controller", "ListRole")
@@ -157,14 +174,14 @@ func (r RoleController) ListRole(ctx *gin.Context) {
 	}()
 	params := types.ListRoleParam{}
 	resp := res.CommonResponse{Code: 1}
-	if err := ctx.ShouldBind(&params); err != nil {
-		resp.Message = errno.ErrorParamsParse.Error()
-		ctx.JSON(http.StatusOK, resp)
+	if ok, valid := param.ShouldBind(ctx, &params); !ok {
+		resp.Message = valid
+		resp.Failure(ctx)
 		return
 	}
 	if params.RoleLevel >= 2 && params.Father == nil {
 		resp.Message = errno.ErrorNotEnoughParam.Error()
-		ctx.JSON(http.StatusOK, resp)
+		resp.Failure(ctx)
 		return
 	}
 	views, err := r.logic.RetrieveRoles(next, params.RoleLevel, params.Father)
@@ -175,7 +192,7 @@ func (r RoleController) ListRole(ctx *gin.Context) {
 		resp.Message = errno.Success
 		resp.Data = views
 	}
-	ctx.JSON(http.StatusOK, resp)
+	resp.Success(ctx)
 }
 
 // MoveRole
@@ -189,17 +206,24 @@ func (r RoleController) ListRole(ctx *gin.Context) {
 // @Failure 1 {object} types.CommonResponse {"code":1,"data":null,"msg":"Error"}
 // @Router /move [POST]
 func (r RoleController) MoveRole(ctx *gin.Context) {
+	span, _ := opentracing.StartSpanFromContext(ctx.Request.Context(), "RoleController-MoveRole")
+	next := opentracing.ContextWithSpan(context.Background(), span)
+	defer func() {
+		span.SetTag("Controller", "MoveRole")
+		span.Finish()
+	}()
 	resp := res.CommonResponse{Code: 1}
 	params := types.MoveRoleParam{}
-	if err := ctx.ShouldBindJSON(&params); err != nil {
-		resp.Message = errno.ErrorParamsParse.Error()
+	if ok, valid := param.ShouldBindJSON(ctx, &params); !ok {
+		resp.Message = valid
+		resp.Failure(ctx)
 		return
 	}
-	if err := r.logic.MoveRole(ctx, params.RoleId, params.Father); err != nil {
+	if err := r.logic.MoveRole(next, params.RoleId, params.Father); err != nil {
 		resp.Message = err.Error()
 	} else {
 		resp.Code = 0
 		resp.Message = errno.Success
 	}
-	ctx.JSON(http.StatusOK, resp)
+	resp.Success(ctx)
 }

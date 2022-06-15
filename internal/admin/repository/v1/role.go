@@ -23,6 +23,11 @@ func NewRoleRepository(db *sqlx.DB, log *zap.Logger) domain.RoleRepositoryFace {
 }
 
 func (repo RoleRepository) Create(ctx context.Context, roleId uint64, roleName string, roleLevel uint8, roleIndex uint8, father *uint64) (err error) {
+	span, _ := opentracing.StartSpanFromContext(ctx, "RoleRepository-Create")
+	defer func() {
+		span.SetTag("RoleRepository", "Create")
+		span.Finish()
+	}()
 	var tx *sqlx.Tx
 	local := zap.Fields(zap.String("Repo", "CreateRole"))
 	defer func() {
@@ -79,6 +84,11 @@ func (repo RoleRepository) Create(ctx context.Context, roleId uint64, roleName s
 }
 
 func (repo RoleRepository) Delete(ctx context.Context, roleId uint64) error {
+	span, _ := opentracing.StartSpanFromContext(ctx, "RoleRepository-Delete")
+	defer func() {
+		span.SetTag("RoleRepository", "Delete")
+		span.Finish()
+	}()
 	var err error
 	local := zap.Fields(zap.String("Repo", "DeleteRole"))
 	_, err = repo.db.Exec(`UPDATE role SET delete_at = ? WHERE role_id = ?`, time.Now(), roleId)
@@ -91,6 +101,11 @@ func (repo RoleRepository) Delete(ctx context.Context, roleId uint64) error {
 }
 
 func (repo RoleRepository) Update(ctx context.Context, roleId uint64, roleName string) error {
+	span, _ := opentracing.StartSpanFromContext(ctx, "RoleRepository-Update")
+	defer func() {
+		span.SetTag("RoleRepository", "Update")
+		span.Finish()
+	}()
 	var err error
 	local := zap.Fields(zap.String("Repo", "DeleteRole"))
 	_, err = repo.db.Exec(`UPDATE role SET role_name = ? WHERE role_id = ?`, roleName, roleId)
@@ -104,7 +119,7 @@ func (repo RoleRepository) Update(ctx context.Context, roleId uint64, roleName s
 func (repo RoleRepository) Retrieve(ctx context.Context, roleLevel uint8, father *uint64) ([]*domain.RoleEntityDTO, error) {
 	span, _ := opentracing.StartSpanFromContext(ctx, "Retrieve")
 	defer func() {
-		span.SetTag("repo", "Retrieve")
+		span.SetTag("RoleRepository", "Retrieve")
 		span.Finish()
 	}()
 	var err error
@@ -158,6 +173,11 @@ func (repo RoleRepository) Retrieve(ctx context.Context, roleLevel uint8, father
 }
 
 func (repo RoleRepository) Move(ctx context.Context, roleId uint64, father uint64) (err error) {
+	span, _ := opentracing.StartSpanFromContext(ctx, "RoleRepository-Move")
+	defer func() {
+		span.SetTag("RoleRepository", "Move")
+		span.Finish()
+	}()
 	var tx *sqlx.Tx
 	local := zap.Fields(zap.String("Repo", "Move"))
 	defer func() {
@@ -175,7 +195,7 @@ func (repo RoleRepository) Move(ctx context.Context, roleId uint64, father uint6
 	tx, err = repo.db.Beginx()
 	if err != nil {
 		repo.log.WithOptions(local).Warn(err.Error())
-		return err
+		return 
 	}
 	// Current Role_id`s All Childs
 	relations := make([]*domain.RoleRelationPO, 0)
@@ -185,7 +205,7 @@ func (repo RoleRepository) Move(ctx context.Context, roleId uint64, father uint6
 		FROM role_relation WHERE ancestor = ? AND delete_at is NULL AND distance != 0`, roleId)
 	if err != nil {
 		repo.log.WithOptions(local).Warn(err.Error())
-		return err
+		return 
 	}
 	dests := make([]uint64, 0)
 	for _, r := range relations {
@@ -202,7 +222,7 @@ func (repo RoleRepository) Move(ctx context.Context, roleId uint64, father uint6
 		WHERE descendant in (?) AND delete_at is NULL AND distance > 1`, dests)
 
 	if err != nil {
-		return err
+		return
 	}
 	tx.MustExec(query, args...)
 
@@ -236,7 +256,7 @@ func (repo RoleRepository) Move(ctx context.Context, roleId uint64, father uint6
 		if err != nil {
 			repo.log.Sugar().Debug(childsRelations)
 			repo.log.WithOptions(local).Warn(err.Error())
-			return err
+			return
 		}
 	}
 
@@ -259,7 +279,7 @@ func (repo RoleRepository) Move(ctx context.Context, roleId uint64, father uint6
 		if err != nil {
 			repo.log.Sugar().Debug(relations)
 			repo.log.WithOptions(local).Warn(err.Error())
-			return err
+			return
 		}
 		_, err = tx.NamedExec(`
 			INSERT INTO role_relation (ancestor, descendant, distance) 
@@ -267,9 +287,8 @@ func (repo RoleRepository) Move(ctx context.Context, roleId uint64, father uint6
 		if err != nil {
 			repo.log.Sugar().Debug(childsRelations)
 			repo.log.WithOptions(local).Warn(err.Error())
-			return err
+			return 
 		}
 	}
-
-	return err
+	return 
 }
