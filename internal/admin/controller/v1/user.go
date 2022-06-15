@@ -203,6 +203,7 @@ func (u UserController) ModifyPassword(ctx *gin.Context) {
 	resp := res.CommonResponse{Code: 1}
 	if ok, valid := param.ShouldBindJSON(ctx, &params); !ok {
 		resp.Message = valid
+		span.LogKV("bind err", valid)
 		resp.Failure(ctx)
 		return
 	}
@@ -212,7 +213,8 @@ func (u UserController) ModifyPassword(ctx *gin.Context) {
 		session := v.(domain.UserSession)
 		uid = session.Id
 	} else {
-		resp.Message = errno.ErrorSessionsInvalid
+		resp.Message = errno.ErrorSessionsInvalid.Error()
+		span.LogKV("session", errno.ErrorSessionsInvalid.Error())
 		resp.Failure(ctx)
 		return
 	}
@@ -224,7 +226,7 @@ func (u UserController) ModifyPassword(ctx *gin.Context) {
 	}
 	// Logout
 	if err := u.logic.Logout(next, ctx.Request, ctx.Writer); err != nil {
-		resp.Message = errno.ErrorLogOutForced
+		resp.Message = errno.ErrorLogOutForced.Error()
 	} else {
 		resp.Code = 0
 		resp.Message = errno.ModifyPasswordSuccess
