@@ -35,13 +35,9 @@ func (logic *UserLogic) Register(ctx context.Context, account string, password s
 		span.SetTag("UserLogic", "Register")
 		span.Finish()
 	}()
-	user, err := logic.repo.RetrieveByUserName(next, account, password)
-	// DataBaseError
-	if user == nil && errors.Is(err, errno.ErrorDataBase) {
-		return err
-	}
-	// User exist
-	if user != nil && errors.Is(err, errno.ErrorUserRecordExist) {
+	// 不存在才可以注册
+	_, err := logic.repo.RetrieveByUserName(next, account, password)
+	if !errors.Is(err, errno.ErrorUserRecordNotExist) {
 		return err
 	}
 	err = logic.repo.CreateByUserName(next, account, password)
@@ -61,7 +57,7 @@ func (logic *UserLogic) Login(ctx context.Context, r *http.Request, rw http.Resp
 	}()
 	//  CheckAccountExist
 	user, err := logic.repo.RetrieveByUserName(next, account, password)
-	if user == nil {
+	if !errors.Is(err, errno.ErrorUserRecordExist) {
 		return nil, err
 	}
 	// Check Password

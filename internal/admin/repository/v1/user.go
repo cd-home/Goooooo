@@ -69,12 +69,12 @@ func (repo *UserRepository) RetrieveByUserName(ctx context.Context, account stri
 		SELECT 
 			id, username, nickname, password, create_at 
 		FROM user WHERE username = ? AND delete_at is null`, account)
-	// User Not Exist
+	// RecordNotExist
 	if err != nil && errors.Is(err, sql.ErrNoRows) {
 		repo.log.WithOptions(local).Info(err.Error())
 		return nil, errno.ErrorUserRecordNotExist
 	}
-	// database error
+	// DB Error
 	if err != nil {
 		return nil, err
 	}
