@@ -73,8 +73,8 @@ type UserVO struct {
 	Email     string  `json:"email"`
 	Avatar    string  `json:"avatar"`
 	Phone     string  `json:"phone"`
-	State     uint8   `json:"state"`
-	Ip        string  `json:"ip"`
+	State     *uint8  `json:"state"`
+	Ip        *string `json:"ip"`
 	LastLogin string  `json:"last_login"`
 	UpdateAt  string  `json:"update_at"`
 	CreateAt  string  `json:"create_at"`

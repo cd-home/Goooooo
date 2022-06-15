@@ -125,6 +125,8 @@ func (logic UserLogic) RetrieveAllUser(ctx context.Context) ([]*domain.UserVO, e
 			nickname *string
 			age      *uint8
 			gender   *uint8
+			state    *uint8
+			ip       *string
 		)
 		if obj.NickName.Valid {
 			nickname = &obj.NickName.String
@@ -137,6 +139,14 @@ func (logic UserLogic) RetrieveAllUser(ctx context.Context) ([]*domain.UserVO, e
 			_gender := uint8(obj.Gender.Int16)
 			gender = &_gender
 		}
+		if obj.State.Valid {
+			_state := uint8(obj.State.Int16)
+			state = &_state
+		}
+		if obj.Ip.Valid {
+			_ip := tools.UintIpToString(uint32(obj.Ip.Int64))
+			ip = &_ip
+		}
 		// TODO 后续优化
 		vos = append(vos, &domain.UserVO{
 			UserName:  obj.UserName,
@@ -146,8 +156,8 @@ func (logic UserLogic) RetrieveAllUser(ctx context.Context) ([]*domain.UserVO, e
 			Email:     obj.Email.String,
 			Avatar:    obj.Avatar.String,
 			Phone:     obj.Phone.String,
-			State:     uint8(obj.State.Int16),
-			Ip:        tools.UintIpToString(uint32(obj.Ip.Int64)),
+			State:     state,
+			Ip:        ip,
 			LastLogin: obj.LastLogin.String,
 			UpdateAt:  obj.UpdateAt,
 			DeleteAt:  obj.DeleteAt.Time.Format(xtime.TimeLayOut),
