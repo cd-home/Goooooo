@@ -69,20 +69,44 @@ func (repo *UserRepository) RetrieveByUserName(ctx context.Context, account stri
 		SELECT 
 			id, username, nickname, password, create_at 
 		FROM user WHERE username = ? AND delete_at is null`, account)
-	// database error
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+	// RecordNotExist
+	if err != nil && errors.Is(err, sql.ErrNoRows) {
 		repo.log.WithOptions(local).Info(err.Error())
-		return nil, errno.ErrorDataBase
-	}
-	// user already exist
-	if err == nil {
-		logger := fmt.Sprint(user.UserName, " Registered At ", user.CreateAt)
-		repo.log.WithOptions(local).Debug(logger)
-		return &user, errno.ErrorUserRecordExist
-		// use not existing
-	} else {
 		return nil, errno.ErrorUserRecordNotExist
 	}
+	// DB Error
+	if err != nil {
+		return nil, err
+	}
+	repo.log.WithOptions(local).Debug(fmt.Sprint(user.UserName, " Registered At ", user.CreateAt))
+	return &user, errno.ErrorUserRecordExist
+}
+
+// RetrieveByUserId
+func (repo *UserRepository) RetrieveByUserId(ctx context.Context, uid uint64) (*domain.UserDTO, error) {
+	span, _ := opentracing.StartSpanFromContext(ctx, "UserRepository-RetrieveByUserName")
+	defer func() {
+		span.SetTag("UserRepository", "RetrieveByUserName")
+		span.Finish()
+	}()
+	var err error
+	local := zap.Fields(zap.String("Repo", "ModifyPassword"))
+	// Check originBcryptPwd is right ?
+	var user domain.UserDTO
+	err = repo.db.Get(&user, `
+		SELECT 
+			id, username, nickname, password, create_at
+		FROM user WHERE id = ? AND delete_at is NULL`, uid)
+	// 未找到用户
+	if err != nil && errors.Is(sql.ErrNoRows, err) {
+		return nil, errors.New("未知用户")
+	}
+	// db error
+	if err != nil {
+		repo.log.WithOptions(local).Warn(err.Error())
+		return nil, err
+	}
+	return &user, nil
 }
 
 // RetrieveAllUsers
@@ -113,5 +137,22 @@ func (repo *UserRepository) RetrieveRoleByUserId(ctx context.Context, userId uin
 
 // DeleteByUserName
 func (repo *UserRepository) DeleteByUserName(ctx context.Context, username string) error {
+	return nil
+}
+
+// DeleteByUserName
+func (repo *UserRepository) ModifyPassword(ctx context.Context, originPassword, newPassword string, uid uint64) error {
+	span, _ := opentracing.StartSpanFromContext(ctx, "UserRepository-ModifyPassword")
+	defer func() {
+		span.SetTag("UserRepository", "ModifyPassword")
+		span.Finish()
+	}()
+	local := zap.Fields(zap.String("Repo", "ModifyPassword"))
+	newBcryptPwd, _ := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	_, err := repo.db.Exec(`UPDATE user SET password = ? WHERE id = ?`, string(newBcryptPwd), uid)
+	if err != nil {
+		repo.log.WithOptions(local).Warn(err.Error())
+		return err
+	}
 	return nil
 }

@@ -25,11 +25,7 @@ type UserController struct {
 	store *session.RedisStore
 }
 
-func NewUserController(
-	apiV1 *version.APIV1,
-	log *zap.Logger,
-	logic domain.UserLogicFace,
-	store *session.RedisStore, xtracer *xtracer.XTracer) {
+func NewUserController(apiV1 *version.APIV1, log *zap.Logger, logic domain.UserLogicFace, store *session.RedisStore, xtracer *xtracer.XTracer) {
 	ctl := &UserController{
 		logic: logic,
 		log:   log.WithOptions(zap.Fields(zap.String("module", "UserController"))),
@@ -50,6 +46,8 @@ func NewUserController(
 	{
 		needAuth.GET("/profile", ctl.GetUserProfile)
 		needAuth.GET("/retrieves", ctl.GetAllUser)
+		needAuth.POST("/logout", ctl.Logout)
+		needAuth.POST("/modify_password", ctl.ModifyPassword)
 	}
 }
 
@@ -160,6 +158,74 @@ func (u UserController) GetAllUser(ctx *gin.Context) {
 		resp.Data = view
 		resp.Code = 0
 		resp.Message = errno.Success
+	}
+	resp.Success(ctx)
+}
+
+// GetUserProfile
+// @Summary Get UserProfile
+// @Description Get UserProfile
+// @Tags User
+// @Accept  json
+// @Produce json
+// @Router /profile [GET]
+func (u UserController) Logout(ctx *gin.Context) {
+	resp := res.CommonResponse{Code: 1}
+	err := u.logic.Logout(ctx, ctx.Request, ctx.Writer)
+	if err != nil {
+		resp.Message = err.Error()
+	} else {
+		resp.Code = 0
+		resp.Message = errno.LogOutSuccess
+	}
+	resp.Success(ctx)
+}
+
+// ModifyPassword
+// @Summary Modify Password
+// @Description Modify Password
+// @Tags User
+// @Accept  json
+// @Produce json
+// @Router /modify_password [GET]
+func (u UserController) ModifyPassword(ctx *gin.Context) {
+	span, _ := opentracing.StartSpanFromContext(ctx.Request.Context(), "UserController-ModifyPassword")
+	next := opentracing.ContextWithSpan(context.Background(), span)
+	defer func() {
+		span.SetTag("UserController", "ModifyPassword")
+		span.Finish()
+	}()
+	params := types.ModifyPasswordParam{}
+	resp := res.CommonResponse{Code: 1}
+	if ok, valid := param.ShouldBindJSON(ctx, &params); !ok {
+		resp.Message = valid
+		span.LogKV("bind err", valid)
+		resp.Failure(ctx)
+		return
+	}
+	// Current user
+	var uid uint64
+	if v, ok := ctx.Get(consts.SROREKEY); ok {
+		session := v.(domain.UserSession)
+		uid = session.Id
+	} else {
+		resp.Message = errno.ErrorSessionsInvalid.Error()
+		span.LogKV("session", errno.ErrorSessionsInvalid.Error())
+		resp.Failure(ctx)
+		return
+	}
+	// Modify Password
+	if err := u.logic.ModifyPassword(next, params.OriginPassword, params.NewPassword, uid); err != nil {
+		resp.Message = err.Error()
+		resp.Failure(ctx)
+		return
+	}
+	// Logout
+	if err := u.logic.Logout(next, ctx.Request, ctx.Writer); err != nil {
+		resp.Message = errno.ErrorLogOutForced.Error()
+	} else {
+		resp.Code = 0
+		resp.Message = errno.ModifyPasswordSuccess
 	}
 	resp.Success(ctx)
 }
