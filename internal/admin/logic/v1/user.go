@@ -52,11 +52,7 @@ func (logic *UserLogic) Register(ctx context.Context, account string, password s
 }
 
 // Login
-func (logic *UserLogic) Login(
-	ctx context.Context,
-	r *http.Request,
-	rw http.ResponseWriter,
-	account string, password string) (*domain.UserVO, error) {
+func (logic *UserLogic) Login(ctx context.Context, r *http.Request, rw http.ResponseWriter, account string, password string) (*domain.UserVO, error) {
 
 	span, _ := opentracing.StartSpanFromContext(ctx, "UserLogic-Login")
 	next := opentracing.ContextWithSpan(context.Background(), span)
@@ -164,4 +160,41 @@ func (logic UserLogic) RetrieveAllUser(ctx context.Context) ([]*domain.UserVO, e
 		})
 	}
 	return vos, nil
+}
+
+func (logic UserLogic) ModifyPassword(ctx context.Context, originPassword, newPassword string, uid uint64) error {
+	span, _ := opentracing.StartSpanFromContext(ctx, "UserLogic-ModifyPassword")
+	next := opentracing.ContextWithSpan(context.Background(), span)
+	defer func() {
+		span.SetTag("UserLogic", "ModifyPassword")
+		span.Finish()
+	}()
+	// check user
+	user, err := logic.repo.RetrieveByUserId(next, uid)
+	if err != nil {
+		return err
+	}
+	// compare password
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(originPassword))
+	if err != nil {
+		return errno.ErrorOriginPassword
+	}
+	return logic.repo.ModifyPassword(next, originPassword, newPassword, uid)
+}
+
+func (logic UserLogic) Logout(ctx context.Context, r *http.Request, w http.ResponseWriter) error {
+	span, _ := opentracing.StartSpanFromContext(ctx, "UserLogic-Logout")
+	defer func() {
+		span.SetTag("UserLogic", "Logout")
+		span.Finish()
+	}()
+	session, err := logic.store.Get(r, consts.SESSIONID)
+	if err != nil {
+		return err
+	}
+	session.Options.MaxAge = -1
+	if err = session.Save(r, w); err != nil {
+		return err
+	}
+	return nil
 }

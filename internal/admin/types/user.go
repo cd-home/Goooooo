@@ -11,3 +11,9 @@ type LoginParam struct {
 	Account  string `json:"account" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
+
+// ModifyPassword [Request, POST, Body]
+type ModifyPasswordParam struct {
+	OriginPassword string `json:"origin_password" binding:"required"`
+	NewPassword    string `json:"new_password" binding:"required"`
+}

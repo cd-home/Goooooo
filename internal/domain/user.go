@@ -10,6 +10,8 @@ type UserLogicFace interface {
 	Register(ctx context.Context, account string, password string) error
 	Login(ctx context.Context, r *http.Request, rw http.ResponseWriter, account string, password string) (*UserVO, error)
 	RetrieveAllUser(ctx context.Context) ([]*UserVO, error)
+	Logout(ctx context.Context, r *http.Request, w http.ResponseWriter) error
+	ModifyPassword(ctx context.Context, originPassword, newPassword string, uid uint64) error
 }
 
 type UserRepositoryFace interface {
@@ -17,8 +19,10 @@ type UserRepositoryFace interface {
 	CreateByEmail(ctx context.Context, email string, password string) error
 	DeleteByUserName(ctx context.Context, username string) error
 	RetrieveByUserName(ctx context.Context, username string, password string) (*UserDTO, error)
+	RetrieveByUserId(ctx context.Context, uid uint64) (*UserDTO, error)
 	RetrieveAllUsers(ctx context.Context) ([]*UserDTO, error)
 	RetrieveRoleByUserId(ctx context.Context, userId uint64) ([]uint64, error)
+	ModifyPassword(ctx context.Context, originPassword, newPassword string, uid uint64) error
 }
 
 type UserEsRepositoryFace interface {
