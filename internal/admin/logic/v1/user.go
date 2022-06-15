@@ -10,6 +10,8 @@ import (
 	"github.com/GodYao1995/Goooooo/internal/pkg/consts"
 	"github.com/GodYao1995/Goooooo/internal/pkg/errno"
 	"github.com/GodYao1995/Goooooo/internal/pkg/session"
+	"github.com/GodYao1995/Goooooo/pkg/tools"
+	"github.com/GodYao1995/Goooooo/pkg/xtime"
 	"github.com/gorilla/sessions"
 	"github.com/opentracing/opentracing-go"
 	"golang.org/x/crypto/bcrypt"
@@ -104,4 +106,62 @@ func (logic *UserLogic) Login(
 		return nil, err
 	}
 	return Vo, nil
+}
+
+func (logic UserLogic) RetrieveAllUser(ctx context.Context) ([]*domain.UserVO, error) {
+	span, _ := opentracing.StartSpanFromContext(ctx, "UserLogic-RetrieveAllUser")
+	next := opentracing.ContextWithSpan(context.Background(), span)
+	defer func() {
+		span.SetTag("UserLogic", "RetrieveAllUser")
+		span.Finish()
+	}()
+	dtos, err := logic.repo.RetrieveAllUsers(next)
+	if err != nil {
+		return nil, err
+	}
+	vos := make([]*domain.UserVO, 0)
+	for _, obj := range dtos {
+		var (
+			nickname *string
+			age      *uint8
+			gender   *uint8
+			state    *uint8
+			ip       *string
+		)
+		if obj.NickName.Valid {
+			nickname = &obj.NickName.String
+		}
+		if obj.Age.Valid {
+			_age := uint8(obj.Age.Int16)
+			age = &_age
+		}
+		if obj.Gender.Valid {
+			_gender := uint8(obj.Gender.Int16)
+			gender = &_gender
+		}
+		if obj.State.Valid {
+			_state := uint8(obj.State.Int16)
+			state = &_state
+		}
+		if obj.Ip.Valid {
+			_ip := tools.UintIpToString(uint32(obj.Ip.Int64))
+			ip = &_ip
+		}
+		// TODO 后续优化
+		vos = append(vos, &domain.UserVO{
+			UserName:  obj.UserName,
+			NickName:  nickname,
+			Age:       age,
+			Gender:    gender,
+			Email:     obj.Email.String,
+			Avatar:    obj.Avatar.String,
+			Phone:     obj.Phone.String,
+			State:     state,
+			Ip:        ip,
+			LastLogin: obj.LastLogin.String,
+			UpdateAt:  obj.UpdateAt,
+			DeleteAt:  obj.DeleteAt.Time.Format(xtime.TimeLayOut),
+		})
+	}
+	return vos, nil
 }

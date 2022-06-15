@@ -227,7 +227,7 @@ func (repo RoleRepository) Move(ctx context.Context, roleId uint64, father uint6
 	tx.MustExec(query, args...)
 
 	// Rebuild New Relation
-	// 先创建于父级目录关系
+	// 先创建与父级目录关系
 	tx.MustExec(
 		`INSERT INTO role_relation (ancestor, descendant, distance)
 		 VALUES(?, ?, ?)`, father, roleId, 1)
@@ -263,21 +263,32 @@ func (repo RoleRepository) Move(ctx context.Context, roleId uint64, father uint6
 	// 移动到的father 有 father
 	if len(grandsRelations) > 0 {
 		for _, relation := range grandsRelations {
+			// 祖先到father的距离+1 就是到roleId的距离
 			relation.Descendant = roleId
 			relation.Distance = relation.Distance + 1
 			for _, child := range relations {
 				childsRelations = append(childsRelations, &domain.RoleRelationPO{
 					Ancestor:   relation.Ancestor,
 					Descendant: child.Descendant,
+					// 祖先的距离 + 本身 roleId 与 孩子的距离 == 祖先到所有孩子的距离
 					Distance:   relation.Distance + child.Distance,
 				})
 			}
 		}
+		//  father 与 childs  需要单独添加
+		for _, child := range relations {
+			childsRelations = append(childsRelations, &domain.RoleRelationPO{
+				Ancestor:   father,
+				Descendant: child.Descendant,
+				Distance:   child.Distance + 1,
+			})
+		}
 		_, err = tx.NamedExec(`
 			INSERT INTO role_relation (ancestor, descendant, distance) 
 			VALUES(:ancestor, :descendant, :distance)`, grandsRelations)
+
 		if err != nil {
-			repo.log.Sugar().Debug(relations)
+			repo.log.Sugar().Debug(grandsRelations)
 			repo.log.WithOptions(local).Warn(err.Error())
 			return
 		}
