@@ -275,7 +275,7 @@ func (repo RoleRepository) Move(ctx context.Context, roleId uint64, father uint6
 				})
 			}
 		}
-		// roleId 与 father 需要单独添加
+		//  father 与 childs  需要单独添加
 		for _, child := range relations {
 			childsRelations = append(childsRelations, &domain.RoleRelationPO{
 				Ancestor:   father,
@@ -286,7 +286,7 @@ func (repo RoleRepository) Move(ctx context.Context, roleId uint64, father uint6
 		_, err = tx.NamedExec(`
 			INSERT INTO role_relation (ancestor, descendant, distance) 
 			VALUES(:ancestor, :descendant, :distance)`, grandsRelations)
-			
+
 		if err != nil {
 			repo.log.Sugar().Debug(grandsRelations)
 			repo.log.WithOptions(local).Warn(err.Error())
