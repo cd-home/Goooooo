@@ -25,11 +25,7 @@ type UserController struct {
 	store *session.RedisStore
 }
 
-func NewUserController(
-	apiV1 *version.APIV1,
-	log *zap.Logger,
-	logic domain.UserLogicFace,
-	store *session.RedisStore, xtracer *xtracer.XTracer) {
+func NewUserController(apiV1 *version.APIV1, log *zap.Logger, logic domain.UserLogicFace, store *session.RedisStore, xtracer *xtracer.XTracer) {
 	ctl := &UserController{
 		logic: logic,
 		log:   log.WithOptions(zap.Fields(zap.String("module", "UserController"))),
