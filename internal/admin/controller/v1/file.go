@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"context"
 	"io"
 	"net/http"
 	"os"
@@ -8,6 +9,7 @@ import (
 
 	"github.com/GodYao1995/Goooooo/internal/admin/version"
 	"github.com/GodYao1995/Goooooo/internal/domain"
+	"github.com/GodYao1995/Goooooo/internal/pkg/consts"
 	"github.com/GodYao1995/Goooooo/internal/pkg/errno"
 	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/auth"
 	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/permission"
@@ -16,6 +18,7 @@ import (
 	"github.com/GodYao1995/Goooooo/pkg/tools"
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
+	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
 )
 
@@ -79,38 +82,43 @@ func (f FileController) ListFile(ctx *gin.Context) {
 // @Produce json
 // @Router /upload [POST]
 func (f FileController) UploadLocal(ctx *gin.Context) {
+	span, _ := opentracing.StartSpanFromContext(ctx.Request.Context(), "FileController-UploadLocal")
+	next := opentracing.ContextWithSpan(context.Background(), span)
+	defer func() {
+		span.SetTag("FileController", "UploadLocal")
+		span.Finish()
+	}()
 	resp := res.CommonResponse{Code: 1}
 	fileObj, err := ctx.FormFile(f.file)
 	if err != nil {
 		resp.Message = errno.ErrorUploadFile.Error()
-		ctx.JSON(http.StatusOK, resp)
+		resp.Failure(ctx)
 		return
 	}
 	target := f.upload + strconv.Itoa(int(tools.SnowId())) + fileObj.Filename
 	if err = ctx.SaveUploadedFile(fileObj, target); err != nil {
 		resp.Message = errno.ErrorUploadFile.Error()
-		ctx.JSON(http.StatusOK, resp)
+		resp.Failure(ctx)
 		return
 	}
 	var user uint64
-	if v, ok := ctx.Get("user"); ok {
+	if v, ok := ctx.Get(consts.SROREKEY); ok {
 		session := v.(domain.UserSession)
 		user = session.Id
 	} else {
 		resp.Message = errno.ErrorUserNotLogin.Error()
-		ctx.JSON(http.StatusOK, resp)
+		resp.Failure(ctx)
 		return
 	}
 	// Just for testing purposes 1526448643605794816 [Temp]
-	err = f.logic.UploadFile(fileObj.Filename, fileObj.Size, target, 1526448643605794816, user)
+	err = f.logic.UploadFile(next, fileObj.Filename, fileObj.Size, target, 1526448643605794816, user)
 	if err != nil {
 		resp.Message = err.Error()
-		ctx.JSON(http.StatusOK, resp)
-		return
+	} else {
+		resp.Code = 0
+		resp.Message = errno.UploadSuccess
 	}
-	resp.Code = 0
-	resp.Message = errno.UploadSuccess
-	ctx.JSON(http.StatusOK, resp)
+	resp.Success(ctx)
 }
 
 // DownloadLocal

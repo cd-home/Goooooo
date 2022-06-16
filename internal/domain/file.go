@@ -1,12 +1,14 @@
 package domain
 
+import "context"
+
 type FileLogicFace interface {
-	UploadFile(fileName string, fileSize int64, fileUrl string, directory_id uint64, uploader uint64) error
+	UploadFile(ctx context.Context, fileName string, fileSize int64, fileUrl string, directory_id uint64, uploader uint64) error
 	DeleteFile(fileId uint64) error
 }
 
 type FileRepositoryFace interface {
-	UploadFile(fileName string, fileSize int64, fileUrl string, directory_id uint64, uploader uint64) error
+	UploadFile(ctx context.Context, fileName string, fileSize int64, fileUrl string, directory_id uint64, uploader uint64) error
 	DeleteFile(fileId uint64) error
 }
 

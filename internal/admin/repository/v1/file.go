@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"context"
+
 	"github.com/GodYao1995/Goooooo/internal/domain"
 	"github.com/GodYao1995/Goooooo/pkg/tools"
 	"github.com/jmoiron/sqlx"
@@ -19,12 +21,13 @@ func NewFileRepository(db *sqlx.DB, log *zap.Logger) domain.FileRepositoryFace {
 	}
 }
 
-func (f FileRepository) UploadFile(fileName string, fileSize int64, fileUrl string, directoryId uint64, uploader uint64) error {
+func (f FileRepository) UploadFile(ctx context.Context, fileName string, fileSize int64, fileUrl string, directoryId uint64, uploader uint64) error {
 	var err error
+	local := zap.Fields(zap.String("Repo", "UploadFile"))
 	_, err = f.db.Exec(`
 		INSERT INTO file (file_id, file_name, file_size, file_url, directory_id, uploader) 
 		VALUES(?, ?, ?, ?, ?, ?)`, tools.SnowId(), fileName, fileSize, fileUrl, directoryId, uploader)
-	local := zap.Fields(zap.String("Repo", "UploadFile"))
+
 	if err != nil {
 		f.log.WithOptions(local).Warn(err.Error())
 		return err
