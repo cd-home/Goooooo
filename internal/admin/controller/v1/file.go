@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/GodYao1995/Goooooo/internal/admin/types"
 	"github.com/GodYao1995/Goooooo/internal/admin/version"
 	"github.com/GodYao1995/Goooooo/internal/domain"
 	"github.com/GodYao1995/Goooooo/internal/pkg/consts"
@@ -16,6 +17,7 @@ import (
 	"github.com/GodYao1995/Goooooo/internal/pkg/res"
 	"github.com/GodYao1995/Goooooo/internal/pkg/session"
 	"github.com/GodYao1995/Goooooo/pkg/tools"
+	"github.com/GodYao1995/Goooooo/pkg/xhttp/param"
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/opentracing/opentracing-go"
@@ -26,9 +28,7 @@ type FileController struct {
 	log    *zap.Logger
 	file   string
 	upload string
-	store  *session.RedisStore
 	logic  domain.FileLogicFace
-	perm   *casbin.Enforcer
 }
 
 func NewFileController(apiV1 *version.APIV1, log *zap.Logger, store *session.RedisStore, logic domain.FileLogicFace, perm *casbin.Enforcer) {
@@ -36,9 +36,7 @@ func NewFileController(apiV1 *version.APIV1, log *zap.Logger, store *session.Red
 		log:    log.WithOptions(zap.Fields(zap.String("module", "FileController"))),
 		file:   "file",
 		upload: "../upload/",
-		store:  store,
 		logic:  logic,
-		perm:   perm,
 	}
 
 	// API version
@@ -57,6 +55,7 @@ func NewFileController(apiV1 *version.APIV1, log *zap.Logger, store *session.Red
 	{
 		needPerm.GET("/download", ctl.DownloadLocal)
 		needPerm.GET("/stream", ctl.DownloadLocalFileStream)
+		needPerm.DELETE("/delete", ctl.DeleteLocal)
 	}
 }
 
@@ -116,7 +115,7 @@ func (f FileController) UploadLocal(ctx *gin.Context) {
 		resp.Message = err.Error()
 	} else {
 		resp.Code = 0
-		resp.Message = errno.UploadSuccess
+		resp.Message = errno.UploadFileSuccess
 	}
 	resp.Success(ctx)
 }
@@ -135,6 +134,38 @@ func (f FileController) DownloadLocal(ctx *gin.Context) {
 	path := f.upload
 	filename := ctx.Query("filename")
 	ctx.FileAttachment(path+filename, filename)
+}
+
+// DeleteLocal
+// @Summary DeleteLocal File
+// @Description DeleteLocal File
+// @Tags File
+// @Accept json
+// @Produce json
+// @Param file_id query
+// @Router /delete [DELETE]
+func (f FileController) DeleteLocal(ctx *gin.Context) {
+	span, _ := opentracing.StartSpanFromContext(ctx.Request.Context(), "FileController-DeleteLocal")
+	next := opentracing.ContextWithSpan(context.Background(), span)
+	defer func() {
+		span.SetTag("FileController", "DeleteLocal")
+		span.Finish()
+	}()
+	params := types.DeleteFileParam{}
+	resp := res.CommonResponse{Code: 1}
+	if ok, valid := param.ShouldBindQuery(ctx, &params); !ok {
+		resp.Message = valid
+		resp.Failure(ctx)
+		return
+	}
+	err := f.logic.DeleteFile(next, params.FileId)
+	if err != nil {
+		resp.Message = err.Error()
+	} else {
+		resp.Code = 0
+		resp.Message = errno.Success
+	}
+	resp.Success(ctx)
 }
 
 // DownloadLocalFileStream

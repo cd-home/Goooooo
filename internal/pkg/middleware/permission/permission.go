@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/GodYao1995/Goooooo/internal/domain"
+	"github.com/GodYao1995/Goooooo/internal/pkg/consts"
 	"github.com/GodYao1995/Goooooo/internal/pkg/errno"
 	"github.com/GodYao1995/Goooooo/internal/pkg/res"
 	"github.com/casbin/casbin/v2"
@@ -15,7 +16,7 @@ import (
 func PermissionMiddleware(e *casbin.Enforcer) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// Login User
-		v, _ := ctx.Get("user")
+		v, _ := ctx.Get(consts.SROREKEY)
 		session := v.(domain.UserSession)
 
 		parts := strings.Split(ctx.Request.URL.Path, "/")

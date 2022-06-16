@@ -5,7 +5,9 @@ import (
 
 	"github.com/GodYao1995/Goooooo/internal/domain"
 	"github.com/GodYao1995/Goooooo/pkg/tools"
+	"github.com/GodYao1995/Goooooo/pkg/xtime"
 	"github.com/jmoiron/sqlx"
+	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
 )
 
@@ -22,6 +24,11 @@ func NewFileRepository(db *sqlx.DB, log *zap.Logger) domain.FileRepositoryFace {
 }
 
 func (f FileRepository) UploadFile(ctx context.Context, fileName string, fileSize int64, fileUrl string, directoryId uint64, uploader uint64) error {
+	span, _ := opentracing.StartSpanFromContext(ctx, "FileRepository-UploadFile")
+	defer func() {
+		span.SetTag("FileRepository", "UploadFile")
+		span.Finish()
+	}()
 	var err error
 	local := zap.Fields(zap.String("Repo", "UploadFile"))
 	_, err = f.db.Exec(`
@@ -35,6 +42,18 @@ func (f FileRepository) UploadFile(ctx context.Context, fileName string, fileSiz
 	return nil
 }
 
-func (f FileRepository) DeleteFile(fileId uint64) error {
+func (f FileRepository) DeleteFile(ctx context.Context, fileId uint64) error {
+	span, _ := opentracing.StartSpanFromContext(ctx, "FileRepository-DeleteFile")
+	defer func() {
+		span.SetTag("FileRepository", "DeleteFile")
+		span.Finish()
+	}()
+	var err error
+	local := zap.Fields(zap.String("Repo", "DeleteFile"))
+	_, err = f.db.Exec(`UPDATE file SET delete_at = ? WHERE file_id = ?`, xtime.Now(), fileId)
+	if err != nil {
+		f.log.WithOptions(local).Warn(err.Error())
+		return err
+	}
 	return nil
 }

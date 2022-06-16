@@ -18,7 +18,8 @@ const (
 	LogOutSuccess         = "登出成功"
 	RegisterSuccess       = "注册成功"
 	ModifyPasswordSuccess = "修改密码成功, 请重新登录"
-	UploadSuccess         = "文件上传成功"
+	UploadFileSuccess         = "文件上传成功"
+	DeleteFileSuccess         = "文件删除成功"
 	NoPermission          = "无操作权限"
 	RoleCreateSuccess     = "角色创建成功"
 )

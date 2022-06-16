@@ -30,6 +30,12 @@ func (f FileLogic) UploadFile(ctx context.Context, fileName string, fileSize int
 	return f.repo.UploadFile(next, fileName, fileSize, fileUrl, directory_id, uploader)
 }
 
-func (f FileLogic) DeleteFile(fileId uint64) error {
-	return nil
+func (f FileLogic) DeleteFile(ctx context.Context, fileId uint64) error {
+	span, _ := opentracing.StartSpanFromContext(ctx, "FileLogic-DeleteFile")
+	next := opentracing.ContextWithSpan(context.Background(), span)
+	defer func() {
+		span.SetTag("FileLogic", "DeleteFile")
+		span.Finish()
+	}()
+	return f.repo.DeleteFile(next, fileId)
 }
