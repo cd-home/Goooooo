@@ -20,16 +20,18 @@ func NewFileLogic(repo domain.FileRepositoryFace, log *zap.Logger) domain.FileLo
 	}
 }
 
-func (f FileLogic) UploadFile(ctx context.Context, fileName string, fileSize int64, fileUrl string, directory_id uint64, uploader uint64) error {
+// UploadFile
+func (f FileLogic) UploadFile(ctx context.Context, fileName string, fileSize int64, fileType string, fileUrl string, directory_id uint64, uploader uint64) error {
 	span, _ := opentracing.StartSpanFromContext(ctx, "FileLogic-UploadFile")
 	next := opentracing.ContextWithSpan(context.Background(), span)
 	defer func() {
 		span.SetTag("FileLogic", "UploadFile")
 		span.Finish()
 	}()
-	return f.repo.UploadFile(next, fileName, fileSize, fileUrl, directory_id, uploader)
+	return f.repo.UploadFile(next, fileName, fileSize, fileType, fileUrl, directory_id, uploader)
 }
 
+// DeleteFile
 func (f FileLogic) DeleteFile(ctx context.Context, fileId uint64) error {
 	span, _ := opentracing.StartSpanFromContext(ctx, "FileLogic-DeleteFile")
 	next := opentracing.ContextWithSpan(context.Background(), span)
@@ -38,4 +40,33 @@ func (f FileLogic) DeleteFile(ctx context.Context, fileId uint64) error {
 		span.Finish()
 	}()
 	return f.repo.DeleteFile(next, fileId)
+}
+
+// RetrieveFiles
+func (f FileLogic) RetrieveFiles(ctx context.Context) ([]*domain.FileEntityVo, error) {
+	span, _ := opentracing.StartSpanFromContext(ctx, "FileController-ListFile")
+	next := opentracing.ContextWithSpan(context.Background(), span)
+	defer func() {
+		span.SetTag("FileController", "ListFile")
+		span.Finish()
+	}()
+	dtos, err := f.repo.RetrieveFiles(next)
+	if err != nil {
+		return nil, err
+	}
+	vos := make([]*domain.FileEntityVo, 0)
+	for _, obj := range dtos {
+		vos = append(vos, &domain.FileEntityVo{
+			FileId:    obj.FileId,
+			FileName:  obj.FileName,
+			FileSize:  obj.FileSize,
+			FileType:  obj.FileType,
+			FileUrl:   obj.FileUrl,
+			Directory: obj.Directory,
+			CreateAt:  obj.CreateAt,
+			UpdateAt:  obj.UpdateAt,
+			Uploader:  obj.Uploader,
+		})
+	}
+	return vos, nil
 }

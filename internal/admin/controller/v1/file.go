@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path"
 	"strconv"
 
 	"github.com/GodYao1995/Goooooo/internal/admin/types"
@@ -35,7 +36,7 @@ func NewFileController(apiV1 *version.APIV1, log *zap.Logger, store *session.Red
 	ctl := &FileController{
 		log:    log.WithOptions(zap.Fields(zap.String("module", "FileController"))),
 		file:   "file",
-		upload: "../upload/",
+		upload: "../uploads/",
 		logic:  logic,
 	}
 
@@ -67,9 +68,22 @@ func NewFileController(apiV1 *version.APIV1, log *zap.Logger, store *session.Red
 // @Produce json
 // @Router /list [GET]
 func (f FileController) ListFile(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "OK",
-	})
+	span, _ := opentracing.StartSpanFromContext(ctx.Request.Context(), "FileController-ListFile")
+	next := opentracing.ContextWithSpan(context.Background(), span)
+	defer func() {
+		span.SetTag("FileController", "ListFile")
+		span.Finish()
+	}()
+	resp := res.CommonResponse{Code: 1}
+	view, err := f.logic.RetrieveFiles(next)
+	if err != nil {
+		resp.Message = err.Error()
+	} else {
+		resp.Data = view
+		resp.Code = 0
+		resp.Message = errno.Success
+	}
+	resp.Success(ctx)
 }
 
 // UploadLocal
@@ -94,8 +108,10 @@ func (f FileController) UploadLocal(ctx *gin.Context) {
 		resp.Failure(ctx)
 		return
 	}
+	fileType := path.Ext(fileObj.Filename)
 	target := f.upload + strconv.Itoa(int(tools.SnowId())) + fileObj.Filename
 	if err = ctx.SaveUploadedFile(fileObj, target); err != nil {
+		f.log.Sugar().Warn(err.Error())
 		resp.Message = errno.ErrorUploadFile.Error()
 		resp.Failure(ctx)
 		return
@@ -110,7 +126,7 @@ func (f FileController) UploadLocal(ctx *gin.Context) {
 		return
 	}
 	// Just for testing purposes 1526448643605794816 [Temp]
-	err = f.logic.UploadFile(next, fileObj.Filename, fileObj.Size, target, 1526448643605794816, user)
+	err = f.logic.UploadFile(next, fileObj.Filename, fileObj.Size, fileType, target, 1526448643605794816, user)
 	if err != nil {
 		resp.Message = err.Error()
 	} else {
