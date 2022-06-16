@@ -46,7 +46,7 @@ func NewFileController(apiV1 *version.APIV1, log *zap.Logger, store *session.Red
 	// Need Authorization
 	needAuth := v1.Use(auth.AuthMiddleware(store))
 	{
-		needAuth.GET("/list", ctl.ListFile)
+		needAuth.GET("/retrieve", ctl.RetrieveFile)
 		needAuth.POST("/upload", ctl.UploadLocal)
 		needAuth.POST("/oss", ctl.UploadOss)
 	}
@@ -60,18 +60,18 @@ func NewFileController(apiV1 *version.APIV1, log *zap.Logger, store *session.Red
 	}
 }
 
-// ListFile
-// @Summary List File
-// @Description List File
+// RetrieveFile
+// @Summary Retrieve File
+// @Description Retrieve File
 // @Tags File
 // @Accept  json
 // @Produce json
-// @Router /list [GET]
-func (f FileController) ListFile(ctx *gin.Context) {
-	span, _ := opentracing.StartSpanFromContext(ctx.Request.Context(), "FileController-ListFile")
+// @Router /retrieve [GET]
+func (f FileController) RetrieveFile(ctx *gin.Context) {
+	span, _ := opentracing.StartSpanFromContext(ctx.Request.Context(), "FileController-RetrieveFile")
 	next := opentracing.ContextWithSpan(context.Background(), span)
 	defer func() {
-		span.SetTag("FileController", "ListFile")
+		span.SetTag("FileController", "RetrieveFile")
 		span.Finish()
 	}()
 	resp := res.CommonResponse{Code: 1}
