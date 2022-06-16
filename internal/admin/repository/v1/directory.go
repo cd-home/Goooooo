@@ -7,6 +7,7 @@ import (
 	"github.com/GodYao1995/Goooooo/internal/domain"
 	"github.com/GodYao1995/Goooooo/pkg/tools"
 	"github.com/jmoiron/sqlx"
+	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
 )
 
@@ -140,6 +141,11 @@ func (repo DirectoryRepository) Retrieve(ctx context.Context, level uint8, fathe
 }
 
 func (repo DirectoryRepository) Move(ctx context.Context, directory_id uint64, father uint64) (err error) {
+	span, _ := opentracing.StartSpanFromContext(ctx, "DirectoryRepository-Move")
+	defer func() {
+		span.SetTag("DirectoryrLogic", "MoveDirectory")
+		span.Finish()
+	}()
 	var tx *sqlx.Tx
 	local := zap.Fields(zap.String("Repo", "Move"))
 	defer func() {
