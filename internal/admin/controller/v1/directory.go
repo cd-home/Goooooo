@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/GodYao1995/Goooooo/internal/admin/types"
@@ -11,8 +12,10 @@ import (
 	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/permission"
 	"github.com/GodYao1995/Goooooo/internal/pkg/res"
 	"github.com/GodYao1995/Goooooo/internal/pkg/session"
+	"github.com/GodYao1995/Goooooo/pkg/xhttp/param"
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
+	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
 )
 
@@ -48,9 +51,9 @@ func NewDirectoryController(apiV1 *version.APIV1, log *zap.Logger,
 func (d DirectoryController) CreateDirectory(ctx *gin.Context) {
 	params := types.CreateDirectoryParam{}
 	resp := res.CommonResponse{Code: 1}
-	if err := ctx.ShouldBindJSON(&params); err != nil {
-		resp.Message = errno.ErrorParamsParse.Error()
-		ctx.JSON(http.StatusOK, resp)
+	if ok, valid := param.ShouldBindJSON(ctx, &params); !ok {
+		resp.Message = valid
+		resp.Failure(ctx)
 		return
 	}
 	if err := d.logic.CreateDirectory(
@@ -64,7 +67,7 @@ func (d DirectoryController) CreateDirectory(ctx *gin.Context) {
 		resp.Code = 0
 		resp.Message = errno.Success
 	}
-	ctx.JSON(http.StatusOK, resp)
+	resp.Success(ctx)
 }
 
 // ListDirectory
@@ -77,15 +80,15 @@ func (d DirectoryController) CreateDirectory(ctx *gin.Context) {
 func (d DirectoryController) ListDirectory(ctx *gin.Context) {
 	params := types.ListDirectoryParam{}
 	resp := res.CommonResponse{Code: 1}
-	if err := ctx.ShouldBind(&params); err != nil {
-		resp.Message = errno.ErrorParamsParse.Error()
-		ctx.JSON(http.StatusOK, resp)
+	if ok, valid := param.ShouldBind(ctx, &params); !ok {
+		resp.Message = valid
+		resp.Failure(ctx)
 		return
 	}
 	resp.Data = d.logic.ListDirectory(ctx, params.DirectoryLevel, params.Father)
 	resp.Code = 0
 	resp.Message = errno.Success
-	ctx.JSON(http.StatusOK, resp)
+	resp.Success(ctx)
 }
 
 // RenameDirectory
@@ -98,10 +101,9 @@ func (d DirectoryController) ListDirectory(ctx *gin.Context) {
 func (d DirectoryController) RenameDirectory(ctx *gin.Context) {
 	params := types.RenameDirectoryParam{}
 	resp := res.CommonResponse{Code: 1}
-	if err := ctx.ShouldBind(&params); err != nil {
-		resp.Message = errno.ErrorParamsParse.Error()
-		ctx.JSON(http.StatusOK, resp)
-		return
+	if ok, valid := param.ShouldBindJSON(ctx, &params); !ok {
+		resp.Message = valid
+		resp.Failure(ctx)
 	}
 	data := d.logic.RenameDirectory(ctx, params.DirectoryId, params.DirectoryName)
 	if data == nil {
@@ -111,7 +113,7 @@ func (d DirectoryController) RenameDirectory(ctx *gin.Context) {
 		resp.Message = errno.Success
 		resp.Data = data
 	}
-	ctx.JSON(http.StatusOK, resp)
+	resp.Success(ctx)
 }
 
 // DeleteDirectory
@@ -122,11 +124,12 @@ func (d DirectoryController) RenameDirectory(ctx *gin.Context) {
 // @Produce json
 // @Router /delete [DELETE]
 func (d DirectoryController) DeleteDirectory(ctx *gin.Context) {
+	// TODO: delete directory
 	params := types.ListDirectoryParam{}
 	resp := res.CommonResponse{Code: 1}
-	if err := ctx.ShouldBind(&params); err != nil {
-		resp.Message = errno.ErrorParamsParse.Error()
-		ctx.JSON(http.StatusOK, resp)
+	if ok, valid := param.ShouldBindQuery(ctx, &params); !ok {
+		resp.Message = valid
+		resp.Failure(ctx)
 		return
 	}
 	resp.Data = d.logic.ListDirectory(ctx, params.DirectoryLevel, params.Father)
@@ -141,17 +144,27 @@ func (d DirectoryController) DeleteDirectory(ctx *gin.Context) {
 // @Tags Directory
 // @Accept  json
 // @Produce json
-// @Router /move [PUT]
+// @Router /move [POST]
 func (d DirectoryController) MoveDirectory(ctx *gin.Context) {
-	params := types.ListDirectoryParam{}
+	span, _ := opentracing.StartSpanFromContext(ctx.Request.Context(), "DirectoryController-MoveDirectory")
+	next := opentracing.ContextWithSpan(context.Background(), span)
+	defer func() {
+		span.SetTag("DirectoryController", "MoveDirectory")
+		span.Finish()
+	}()
+	params := types.MoveDirectoryParam{}
 	resp := res.CommonResponse{Code: 1}
-	if err := ctx.ShouldBind(&params); err != nil {
-		resp.Message = errno.ErrorParamsParse.Error()
-		ctx.JSON(http.StatusOK, resp)
+	if ok, valid := param.ShouldBind(ctx, &params); !ok {
+		resp.Message = valid
+		resp.Failure(ctx)
 		return
 	}
-	resp.Data = d.logic.ListDirectory(ctx, params.DirectoryLevel, params.Father)
-	resp.Code = 0
-	resp.Message = errno.Success
-	ctx.JSON(http.StatusOK, resp)
+	err := d.logic.MoveDirectory(next, params.DirectoryId, params.Father)
+	if err != nil {
+		resp.Message = err.Error()
+	} else {
+		resp.Code = 0
+		resp.Message = errno.Success
+	}
+	resp.Success(ctx)
 }

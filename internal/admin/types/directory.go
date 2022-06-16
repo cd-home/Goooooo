@@ -21,3 +21,8 @@ type RenameDirectoryParam struct {
 	DirectoryName string `json:"directory_name" binding:"required"`
 }
 
+// MoveDirectoryParam [Request, POST, Body]
+type MoveDirectoryParam struct {
+	DirectoryId uint64 `json:"directory_id" binding:"required"`
+	Father      uint64 `json:"father" binding:"required"`
+}

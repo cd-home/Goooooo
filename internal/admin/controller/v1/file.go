@@ -1,21 +1,27 @@
 package v1
 
 import (
+	"context"
 	"io"
 	"net/http"
 	"os"
+	"path"
 	"strconv"
 
+	"github.com/GodYao1995/Goooooo/internal/admin/types"
 	"github.com/GodYao1995/Goooooo/internal/admin/version"
 	"github.com/GodYao1995/Goooooo/internal/domain"
+	"github.com/GodYao1995/Goooooo/internal/pkg/consts"
 	"github.com/GodYao1995/Goooooo/internal/pkg/errno"
 	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/auth"
 	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/permission"
 	"github.com/GodYao1995/Goooooo/internal/pkg/res"
 	"github.com/GodYao1995/Goooooo/internal/pkg/session"
 	"github.com/GodYao1995/Goooooo/pkg/tools"
+	"github.com/GodYao1995/Goooooo/pkg/xhttp/param"
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
+	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
 )
 
@@ -23,19 +29,15 @@ type FileController struct {
 	log    *zap.Logger
 	file   string
 	upload string
-	store  *session.RedisStore
 	logic  domain.FileLogicFace
-	perm   *casbin.Enforcer
 }
 
 func NewFileController(apiV1 *version.APIV1, log *zap.Logger, store *session.RedisStore, logic domain.FileLogicFace, perm *casbin.Enforcer) {
 	ctl := &FileController{
 		log:    log.WithOptions(zap.Fields(zap.String("module", "FileController"))),
 		file:   "file",
-		upload: "../upload/",
-		store:  store,
+		upload: "../uploads/",
 		logic:  logic,
-		perm:   perm,
 	}
 
 	// API version
@@ -54,6 +56,7 @@ func NewFileController(apiV1 *version.APIV1, log *zap.Logger, store *session.Red
 	{
 		needPerm.GET("/download", ctl.DownloadLocal)
 		needPerm.GET("/stream", ctl.DownloadLocalFileStream)
+		needPerm.DELETE("/delete", ctl.DeleteLocal)
 	}
 }
 
@@ -65,9 +68,22 @@ func NewFileController(apiV1 *version.APIV1, log *zap.Logger, store *session.Red
 // @Produce json
 // @Router /list [GET]
 func (f FileController) ListFile(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "OK",
-	})
+	span, _ := opentracing.StartSpanFromContext(ctx.Request.Context(), "FileController-ListFile")
+	next := opentracing.ContextWithSpan(context.Background(), span)
+	defer func() {
+		span.SetTag("FileController", "ListFile")
+		span.Finish()
+	}()
+	resp := res.CommonResponse{Code: 1}
+	view, err := f.logic.RetrieveFiles(next)
+	if err != nil {
+		resp.Message = err.Error()
+	} else {
+		resp.Data = view
+		resp.Code = 0
+		resp.Message = errno.Success
+	}
+	resp.Success(ctx)
 }
 
 // UploadLocal
@@ -79,38 +95,45 @@ func (f FileController) ListFile(ctx *gin.Context) {
 // @Produce json
 // @Router /upload [POST]
 func (f FileController) UploadLocal(ctx *gin.Context) {
+	span, _ := opentracing.StartSpanFromContext(ctx.Request.Context(), "FileController-UploadLocal")
+	next := opentracing.ContextWithSpan(context.Background(), span)
+	defer func() {
+		span.SetTag("FileController", "UploadLocal")
+		span.Finish()
+	}()
 	resp := res.CommonResponse{Code: 1}
 	fileObj, err := ctx.FormFile(f.file)
 	if err != nil {
 		resp.Message = errno.ErrorUploadFile.Error()
-		ctx.JSON(http.StatusOK, resp)
+		resp.Failure(ctx)
 		return
 	}
+	fileType := path.Ext(fileObj.Filename)
 	target := f.upload + strconv.Itoa(int(tools.SnowId())) + fileObj.Filename
 	if err = ctx.SaveUploadedFile(fileObj, target); err != nil {
+		f.log.Sugar().Warn(err.Error())
 		resp.Message = errno.ErrorUploadFile.Error()
-		ctx.JSON(http.StatusOK, resp)
+		resp.Failure(ctx)
 		return
 	}
 	var user uint64
-	if v, ok := ctx.Get("user"); ok {
+	if v, ok := ctx.Get(consts.SROREKEY); ok {
 		session := v.(domain.UserSession)
 		user = session.Id
 	} else {
 		resp.Message = errno.ErrorUserNotLogin.Error()
-		ctx.JSON(http.StatusOK, resp)
+		resp.Failure(ctx)
 		return
 	}
 	// Just for testing purposes 1526448643605794816 [Temp]
-	err = f.logic.UploadFile(fileObj.Filename, fileObj.Size, target, 1526448643605794816, user)
+	err = f.logic.UploadFile(next, fileObj.Filename, fileObj.Size, fileType, target, 1526448643605794816, user)
 	if err != nil {
 		resp.Message = err.Error()
-		ctx.JSON(http.StatusOK, resp)
-		return
+	} else {
+		resp.Code = 0
+		resp.Message = errno.UploadFileSuccess
 	}
-	resp.Code = 0
-	resp.Message = errno.UploadSuccess
-	ctx.JSON(http.StatusOK, resp)
+	resp.Success(ctx)
 }
 
 // DownloadLocal
@@ -127,6 +150,38 @@ func (f FileController) DownloadLocal(ctx *gin.Context) {
 	path := f.upload
 	filename := ctx.Query("filename")
 	ctx.FileAttachment(path+filename, filename)
+}
+
+// DeleteLocal
+// @Summary DeleteLocal File
+// @Description DeleteLocal File
+// @Tags File
+// @Accept json
+// @Produce json
+// @Param file_id query
+// @Router /delete [DELETE]
+func (f FileController) DeleteLocal(ctx *gin.Context) {
+	span, _ := opentracing.StartSpanFromContext(ctx.Request.Context(), "FileController-DeleteLocal")
+	next := opentracing.ContextWithSpan(context.Background(), span)
+	defer func() {
+		span.SetTag("FileController", "DeleteLocal")
+		span.Finish()
+	}()
+	params := types.DeleteFileParam{}
+	resp := res.CommonResponse{Code: 1}
+	if ok, valid := param.ShouldBindQuery(ctx, &params); !ok {
+		resp.Message = valid
+		resp.Failure(ctx)
+		return
+	}
+	err := f.logic.DeleteFile(next, params.FileId)
+	if err != nil {
+		resp.Message = err.Error()
+	} else {
+		resp.Code = 0
+		resp.Message = errno.Success
+	}
+	resp.Success(ctx)
 }
 
 // DownloadLocalFileStream

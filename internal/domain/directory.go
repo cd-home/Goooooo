@@ -6,6 +6,7 @@ type DirectoryLogicFace interface {
 	CreateDirectory(ctx context.Context, name string, dType string, level uint8, index uint8, father *uint64) error
 	ListDirectory(ctx context.Context, level uint8, directory_id *uint64) []*DirectoryVO
 	RenameDirectory(ctx context.Context, directory_id uint64, name string) *DirectoryVO
+	MoveDirectory(ctx context.Context, directory_id uint64, father uint64) error
 }
 
 type DirectoryRepositoryFace interface {
