@@ -12,7 +12,7 @@ import (
 	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/tracer"
 	"github.com/GodYao1995/Goooooo/internal/pkg/res"
 	"github.com/GodYao1995/Goooooo/internal/pkg/session"
-	"github.com/GodYao1995/Goooooo/pkg/xhttp/param"
+	"github.com/GodYao1995/Goooooo/pkg/xhttp"
 	"github.com/GodYao1995/Goooooo/pkg/xtracer"
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
@@ -73,7 +73,7 @@ func (r RoleController) CreateRole(ctx *gin.Context) {
 	}()
 	params := types.CreateRoleParam{}
 	resp := res.CommonResponse{Code: 1}
-	if ok, valid := param.ShouldBindJSON(ctx, &params); !ok {
+	if ok, valid := xhttp.ShouldBindJSON(ctx, &params); !ok {
 		resp.Message = valid
 		resp.Failure(ctx)
 		return
@@ -107,7 +107,7 @@ func (r RoleController) DeleteRole(ctx *gin.Context) {
 	}()
 	params := types.DeleteRoleParam{}
 	resp := res.CommonResponse{Code: 1}
-	if ok, valid := param.ShouldBindQuery(ctx, &params); !ok {
+	if ok, valid := xhttp.ShouldBindQuery(ctx, &params); !ok {
 		resp.Message = valid
 		resp.Failure(ctx)
 		return
@@ -141,7 +141,7 @@ func (r RoleController) UpdateRole(ctx *gin.Context) {
 	}()
 	params := types.RenameRoleParam{}
 	resp := res.CommonResponse{Code: 1}
-	if ok, valid := param.ShouldBindJSON(ctx, &params); !ok {
+	if ok, valid := xhttp.ShouldBindJSON(ctx, &params); !ok {
 		resp.Message = valid
 		resp.Failure(ctx)
 		return
@@ -174,7 +174,7 @@ func (r RoleController) ListRole(ctx *gin.Context) {
 	}()
 	params := types.ListRoleParam{}
 	resp := res.CommonResponse{Code: 1}
-	if ok, valid := param.ShouldBind(ctx, &params); !ok {
+	if ok, valid := xhttp.ShouldBind(ctx, &params); !ok {
 		resp.Message = valid
 		resp.Failure(ctx)
 		return
@@ -214,7 +214,7 @@ func (r RoleController) MoveRole(ctx *gin.Context) {
 	}()
 	resp := res.CommonResponse{Code: 1}
 	params := types.MoveRoleParam{}
-	if ok, valid := param.ShouldBindJSON(ctx, &params); !ok {
+	if ok, valid := xhttp.ShouldBindJSON(ctx, &params); !ok {
 		resp.Message = valid
 		resp.Failure(ctx)
 		return

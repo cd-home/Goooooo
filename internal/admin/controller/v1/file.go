@@ -18,7 +18,7 @@ import (
 	"github.com/GodYao1995/Goooooo/internal/pkg/res"
 	"github.com/GodYao1995/Goooooo/internal/pkg/session"
 	"github.com/GodYao1995/Goooooo/pkg/tools"
-	"github.com/GodYao1995/Goooooo/pkg/xhttp/param"
+	"github.com/GodYao1995/Goooooo/pkg/xhttp"
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/opentracing/opentracing-go"
@@ -169,7 +169,7 @@ func (f FileController) DeleteLocal(ctx *gin.Context) {
 	}()
 	params := types.DeleteFileParam{}
 	resp := res.CommonResponse{Code: 1}
-	if ok, valid := param.ShouldBindQuery(ctx, &params); !ok {
+	if ok, valid := xhttp.ShouldBindQuery(ctx, &params); !ok {
 		resp.Message = valid
 		resp.Failure(ctx)
 		return

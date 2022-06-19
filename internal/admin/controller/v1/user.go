@@ -12,7 +12,7 @@ import (
 	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/tracer"
 	"github.com/GodYao1995/Goooooo/internal/pkg/res"
 	"github.com/GodYao1995/Goooooo/internal/pkg/session"
-	"github.com/GodYao1995/Goooooo/pkg/xhttp/param"
+	"github.com/GodYao1995/Goooooo/pkg/xhttp"
 	"github.com/GodYao1995/Goooooo/pkg/xtracer"
 	"github.com/gin-gonic/gin"
 	"github.com/opentracing/opentracing-go"
@@ -70,7 +70,7 @@ func (u UserController) Login(ctx *gin.Context) {
 	}()
 	params := types.LoginParam{}
 	resp := res.CommonResponse{Code: 1}
-	if ok, valid := param.ShouldBindJSON(ctx, &params); !ok {
+	if ok, valid := xhttp.ShouldBindJSON(ctx, &params); !ok {
 		resp.Message = valid
 		resp.Failure(ctx)
 		return
@@ -105,7 +105,7 @@ func (user UserController) Register(ctx *gin.Context) {
 	}()
 	params := types.RegisterParam{}
 	resp := res.CommonResponse{Code: 1}
-	if ok, valid := param.ShouldBindJSON(ctx, &params); !ok {
+	if ok, valid := xhttp.ShouldBindJSON(ctx, &params); !ok {
 		resp.Message = valid
 		resp.Failure(ctx)
 		return
@@ -197,7 +197,7 @@ func (u UserController) ModifyPassword(ctx *gin.Context) {
 	}()
 	params := types.ModifyPasswordParam{}
 	resp := res.CommonResponse{Code: 1}
-	if ok, valid := param.ShouldBindJSON(ctx, &params); !ok {
+	if ok, valid := xhttp.ShouldBindJSON(ctx, &params); !ok {
 		resp.Message = valid
 		span.LogKV("bind err", valid)
 		resp.Failure(ctx)

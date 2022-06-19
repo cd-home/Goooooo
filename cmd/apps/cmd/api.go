@@ -4,7 +4,7 @@ import (
 	"github.com/GodYao1995/Goooooo/internal/api/controller"
 	"github.com/GodYao1995/Goooooo/pkg/casbin"
 	"github.com/GodYao1995/Goooooo/pkg/db"
-	"github.com/GodYao1995/Goooooo/pkg/xhttp/server"
+	"github.com/GodYao1995/Goooooo/pkg/xhttp"
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxevent"
 )
@@ -18,7 +18,7 @@ func injectApi() fx.Option {
 		// Provide
 		configModule,
 		db.Module,
-		server.Module,
+		xhttp.Module,
 		casbin.Module,
 		// Invoke
 		controller.Module,
