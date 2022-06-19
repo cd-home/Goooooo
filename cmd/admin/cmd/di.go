@@ -12,7 +12,7 @@ import (
 	"github.com/GodYao1995/Goooooo/pkg/db"
 	"github.com/GodYao1995/Goooooo/pkg/logger"
 	"github.com/GodYao1995/Goooooo/pkg/xes"
-	"github.com/GodYao1995/Goooooo/pkg/xhttp/server"
+	"github.com/GodYao1995/Goooooo/pkg/xhttp"
 	xjob "github.com/GodYao1995/Goooooo/pkg/xjob"
 	"github.com/GodYao1995/Goooooo/pkg/xtracer"
 	"go.uber.org/fx"
@@ -31,7 +31,7 @@ func inject() fx.Option {
 		db.Module,
 		cache.Module,
 		session.Module,
-		server.Module,
+		xhttp.Module,
 		version.Module,
 		casbin.Module,
 		xes.Module,

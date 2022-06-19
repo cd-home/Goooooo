@@ -12,7 +12,7 @@ import (
 	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/permission"
 	"github.com/GodYao1995/Goooooo/internal/pkg/res"
 	"github.com/GodYao1995/Goooooo/internal/pkg/session"
-	"github.com/GodYao1995/Goooooo/pkg/xhttp/param"
+	"github.com/GodYao1995/Goooooo/pkg/xhttp"
 	"github.com/casbin/casbin/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/opentracing/opentracing-go"
@@ -51,7 +51,7 @@ func NewDirectoryController(apiV1 *version.APIV1, log *zap.Logger,
 func (d DirectoryController) CreateDirectory(ctx *gin.Context) {
 	params := types.CreateDirectoryParam{}
 	resp := res.CommonResponse{Code: 1}
-	if ok, valid := param.ShouldBindJSON(ctx, &params); !ok {
+	if ok, valid := xhttp.ShouldBindJSON(ctx, &params); !ok {
 		resp.Message = valid
 		resp.Failure(ctx)
 		return
@@ -80,7 +80,7 @@ func (d DirectoryController) CreateDirectory(ctx *gin.Context) {
 func (d DirectoryController) ListDirectory(ctx *gin.Context) {
 	params := types.ListDirectoryParam{}
 	resp := res.CommonResponse{Code: 1}
-	if ok, valid := param.ShouldBind(ctx, &params); !ok {
+	if ok, valid := xhttp.ShouldBind(ctx, &params); !ok {
 		resp.Message = valid
 		resp.Failure(ctx)
 		return
@@ -101,7 +101,7 @@ func (d DirectoryController) ListDirectory(ctx *gin.Context) {
 func (d DirectoryController) RenameDirectory(ctx *gin.Context) {
 	params := types.RenameDirectoryParam{}
 	resp := res.CommonResponse{Code: 1}
-	if ok, valid := param.ShouldBindJSON(ctx, &params); !ok {
+	if ok, valid := xhttp.ShouldBindJSON(ctx, &params); !ok {
 		resp.Message = valid
 		resp.Failure(ctx)
 	}
@@ -127,7 +127,7 @@ func (d DirectoryController) DeleteDirectory(ctx *gin.Context) {
 	// TODO: delete directory
 	params := types.ListDirectoryParam{}
 	resp := res.CommonResponse{Code: 1}
-	if ok, valid := param.ShouldBindQuery(ctx, &params); !ok {
+	if ok, valid := xhttp.ShouldBindQuery(ctx, &params); !ok {
 		resp.Message = valid
 		resp.Failure(ctx)
 		return
@@ -154,7 +154,7 @@ func (d DirectoryController) MoveDirectory(ctx *gin.Context) {
 	}()
 	params := types.MoveDirectoryParam{}
 	resp := res.CommonResponse{Code: 1}
-	if ok, valid := param.ShouldBind(ctx, &params); !ok {
+	if ok, valid := xhttp.ShouldBind(ctx, &params); !ok {
 		resp.Message = valid
 		resp.Failure(ctx)
 		return
