@@ -12,16 +12,17 @@ var (
 
 // Response Message
 const (
-	Success               = "成功"
-	Failure               = "失败"
-	LoginSuccess          = "登录成功"
-	LogOutSuccess         = "登出成功"
-	RegisterSuccess       = "注册成功"
-	ModifyPasswordSuccess = "修改密码成功, 请重新登录"
-	UploadFileSuccess     = "文件上传成功"
-	DeleteFileSuccess     = "文件删除成功"
-	NoPermission          = "无操作权限"
-	RoleCreateSuccess     = "角色创建成功"
+	Success                 = "成功"
+	Failure                 = "失败"
+	LoginSuccess            = "登录成功"
+	LogOutSuccess           = "登出成功"
+	RegisterSuccess         = "注册成功"
+	ModifyPasswordSuccess   = "修改密码成功, 请重新登录"
+	UploadFileSuccess       = "文件上传成功"
+	DeleteFileSuccess       = "文件删除成功"
+	NoPermission            = "无操作权限"
+	RoleCreateSuccess       = "角色创建成功"
+	CreatePermissionSuccess = "权限设置成功"
 )
 
 // API Error
