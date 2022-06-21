@@ -25,11 +25,7 @@ type RoleController struct {
 	log   *zap.Logger
 }
 
-func NewRoleController(
-	apiV1 *version.APIV1,
-	log *zap.Logger,
-	logic domain.RoleLogicFace,
-	store *session.RedisStore,
+func NewRoleController(apiV1 *version.APIV1, log *zap.Logger, logic domain.RoleLogicFace, store *session.RedisStore,
 	perm *casbin.Enforcer, xtracer *xtracer.XTracer) {
 	ctl := &RoleController{
 		logic: logic,
