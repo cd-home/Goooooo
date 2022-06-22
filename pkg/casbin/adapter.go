@@ -2,7 +2,6 @@ package casbin
 
 import (
 	"bytes"
-	"log"
 	"strconv"
 
 	"github.com/casbin/casbin/v2/model"
@@ -74,13 +73,13 @@ func (adapter *Adapter) SavePolicy(model model.Model) (err error) {
 	argsG := make([]*_CasbinRule, 0, 32)
 	for ptype, ast := range model["p"] {
 		for _, rule := range ast.Policy {
-			arg := _GetStructArgs(ptype, rule)
+			arg := _GetStructArg(ptype, rule)
 			argsP = append(argsP, arg)
 		}
 	}
 	for ptype, ast := range model["g"] {
 		for _, rule := range ast.Policy {
-			arg := _GetStructArgs(ptype, rule)
+			arg := _GetStructArg(ptype, rule)
 			argsG = append(argsG, arg)
 		}
 	}
@@ -131,12 +130,11 @@ func _GetArgs(ptype string, rule []string) []interface{} {
 	return args
 }
 
-func _GetStructArgs(ptype string, rule []string) *_CasbinRule {
+func _GetStructArg(ptype string, rule []string) *_CasbinRule {
 	arg := &_CasbinRule{}
 	arg.PType = ptype
 	arg.V0 = rule[0]
 	arg.V1 = rule[1]
-	log.Println(len(rule))
 	switch len(rule) {
 	case 3:
 		arg.V2 = rule[2]
@@ -154,4 +152,55 @@ func _GetStructArgs(ptype string, rule []string) *_CasbinRule {
 		arg.V5 = rule[5]
 	}
 	return arg
+}
+
+func _GetStructArgs(ptype string, rules [][]string) []*_CasbinRule {
+	args := make([]*_CasbinRule, 0)
+	for _, rule := range rules {
+		args = append(args, _GetStructArg(ptype, rule))
+	}
+	return args
+}
+
+func (adapter *Adapter) AddPolicies(sec string, ptype string, rules [][]string) error {
+	_rules := _GetStructArgs(ptype, rules)
+	_, err := adapter.db.NamedExec(_InsertNamePolicySQL, _rules)
+	return err
+}
+
+func (adapter *Adapter) RemovePolicies(sec string, ptype string, rules [][]string) (err error) {
+	var tx *sqlx.Tx
+	defer func() {
+		if e := recover(); e != nil {
+			err = e.(error)
+			tx.Rollback()
+		}
+		if err != nil {
+			tx.Rollback()
+		} else {
+			tx.Commit()
+		}
+	}()
+	tx, err = adapter.db.Beginx()
+	if err != nil {
+		return
+	}
+	var sqlBuffer bytes.Buffer
+	sqlBuffer.Grow(64)
+	sqlBuffer.WriteString(_DeletePolicyRecordSQL)
+	args := make([]interface{}, 0, 4)
+	args = append(args, ptype)
+	for _, rule := range rules {
+		for i, arg := range rule {
+			if arg != "" {
+				sqlBuffer.WriteString(" AND v")
+				sqlBuffer.WriteString(strconv.Itoa(i))
+				sqlBuffer.WriteString(" = ?")
+				args = append(args, arg)
+			}
+		}
+		query := adapter.db.Rebind(sqlBuffer.String())
+		tx.MustExec(query, args...)
+	}
+	return
 }
