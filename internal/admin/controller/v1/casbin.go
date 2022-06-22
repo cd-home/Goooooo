@@ -45,24 +45,21 @@ func (c CasbinController) CreatePermission(ctx *gin.Context) {
 		resp.Failure(ctx)
 		return
 	}
-	if params.Ptype == "p" {
+	if len(params.P) > 0 {
 		// 用户权限
-		if ok, err := c.perm.AddPolicy(params.Subject, params.Object, params.Action, params.Version); !ok {
+		if ok, err := c.perm.AddPolicy(params.P); !ok && err != nil {
 			resp.Message = err.Error()
 			resp.Failure(ctx)
 			return
 		}
-	} else if params.Ptype == "g" {
+	}
+	if len(params.G) > 0 {
 		// 角色权限
-		if ok, err := c.perm.AddGroupingPolicy(params.Subject, params.Object, params.Action, params.Version); !ok {
+		if ok, err := c.perm.AddGroupingPolicy(params.G); !ok && err != nil {
 			resp.Message = err.Error()
 			resp.Failure(ctx)
 			return
 		}
-	} else {
-		resp.Message = errno.ErrorParamsParse
-		resp.Failure(ctx)
-		return
 	}
 	resp.Code = 0
 	resp.Message = errno.CreatePermissionSuccess
@@ -89,7 +86,7 @@ func (c CasbinController) CreatePermissions(ctx *gin.Context) {
 	}
 	if len(params.P) > 0 {
 		// 用户权限
-		if ok, err := c.perm.AddPolicies(params.P); !ok {
+		if ok, err := c.perm.AddPolicies(params.P); !ok && err != nil {
 			resp.Message = err.Error()
 			resp.Failure(ctx)
 			return
@@ -97,7 +94,7 @@ func (c CasbinController) CreatePermissions(ctx *gin.Context) {
 	}
 	if len(params.G) > 0 {
 		// 角色权限
-		if ok, err := c.perm.AddGroupingPolicies(params.G); !ok {
+		if ok, err := c.perm.AddGroupingPolicies(params.G); !ok && err != nil {
 			c.perm.RemovePolicies(params.P)
 			resp.Message = err.Error()
 			resp.Failure(ctx)
