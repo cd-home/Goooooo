@@ -7,3 +7,8 @@ type CreatePermissionParam struct {
 	Action  string `json:"action" binding:"required"`
 	Version string `json:"version" binding:"required"`
 }
+
+type CreatePermissionsParam struct {
+	P [][]string `json:"p"`
+	G [][]string `json:"g"`
+}
