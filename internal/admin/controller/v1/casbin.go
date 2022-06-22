@@ -69,19 +69,42 @@ func (c CasbinController) CreatePermission(ctx *gin.Context) {
 	resp.Success(ctx)
 }
 
-// CreatePermission
-// @Summary Create Permission
-// @Description Create Permission
+// CreatePermissions
+// @Summary Create Permissions
+// @Description Create Permissions
 // @Tags Permission
 // @Accept  json
 // @Produce json
 // @Param
 // @Success 0 {object} types.CommonResponse {"code":1,"data":null,"msg":"Success"}
 // @Failure 1 {object} types.CommonResponse {"code":1,"data":null,"msg":"Error"}
-// @Router /create [POST]
+// @Router /creates [POST]
 func (c CasbinController) CreatePermissions(ctx *gin.Context) {
-	// 用户权限
-	c.perm.AddPolicy()
-	// 角色权限
-	c.perm.AddGroupingPolicy()
+	resp := res.CommonResponse{Code: 1}
+	params := types.CreatePermissionsParam{}
+	if ok, valid := xhttp.ShouldBindJSON(ctx, &params); !ok {
+		resp.Message = valid
+		resp.Failure(ctx)
+		return
+	}
+	if len(params.P) > 0 {
+		// 用户权限
+		if ok, err := c.perm.AddPolicies(params.P); !ok {
+			resp.Message = err.Error()
+			resp.Failure(ctx)
+			return
+		}
+	}
+	if len(params.G) > 0 {
+		// 角色权限
+		if ok, err := c.perm.AddGroupingPolicies(params.G); !ok {
+			c.perm.RemovePolicies(params.P)
+			resp.Message = err.Error()
+			resp.Failure(ctx)
+			return
+		}
+	}
+	resp.Code = 0
+	resp.Message = errno.CreatePermissionSuccess
+	resp.Success(ctx)
 }
