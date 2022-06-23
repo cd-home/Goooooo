@@ -11,7 +11,7 @@ app_os = $(app)_$(os)
 
 build:
 	@echo "Build $(app)"
-	cd cmd/$(app) && CGO_ENABLED=0 GOOS=$(os) GOARCH=${arch} go build -gcflags="-m -l" -ldflags="-w -s" -o=../../bin/$(app_os)
+	cd cmd/$(app) && CGO_ENABLED=0 GOOS=$(os) GOARCH=$(arch) go build -gcflags="-m -l" -ldflags="-w -s" -o=../../bin/$(app_os)
 
 run:
 	@echo "Build $(app) and Run"
