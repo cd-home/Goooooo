@@ -22,7 +22,8 @@ body {
 }
 
 #app {
-  background-image: url("@/assets/loginbg.jpeg");
+  /* background-image: url("@/assets/loginbg.jpeg"); */
+  background-color: #2b353a;
   background-size: cover;
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
