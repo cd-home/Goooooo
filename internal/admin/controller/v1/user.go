@@ -96,7 +96,7 @@ func (u UserController) Login(ctx *gin.Context) {
 // @Success 0 {object} types.CommonResponse {"code":1,"data":null,"msg":"Success"}
 // @Failure 1 {object} types.CommonResponse {"code":0,"data":null,"msg":"Error"}
 // @Router /register [POST]
-func (user UserController) Register(ctx *gin.Context) {
+func (u UserController) Register(ctx *gin.Context) {
 	span, _ := opentracing.StartSpanFromContext(ctx.Request.Context(), "UserController-Register")
 	next := opentracing.ContextWithSpan(context.Background(), span)
 	defer func() {
@@ -110,7 +110,7 @@ func (user UserController) Register(ctx *gin.Context) {
 		resp.Failure(ctx)
 		return
 	}
-	if err := user.logic.Register(next, params.Account, params.Password); err != nil {
+	if err := u.logic.Register(next, params.Account, params.Password); err != nil {
 		resp.Message = err.Error()
 	} else {
 		resp.Code = 0

@@ -15,35 +15,35 @@ func NewSysController(apiV1 *version.APIV1, db *sqlx.DB) {
 	ctl := &SysController{db: db}
 	health := v1.Group("/health")
 	{
-		health.GET("/sys", ctl.HealthCheck)
-		health.GET("/db", ctl.DBStats)
+		health.GET("/sys", ctl.SysCheck)
+		health.GET("/db", ctl.DBCheck)
 	}
 }
 
-// DBStats
-// @Summary Sys DBStats
-// @Description Sys DBStats
+// SysCheck
+// @Summary Sys Check
+// @Description Sys Check
+// @Tags Sys
+// @Accept  json
+// @Produce json
+// @Router /sys [GET]
+func (u SysController) SysCheck(ctx *gin.Context) {
+	ctx.JSON(200, map[string]interface{}{
+		"message": "ok",
+	})
+}
+
+// DBCheck
+// @Summary DB Check
+// @Description DbCheck
 // @Tags Sys
 // @Accept  json
 // @Produce json
 // @Router /db [GET]
-func (u SysController) DBStats(ctx *gin.Context) {
-	stats := u.db.Stats()
+func (sys SysController) DBCheck(ctx *gin.Context) {
+	stats := sys.db.Stats()
 	ctx.JSON(200, map[string]interface{}{
 		"message": "ok",
 		"stats":   stats,
-	})
-}
-
-// HealthyCheck
-// @Summary Sys HealthyCheck
-// @Description Sys HealthyCheck
-// @Tags Sys
-// @Accept  json
-// @Produce json
-// @Router /health [GET]
-func (u SysController) HealthCheck(ctx *gin.Context) {
-	ctx.JSON(200, map[string]interface{}{
-		"message": "ok",
 	})
 }
