@@ -27,10 +27,6 @@ upx:
 	./$(app)_$(mode) server --mode=$(mode) --app=$(app) --config=$(config)
 
 
-shbuild:
-	pwd && cd ./scripts/ && chmod +x build.sh && ./build.sh $(app) $(os) $(app_os)
-
-
 docker:
 	pwd && chmod +x ./scripts/docker.sh && ./scripts/docker.sh $(app) $(mode)
 
