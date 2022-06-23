@@ -2,6 +2,7 @@
 
 # Default Dev Env
 os = darwin
+arch=adm64
 mode = dev
 config= ../configs/
 
@@ -10,7 +11,7 @@ app_os = $(app)_$(os)
 
 build:
 	@echo "Build $(app)"
-	cd cmd/$(app) && CGO_ENABLED=0 GOOS=$(os) GOARCH=amd64 go build -gcflags="-m -l" -ldflags="-w -s" -o=../../bin/$(app_os)
+	cd cmd/$(app) && CGO_ENABLED=0 GOOS=$(os) GOARCH=${arch} go build -gcflags="-m -l" -ldflags="-w -s" -o=../../bin/$(app_os)
 
 run:
 	@echo "Build $(app) and Run"
