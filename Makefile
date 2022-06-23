@@ -1,4 +1,4 @@
-.PHONY: build run upx test shbuild docker swag db
+.PHONY: build run upx test shbuild docker swag db buildx
 
 # Default Dev Env
 config= ../configs/
@@ -20,7 +20,7 @@ run:
 upx:
 	@echo 'Build $(app) command:'
 	cd cmd/$(app) && \
-	CGO_ENABLED=0 GOOS=$(os) GOARCH=amd64 go build -gcflags="-m -l" -ldflags="-w -s" -o=../../bin/${app}_${mode} && \
+	CGO_ENABLED=0 go build -gcflags="-m -l" -ldflags="-w -s" -o=../../bin/${app}_${mode} && \
     cd ../../bin && \
 	upx -$(level) ${app}_${mode} -o $(app)_upx_${mode} && ls -lh  && \
 	./$(app)_$(mode) server --mode=$(mode) --app=$(app) --config=$(config)
