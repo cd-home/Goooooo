@@ -8,8 +8,8 @@ Gooooooo
 
 ~~~makefile
 make run   app=admin mode=dev
-make build app=admin os=linux
-make upx   app=admin os=mac level=2
+make build app=admin
+make upx   app=admin mode=dev level=2
 ~~~
 
 ### DEBUG
