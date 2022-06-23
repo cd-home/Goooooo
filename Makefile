@@ -11,7 +11,7 @@ app_os = $(app)_$(os)
 
 build:
 	@echo "Build $(app)"
-	cd cmd/$(app) && CGO_ENABLED=0 GOOS=$(os) GOARCH=${arch} go build -gcflags="-m -l" -ldflags="-w -s" -o=../../bin/$(app_os)
+	cd cmd/$(app) && CGO_ENABLED=0 GOOS=$(os) GOARCH=$(arch) go build -gcflags="-m -l" -ldflags="-w -s" -o=../../bin/$(app_os)
 
 run:
 	@echo "Build $(app) and Run"
@@ -25,10 +25,6 @@ upx:
     cd ../../bin && \
 	upx -$(level) ${app}_${mode} -o $(app)_upx_${mode} && ls -lh  && \
 	./$(app)_$(mode) server --mode=$(mode) --app=$(app) --config=$(config)
-
-
-shbuild:
-	pwd && cd ./scripts/ && chmod +x build.sh && ./build.sh $(app) $(os) $(app_os)
 
 
 docker:

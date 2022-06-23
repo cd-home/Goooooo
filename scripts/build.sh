@@ -1,1 +1,2 @@
-cd ./cmd/$1 && CGO_ENABLED=0 GOOS=$2 GOARCH=$3 go build -o=../../bin/$4 .
+echo "Build Stage"
+go build -v -o=./bin/$1_build  ./cmd/$1/main.go
