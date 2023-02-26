@@ -3,7 +3,7 @@ package tracer
 import (
 	"context"
 
-	"github.com/GodYao1995/Goooooo/pkg/xtracer"
+	"github.com/cd-home/Goooooo/pkg/xtracer"
 	"github.com/gin-gonic/gin"
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"

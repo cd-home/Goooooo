@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/GodYao1995/Goooooo/internal/domain"
+	"github.com/cd-home/Goooooo/internal/domain"
 	"github.com/jmoiron/sqlx"
 	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
@@ -195,7 +195,7 @@ func (repo RoleRepository) Move(ctx context.Context, roleId uint64, father uint6
 	tx, err = repo.db.Beginx()
 	if err != nil {
 		repo.log.WithOptions(local).Warn(err.Error())
-		return 
+		return
 	}
 	// Current Role_id`s All Childs
 	relations := make([]*domain.RoleRelationPO, 0)
@@ -205,7 +205,7 @@ func (repo RoleRepository) Move(ctx context.Context, roleId uint64, father uint6
 		FROM role_relation WHERE ancestor = ? AND delete_at is NULL AND distance != 0`, roleId)
 	if err != nil {
 		repo.log.WithOptions(local).Warn(err.Error())
-		return 
+		return
 	}
 	dests := make([]uint64, 0)
 	for _, r := range relations {
@@ -271,7 +271,7 @@ func (repo RoleRepository) Move(ctx context.Context, roleId uint64, father uint6
 					Ancestor:   relation.Ancestor,
 					Descendant: child.Descendant,
 					// 祖先的距离 + 本身 roleId 与 孩子的距离 == 祖先到所有孩子的距离
-					Distance:   relation.Distance + child.Distance,
+					Distance: relation.Distance + child.Distance,
 				})
 			}
 		}
@@ -298,8 +298,8 @@ func (repo RoleRepository) Move(ctx context.Context, roleId uint64, father uint6
 		if err != nil {
 			repo.log.Sugar().Debug(childsRelations)
 			repo.log.WithOptions(local).Warn(err.Error())
-			return 
+			return
 		}
 	}
-	return 
+	return
 }

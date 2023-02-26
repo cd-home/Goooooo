@@ -1,10 +1,10 @@
 package cmd
 
 import (
-	"github.com/GodYao1995/Goooooo/internal/api/controller"
-	"github.com/GodYao1995/Goooooo/pkg/casbin"
-	"github.com/GodYao1995/Goooooo/pkg/db"
-	"github.com/GodYao1995/Goooooo/pkg/xhttp"
+	"github.com/cd-home/Goooooo/internal/api/controller"
+	"github.com/cd-home/Goooooo/pkg/casbin"
+	"github.com/cd-home/Goooooo/pkg/db"
+	"github.com/cd-home/Goooooo/pkg/xhttp"
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxevent"
 )

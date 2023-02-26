@@ -5,11 +5,11 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/GodYao1995/Goooooo/internal/domain"
-	"github.com/GodYao1995/Goooooo/internal/pkg/consts"
-	"github.com/GodYao1995/Goooooo/internal/pkg/errno"
-	"github.com/GodYao1995/Goooooo/internal/pkg/res"
-	"github.com/GodYao1995/Goooooo/internal/pkg/session"
+	"github.com/cd-home/Goooooo/internal/domain"
+	"github.com/cd-home/Goooooo/internal/pkg/consts"
+	"github.com/cd-home/Goooooo/internal/pkg/errno"
+	"github.com/cd-home/Goooooo/internal/pkg/res"
+	"github.com/cd-home/Goooooo/internal/pkg/session"
 	"github.com/gin-gonic/gin"
 )
 

@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/GodYao1995/Goooooo/internal/domain"
-	"github.com/GodYao1995/Goooooo/internal/pkg/errno"
+	"github.com/cd-home/Goooooo/internal/domain"
+	"github.com/cd-home/Goooooo/internal/pkg/errno"
 	"github.com/jmoiron/sqlx"
 	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"

@@ -1,15 +1,15 @@
 package cmd
 
 import (
-	esrepo "github.com/GodYao1995/Goooooo/internal/admin/es"
-	"github.com/GodYao1995/Goooooo/internal/admin/repository"
-	job "github.com/GodYao1995/Goooooo/internal/job"
-	tasks "github.com/GodYao1995/Goooooo/internal/job/tasks"
-	"github.com/GodYao1995/Goooooo/pkg/db"
-	"github.com/GodYao1995/Goooooo/pkg/logger"
-	"github.com/GodYao1995/Goooooo/pkg/xes"
-	xjob "github.com/GodYao1995/Goooooo/pkg/xjob"
 	"github.com/RichardKnop/machinery/v2"
+	esrepo "github.com/cd-home/Goooooo/internal/admin/es"
+	"github.com/cd-home/Goooooo/internal/admin/repository"
+	job "github.com/cd-home/Goooooo/internal/job"
+	tasks "github.com/cd-home/Goooooo/internal/job/tasks"
+	"github.com/cd-home/Goooooo/pkg/db"
+	"github.com/cd-home/Goooooo/pkg/logger"
+	"github.com/cd-home/Goooooo/pkg/xes"
+	xjob "github.com/cd-home/Goooooo/pkg/xjob"
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxevent"
 )

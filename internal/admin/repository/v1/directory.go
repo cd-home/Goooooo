@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/GodYao1995/Goooooo/internal/domain"
-	"github.com/GodYao1995/Goooooo/pkg/tools"
+	"github.com/cd-home/Goooooo/internal/domain"
+	"github.com/cd-home/Goooooo/pkg/tools"
 	"github.com/jmoiron/sqlx"
 	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"

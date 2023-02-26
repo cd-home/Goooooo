@@ -1,8 +1,8 @@
 package main
 
 import (
-	_ "github.com/GodYao1995/Goooooo/api/admin"
-	"github.com/GodYao1995/Goooooo/cmd/admin/cmd"
+	_ "github.com/cd-home/Goooooo/api/admin"
+	"github.com/cd-home/Goooooo/cmd/admin/cmd"
 )
 
 // InitRouter @title Goooooo-Admin

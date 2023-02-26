@@ -1,4 +1,4 @@
-module github.com/GodYao1995/Goooooo
+module github.com/cd-home/Goooooo
 
 go 1.17
 

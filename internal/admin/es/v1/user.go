@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/GodYao1995/Goooooo/internal/domain"
+	"github.com/cd-home/Goooooo/internal/domain"
 	"github.com/olivere/elastic/v7"
 	"go.uber.org/zap"
 )

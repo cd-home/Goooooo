@@ -5,8 +5,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/GodYao1995/Goooooo/internal/pkg/errno"
-	"github.com/GodYao1995/Goooooo/pkg/config"
+	"github.com/cd-home/Goooooo/internal/pkg/errno"
+	"github.com/cd-home/Goooooo/pkg/config"
 	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"

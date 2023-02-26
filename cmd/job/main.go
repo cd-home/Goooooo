@@ -1,6 +1,6 @@
 package main
 
-import "github.com/GodYao1995/Goooooo/cmd/job/cmd"
+import "github.com/cd-home/Goooooo/cmd/job/cmd"
 
 func main() {
 	cmd.Exeute()

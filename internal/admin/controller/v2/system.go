@@ -1,9 +1,9 @@
 package v2
 
 import (
-	"github.com/GodYao1995/Goooooo/internal/admin/version"
-	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/permission"
 	"github.com/casbin/casbin/v2"
+	"github.com/cd-home/Goooooo/internal/admin/version"
+	"github.com/cd-home/Goooooo/internal/pkg/middleware/permission"
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
 )

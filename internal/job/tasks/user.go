@@ -3,8 +3,8 @@ package job
 import (
 	"context"
 
-	"github.com/GodYao1995/Goooooo/internal/domain"
-	"github.com/GodYao1995/Goooooo/pkg/tools"
+	"github.com/cd-home/Goooooo/internal/domain"
+	"github.com/cd-home/Goooooo/pkg/tools"
 )
 
 type UserESTask struct {

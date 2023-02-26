@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/GodYao1995/Goooooo/pkg/config"
+	"github.com/cd-home/Goooooo/pkg/config"
 	"github.com/spf13/viper"
 	"go.uber.org/fx"
 )

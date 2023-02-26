@@ -1,16 +1,16 @@
 package v1
 
 import (
-	"github.com/GodYao1995/Goooooo/internal/admin/types"
-	"github.com/GodYao1995/Goooooo/internal/admin/version"
-	"github.com/GodYao1995/Goooooo/internal/pkg/errno"
-	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/auth"
-	"github.com/GodYao1995/Goooooo/internal/pkg/middleware/permission"
-	"github.com/GodYao1995/Goooooo/internal/pkg/res"
-	"github.com/GodYao1995/Goooooo/internal/pkg/session"
-	"github.com/GodYao1995/Goooooo/pkg/xhttp"
-	"github.com/GodYao1995/Goooooo/pkg/xtracer"
 	"github.com/casbin/casbin/v2"
+	"github.com/cd-home/Goooooo/internal/admin/types"
+	"github.com/cd-home/Goooooo/internal/admin/version"
+	"github.com/cd-home/Goooooo/internal/pkg/errno"
+	"github.com/cd-home/Goooooo/internal/pkg/middleware/auth"
+	"github.com/cd-home/Goooooo/internal/pkg/middleware/permission"
+	"github.com/cd-home/Goooooo/internal/pkg/res"
+	"github.com/cd-home/Goooooo/internal/pkg/session"
+	"github.com/cd-home/Goooooo/pkg/xhttp"
+	"github.com/cd-home/Goooooo/pkg/xtracer"
 	"github.com/gin-gonic/gin"
 )
 

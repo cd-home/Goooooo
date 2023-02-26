@@ -3,9 +3,9 @@ package v1
 import (
 	"context"
 
-	"github.com/GodYao1995/Goooooo/internal/admin/version"
 	"github.com/RichardKnop/machinery/v2"
 	"github.com/RichardKnop/machinery/v2/tasks"
+	"github.com/cd-home/Goooooo/internal/admin/version"
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
 )

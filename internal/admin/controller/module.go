@@ -1,8 +1,8 @@
 package controller
 
 import (
-	v1 "github.com/GodYao1995/Goooooo/internal/admin/controller/v1"
-	v2 "github.com/GodYao1995/Goooooo/internal/admin/controller/v2"
+	v1 "github.com/cd-home/Goooooo/internal/admin/controller/v1"
+	v2 "github.com/cd-home/Goooooo/internal/admin/controller/v2"
 	"go.uber.org/fx"
 )
 

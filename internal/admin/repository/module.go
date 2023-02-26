@@ -1,7 +1,7 @@
 package repository
 
 import (
-	v1 "github.com/GodYao1995/Goooooo/internal/admin/repository/v1"
+	v1 "github.com/cd-home/Goooooo/internal/admin/repository/v1"
 	"go.uber.org/fx"
 )
 

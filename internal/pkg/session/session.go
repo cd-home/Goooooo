@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/GodYao1995/Goooooo/internal/pkg/errno"
+	"github.com/cd-home/Goooooo/internal/pkg/errno"
 	"github.com/go-redis/redis/v8"
 	"github.com/gorilla/sessions"
 	"go.uber.org/fx"
